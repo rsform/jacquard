@@ -8,13 +8,7 @@
 /// A sim's constitution and agent configuration. One document per sim.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Agents<'a> {
@@ -27,18 +21,15 @@ pub struct Agents<'a> {
     /// Rich text annotations for description (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Short summary of this sim's constitution, suitable for previews and list views. Rich text annotations may be provided via shortDescriptionFacets.
     #[serde(borrow)]
     pub short_description: jacquard_common::CowStr<'a>,
     /// Rich text annotations for shortDescription (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub short_description_facets:
+        std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Reference to the sim record this constitution belongs to
     #[serde(borrow)]
     pub sim: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -46,7 +37,7 @@ pub struct Agents<'a> {
 
 pub mod agents_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,50 +46,50 @@ pub mod agents_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ShortDescription;
-        type CreatedAt;
         type Sim;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ShortDescription = Unset;
-        type CreatedAt = Unset;
         type Sim = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShortDescription<S> {}
     impl<S: State> State for SetShortDescription<S> {
         type ShortDescription = Set<members::short_description>;
+        type Sim = S::Sim;
         type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = Set<members::created_at>;
-        type Sim = S::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
         type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
         type Sim = Set<members::sim>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ShortDescription = S::ShortDescription;
+        type Sim = S::Sim;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `short_description` field
         pub struct short_description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -155,18 +146,12 @@ where
 
 impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -252,8 +237,8 @@ impl<'a, S> AgentsBuilder<'a, S>
 where
     S: agents_state::State,
     S::ShortDescription: agents_state::IsSet,
-    S::CreatedAt: agents_state::IsSet,
     S::Sim: agents_state::IsSet,
+    S::CreatedAt: agents_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Agents<'a> {
@@ -302,13 +287,7 @@ impl<'a> Agents<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgentsGetRecordOutput<'a> {
@@ -365,9 +344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -381,13 +358,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -413,13 +392,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "short_description",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "short_description",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -427,9 +408,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
     }
 }
 
-fn lexicon_doc_org_simocracy_agents() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_agents() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.agents"),

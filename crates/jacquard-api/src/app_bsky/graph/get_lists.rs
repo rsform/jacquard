@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLists<'a> {
@@ -31,7 +25,7 @@ pub struct GetLists<'a> {
 
 pub mod get_lists_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,10 +106,7 @@ where
 
 impl<'a, S: get_lists_state::State> GetListsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -141,18 +132,12 @@ impl<'a, S: get_lists_state::State> GetListsBuilder<'a, S> {
 
 impl<'a, S: get_lists_state::State> GetListsBuilder<'a, S> {
     /// Set the `purposes` field (optional)
-    pub fn purposes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn purposes(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `purposes` field to an Option value (optional)
-    pub fn maybe_purposes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_purposes(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -176,13 +161,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsOutput<'a> {

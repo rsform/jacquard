@@ -13,13 +13,7 @@ pub mod update_draft;
 /// A draft containing an array of draft posts.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Draft<'a> {
@@ -37,9 +31,8 @@ pub struct Draft<'a> {
     /// Embedding rules for the postgates to be created when this draft is published.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub postgate_embedding_rules: std::option::Option<
-        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
-    >,
+    pub postgate_embedding_rules:
+        std::option::Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
     /// Array of draft posts that compose this draft.
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::draft::DraftPost<'a>>,
@@ -51,7 +44,7 @@ pub struct Draft<'a> {
 
 pub mod draft_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,18 +108,12 @@ impl<'a> DraftBuilder<'a, draft_state::Empty> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `deviceId` field (optional)
-    pub fn device_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn device_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `deviceId` field to an Option value (optional)
-    pub fn maybe_device_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_device_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -134,18 +121,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `deviceName` field (optional)
-    pub fn device_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn device_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `deviceName` field to an Option value (optional)
-    pub fn maybe_device_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_device_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -266,13 +247,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -287,9 +262,7 @@ pub enum DraftThreadgateAllowItem<'a> {
     ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
 }
 
-fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.draft.defs"),
@@ -452,145 +425,139 @@ fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "draftEmbedCaption",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftEmbedCaption"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("content")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "content",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(10000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lang",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Language,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(10000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Language,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "draftEmbedExternal",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftEmbedExternal"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "draftEmbedImage",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: Some(2000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "localRef",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#draftEmbedLocalRef",
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftEmbedImage"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("alt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#draftEmbedLocalRef",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
@@ -633,97 +600,95 @@ fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "draftEmbedRecord",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "record",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftEmbedRecord"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("record"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "com.atproto.repo.strongRef",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "draftEmbedVideo",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: Some(2000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "captions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#draftEmbedCaption",
-                                    ),
-                                }),
-                                min_length: None,
-                                max_length: Some(20usize),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "localRef",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#draftEmbedLocalRef",
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftEmbedVideo"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("alt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("captions"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#draftEmbedCaption",
+                                                ),
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: Some(20usize),
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("localRef"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#draftEmbedLocalRef",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("draftPost"),
@@ -849,103 +814,97 @@ fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("draftView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "View to present drafts data to users.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("draft"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The time the draft was created.",
-                                    ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The time the draft was created.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("draft"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#draft"),
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "draft",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#draft"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "A TID to be used as a draft identifier.",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "A TID to be used as a draft identifier.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The time the draft was last updated.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "updatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The time the draft was last updated.",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("draftWithId"),
@@ -1021,9 +980,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "device_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("device_id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1033,9 +990,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "device_name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("device_name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1045,9 +1000,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "langs",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("langs"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -1070,9 +1023,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("posts"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -1083,9 +1034,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("posts"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -1109,13 +1058,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedCaption<'a> {
@@ -1126,7 +1069,7 @@ pub struct DraftEmbedCaption<'a> {
 
 pub mod draft_embed_caption_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1282,9 +1225,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedCaption<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1296,23 +1237,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedCaption<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedExternal<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod draft_embed_external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1345,9 +1280,7 @@ pub mod draft_embed_external_state {
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedExternalBuilder<'a, S: draft_embed_external_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::UriValue<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1377,7 +1310,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> DraftEmbedExternalBuilder<'a, draft_embed_external_state::SetUri<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         DraftEmbedExternalBuilder {
@@ -1434,13 +1367,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedExternal<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedImage<'a> {
@@ -1453,7 +1380,7 @@ pub struct DraftEmbedImage<'a> {
 
 pub mod draft_embed_image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1593,13 +1520,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedImage<'a> {
                     )
                     .count();
                 if count > 2000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "alt",
-                        ),
-                        max: 2000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
+                            max: 2000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1616,7 +1543,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedImage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedLocalRef<'a> {
@@ -1643,9 +1570,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1656,9 +1581,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1670,13 +1593,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedRecord<'a> {
@@ -1686,7 +1603,7 @@ pub struct DraftEmbedRecord<'a> {
 
 pub mod draft_embed_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1719,9 +1636,8 @@ pub mod draft_embed_record_state {
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedRecordBuilder<'a, S: draft_embed_record_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1808,13 +1724,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedRecord<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedVideo<'a> {
@@ -1823,16 +1733,14 @@ pub struct DraftEmbedVideo<'a> {
     pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub captions: std::option::Option<
-        Vec<crate::app_bsky::draft::DraftEmbedCaption<'a>>,
-    >,
+    pub captions: std::option::Option<Vec<crate::app_bsky::draft::DraftEmbedCaption<'a>>>,
     #[serde(borrow)]
     pub local_ref: crate::app_bsky::draft::DraftEmbedLocalRef<'a>,
 }
 
 pub mod draft_embed_video_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1994,13 +1902,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
                     )
                     .count();
                 if count > 2000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "alt",
-                        ),
-                        max: 2000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
+                            max: 2000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -2008,9 +1916,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "captions",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("captions"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -2030,30 +1936,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftPost<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_externals: std::option::Option<
-        Vec<crate::app_bsky::draft::DraftEmbedExternal<'a>>,
-    >,
+    pub embed_externals: std::option::Option<Vec<crate::app_bsky::draft::DraftEmbedExternal<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_images: std::option::Option<
-        Vec<crate::app_bsky::draft::DraftEmbedImage<'a>>,
-    >,
+    pub embed_images: std::option::Option<Vec<crate::app_bsky::draft::DraftEmbedImage<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_records: std::option::Option<
-        Vec<crate::app_bsky::draft::DraftEmbedRecord<'a>>,
-    >,
+    pub embed_records: std::option::Option<Vec<crate::app_bsky::draft::DraftEmbedRecord<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_videos: std::option::Option<
-        Vec<crate::app_bsky::draft::DraftEmbedVideo<'a>>,
-    >,
+    pub embed_videos: std::option::Option<Vec<crate::app_bsky::draft::DraftEmbedVideo<'a>>>,
     /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -2129,9 +2027,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2146,13 +2042,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -2163,13 +2061,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
 /// View to present drafts data to users.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftView<'a> {
@@ -2185,7 +2077,7 @@ pub struct DraftView<'a> {
 
 pub mod draft_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2193,8 +2085,8 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Id;
+        type CreatedAt;
         type Draft;
         type UpdatedAt;
     }
@@ -2202,26 +2094,26 @@ pub mod draft_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Id = Unset;
+        type CreatedAt = Unset;
         type Draft = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Id = S::Id;
-        type Draft = S::Draft;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type CreatedAt = S::CreatedAt;
         type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
+        type Draft = S::Draft;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
         type Draft = S::Draft;
         type UpdatedAt = S::UpdatedAt;
     }
@@ -2229,8 +2121,8 @@ pub mod draft_view_state {
     pub struct SetDraft<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDraft<S> {}
     impl<S: State> State for SetDraft<S> {
-        type CreatedAt = S::CreatedAt;
         type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
         type Draft = Set<members::draft>;
         type UpdatedAt = S::UpdatedAt;
     }
@@ -2238,18 +2130,18 @@ pub mod draft_view_state {
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type CreatedAt = S::CreatedAt;
         type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
         type Draft = S::Draft;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `draft` field
         pub struct draft(());
         ///Marker type for the `updated_at` field
@@ -2366,8 +2258,8 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::CreatedAt: draft_view_state::IsSet,
     S::Id: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
     S::Draft: draft_view_state::IsSet,
     S::UpdatedAt: draft_view_state::IsSet,
 {
@@ -2419,13 +2311,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
 /// A draft with an identifier, used to store drafts in private storage (stash).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftWithId<'a> {
@@ -2437,7 +2323,7 @@ pub struct DraftWithId<'a> {
 
 pub mod draft_with_id_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2445,37 +2331,37 @@ pub mod draft_with_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Draft;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Draft = S::Draft;
+        type Id = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDraft<S> {}
     impl<S: State> State for SetDraft<S> {
-        type Id = S::Id;
         type Draft = Set<members::draft>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Draft = S::Draft;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2548,8 +2434,8 @@ where
 impl<'a, S> DraftWithIdBuilder<'a, S>
 where
     S: draft_with_id_state::State,
-    S::Id: draft_with_id_state::IsSet,
     S::Draft: draft_with_id_state::IsSet,
+    S::Id: draft_with_id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftWithId<'a> {

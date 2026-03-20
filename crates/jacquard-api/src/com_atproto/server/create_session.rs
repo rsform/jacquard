@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSession<'a> {
@@ -33,13 +33,7 @@ pub struct CreateSession<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSessionOutput<'a> {
@@ -157,9 +151,7 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
         match self {
             CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
             CreateSessionOutputStatus::Suspended => CreateSessionOutputStatus::Suspended,
-            CreateSessionOutputStatus::Deactivated => {
-                CreateSessionOutputStatus::Deactivated
-            }
+            CreateSessionOutputStatus::Deactivated => CreateSessionOutputStatus::Deactivated,
             CreateSessionOutputStatus::Other(v) => {
                 CreateSessionOutputStatus::Other(v.into_static())
             }
@@ -177,7 +169,7 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -222,9 +214,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
     const NSID: &'static str = "com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateSessionResponse;
 }
 
@@ -233,9 +224,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
 pub struct CreateSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateSession<'de>;
     type Response = CreateSessionResponse;
 }

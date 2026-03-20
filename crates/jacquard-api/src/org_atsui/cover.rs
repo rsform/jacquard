@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cover<'a> {
@@ -28,7 +22,7 @@ pub struct Cover<'a> {
 
 pub mod cover_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,10 +90,7 @@ impl<'a, S: cover_state::State> CoverBuilder<'a, S> {
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -155,13 +146,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CoverOutput<'a> {
@@ -182,9 +167,8 @@ impl jacquard_common::xrpc::XrpcResp for CoverResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Cover<'a> {
     const NSID: &'static str = "org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CoverResponse;
 }
 
@@ -193,9 +177,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Cover<'a> {
 pub struct CoverRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CoverRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Cover<'de>;
     type Response = CoverResponse;
 }

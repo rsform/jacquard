@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Timestamp<'a> {
@@ -22,7 +16,7 @@ pub struct Timestamp<'a> {
 
 pub mod timestamp_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,9 +49,7 @@ pub mod timestamp_state {
 /// Builder for constructing an instance of this type
 pub struct TimestampBuilder<'a, S: timestamp_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Datetime>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -127,13 +119,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimestampOutput<'a> {
@@ -154,9 +140,8 @@ impl jacquard_common::xrpc::XrpcResp for TimestampResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Timestamp<'a> {
     const NSID: &'static str = "org.atsui.Timestamp";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = TimestampResponse;
 }
 
@@ -165,9 +150,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Timestamp<'a> {
 pub struct TimestampRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TimestampRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Timestamp";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Timestamp<'de>;
     type Response = TimestampResponse;
 }

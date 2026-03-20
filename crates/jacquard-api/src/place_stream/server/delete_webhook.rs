@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteWebhook<'a> {
@@ -25,13 +25,7 @@ pub struct DeleteWebhook<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteWebhookOutput<'a> {
@@ -49,7 +43,7 @@ pub struct DeleteWebhookOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -96,9 +90,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteWebhookResponse;
 }
 
@@ -107,9 +100,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
 pub struct DeleteWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.deleteWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteWebhook<'de>;
     type Response = DeleteWebhookResponse;
 }

@@ -111,7 +111,7 @@ async fn agent_delegates_to_session_and_refreshes() {
     let info = agent.info().await.expect("session info");
     assert_eq!(info.0.as_str(), "did:plc:alice");
     assert_eq!(info.1.as_ref().unwrap().as_str(), "session");
-    assert_eq!(agent.endpoint().await.as_str(), "https://pds/");
+    assert_eq!(agent.endpoint().await.as_str(), "https://pds");
 
     // Queue a refresh response and call agent.refresh(); Authorization header must use refresh token
     client

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionStats<'a> {
@@ -28,7 +22,7 @@ pub struct CollectionStats<'a> {
 
 pub mod collection_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,51 +30,51 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type UniqueActors;
         type RecordCount;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type UniqueActors = Unset;
         type RecordCount = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
-    impl<S: State> State for SetUniqueActors<S> {
-        type UniqueActors = Set<members::unique_actors>;
-        type RecordCount = S::RecordCount;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
-    impl<S: State> State for SetRecordCount<S> {
-        type UniqueActors = S::UniqueActors;
-        type RecordCount = Set<members::record_count>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
         type UniqueActors = S::UniqueActors;
         type RecordCount = S::RecordCount;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
+    impl<S: State> State for SetUniqueActors<S> {
+        type Collection = S::Collection;
+        type UniqueActors = Set<members::unique_actors>;
+        type RecordCount = S::RecordCount;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
+    impl<S: State> State for SetRecordCount<S> {
+        type Collection = S::Collection;
+        type UniqueActors = S::UniqueActors;
+        type RecordCount = Set<members::record_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `unique_actors` field
         pub struct unique_actors(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
@@ -173,9 +167,9 @@ where
 impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
+    S::Collection: collection_stats_state::IsSet,
     S::UniqueActors: collection_stats_state::IsSet,
     S::RecordCount: collection_stats_state::IsSet,
-    S::Collection: collection_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionStats<'a> {
@@ -203,9 +197,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.slice.stats"),
@@ -214,72 +206,76 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "collectionStats",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("collectionStats"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("recordCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uniqueActors")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "collection",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Collection NSID"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uniqueActors"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "collection",
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Collection NSID",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recordCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uniqueActors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "recordCount",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "uniqueActors",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -348,13 +344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
 }
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
@@ -364,7 +354,7 @@ pub struct Stats<'a> {
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -453,13 +443,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatsOutput<'a> {

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorNeighbours<'a> {
@@ -22,7 +16,7 @@ pub struct GetActorNeighbours<'a> {
 
 pub mod get_actor_neighbours_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,9 +49,8 @@ pub mod get_actor_neighbours_state {
 /// Builder for constructing an instance of this type
 pub struct GetActorNeighboursBuilder<'a, S: get_actor_neighbours_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -120,15 +113,13 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorNeighboursOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub neighbours: std::option::Option<
-        Vec<crate::app_rocksky::actor::NeighbourViewBasic<'a>>,
-    >,
+    pub neighbours: std::option::Option<Vec<crate::app_rocksky::actor::NeighbourViewBasic<'a>>>,
 }
 
 /// Response type for

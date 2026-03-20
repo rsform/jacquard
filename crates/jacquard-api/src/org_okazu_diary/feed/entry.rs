@@ -8,13 +8,7 @@
 /// A diary entry to record a self-gratification activity.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
@@ -35,9 +29,7 @@ pub struct Entry<'a> {
     /// References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub subjects: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     /// User-specified tags for the activity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -54,7 +46,7 @@ pub struct Entry<'a> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -171,10 +163,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -189,9 +178,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -402,13 +389,7 @@ impl jacquard_common::IntoStatic for EntryVisibility<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
@@ -465,9 +446,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -481,13 +460,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "note",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "note",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -495,9 +476,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 16usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subjects",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
                     max: 16usize,
                     actual: value.len(),
                 });
@@ -507,9 +486,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 64usize,
                     actual: value.len(),
                 });
@@ -519,9 +496,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-fn lexicon_doc_org_okazu_diary_feed_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_okazu_diary_feed_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.okazu-diary.feed.entry"),

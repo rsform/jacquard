@@ -150,7 +150,10 @@ inventory::collect!(LexiconSchemaRef);
 #[derive(Debug, Clone)]
 pub struct SchemaRegistry {
     /// Schema documents indexed by NSID (concurrent access safe)
-    schemas: dashmap::DashMap<jacquard_common::deps::smol_str::SmolStr, crate::lexicon::LexiconDoc<'static>>,
+    schemas: dashmap::DashMap<
+        jacquard_common::deps::smol_str::SmolStr,
+        crate::lexicon::LexiconDoc<'static>,
+    >,
 }
 
 impl SchemaRegistry {
@@ -198,7 +201,11 @@ impl SchemaRegistry {
     }
 
     /// Insert or update a schema (for runtime schema loading)
-    pub fn insert(&self, nsid: jacquard_common::deps::smol_str::SmolStr, doc: crate::lexicon::LexiconDoc<'static>) {
+    pub fn insert(
+        &self,
+        nsid: jacquard_common::deps::smol_str::SmolStr,
+        doc: crate::lexicon::LexiconDoc<'static>,
+    ) {
         self.schemas.insert(nsid, doc);
     }
 
@@ -225,7 +232,8 @@ impl Default for SchemaRegistry {
 
 /// Global schema registry built from inventory
 pub fn global_registry() -> &'static SchemaRegistry {
-    static REGISTRY: std::sync::LazyLock<SchemaRegistry> = std::sync::LazyLock::new(SchemaRegistry::from_inventory);
+    static REGISTRY: std::sync::LazyLock<SchemaRegistry> =
+        std::sync::LazyLock::new(SchemaRegistry::from_inventory);
     &REGISTRY
 }
 

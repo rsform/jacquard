@@ -8,20 +8,14 @@
 /// The phenomenon being observed (e.g. air temperature, PM2.5 concentration).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservedProperty<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// URI identifying the property from a controlled vocabulary (CF Standard Names, QUDT quantity kinds, etc.)
     #[serde(borrow)]
-    pub definition: jacquard_common::types::string::Uri<'a>,
+    pub definition: jacquard_common::types::string::UriValue<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -31,7 +25,7 @@ pub struct ObservedProperty<'a> {
 
 pub mod observed_property_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,49 +33,49 @@ pub mod observed_property_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Definition;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Definition = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Definition = S::Definition;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `definition` field to Set
     pub struct SetDefinition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefinition<S> {}
     impl<S: State> State for SetDefinition<S> {
-        type Name = S::Name;
         type Definition = Set<members::definition>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Definition = S::Definition;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Definition = S::Definition;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `definition` field
         pub struct definition(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -92,7 +86,7 @@ pub struct ObservedPropertyBuilder<'a, S: observed_property_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -144,7 +138,7 @@ where
     /// Set the `definition` field (required)
     pub fn definition(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> ObservedPropertyBuilder<'a, observed_property_state::SetDefinition<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ObservedPropertyBuilder {
@@ -157,18 +151,12 @@ where
 
 impl<'a, S: observed_property_state::State> ObservedPropertyBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -196,8 +184,8 @@ where
 impl<'a, S> ObservedPropertyBuilder<'a, S>
 where
     S: observed_property_state::State,
-    S::Name: observed_property_state::IsSet,
     S::Definition: observed_property_state::IsSet,
+    S::Name: observed_property_state::IsSet,
     S::CreatedAt: observed_property_state::IsSet,
 {
     /// Build the final struct
@@ -243,13 +231,7 @@ impl<'a> ObservedProperty<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservedPropertyGetRecordOutput<'a> {
@@ -306,9 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ObservedProperty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -319,9 +299,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ObservedProperty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -331,9 +309,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ObservedProperty<'a> {
     }
 }
 
-fn lexicon_doc_dev_sensorthings_observedProperty() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_sensorthings_observedProperty()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.sensorthings.observedProperty"),

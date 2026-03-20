@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshIdentity<'a> {
@@ -23,7 +17,7 @@ pub struct RefreshIdentity<'a> {
 
 pub mod refresh_identity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,9 +50,8 @@ pub mod refresh_identity_state {
 /// Builder for constructing an instance of this type
 pub struct RefreshIdentityBuilder<'a, S: refresh_identity_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,13 +121,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshIdentityOutput<'a> {
@@ -153,7 +140,7 @@ pub struct RefreshIdentityOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -210,9 +197,8 @@ impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RefreshIdentityResponse;
 }
 
@@ -221,9 +207,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
 pub struct RefreshIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.refreshIdentity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RefreshIdentity<'de>;
     type Response = RefreshIdentityResponse;
 }

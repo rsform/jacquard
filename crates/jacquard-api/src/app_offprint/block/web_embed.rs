@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebEmbed<'a> {
@@ -31,13 +25,13 @@ pub struct WebEmbed<'a> {
     /// oEmbed URL for iframe embedding
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub embed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Native embed width in pixels
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub embed_width: std::option::Option<i64>,
     /// The URL of the embedded page
     #[serde(borrow)]
-    pub href: jacquard_common::types::string::Uri<'a>,
+    pub href: jacquard_common::types::string::UriValue<'a>,
     /// Screenshot of the embedded content (1280×720px)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -58,7 +52,7 @@ pub struct WebEmbed<'a> {
 
 pub mod web_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,9 +89,9 @@ pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -118,18 +112,7 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
     pub fn new() -> Self {
         WebEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -137,18 +120,12 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -156,18 +133,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -190,7 +161,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedUrl` field (optional)
     pub fn embed_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -198,7 +169,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedUrl` field to an Option value (optional)
     pub fn maybe_embed_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -226,7 +197,7 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> WebEmbedBuilder<'a, web_embed_state::SetHref<S>> {
         self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         WebEmbedBuilder {
@@ -258,18 +229,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `siteName` field (optional)
-    pub fn site_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn site_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `siteName` field to an Option value (optional)
-    pub fn maybe_site_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_site_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -277,10 +242,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -293,10 +255,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn width(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -352,9 +311,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.offprint.block.webEmbed"),
@@ -588,13 +545,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -612,9 +571,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         if let Some(ref value) = self.embed_width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "embed_width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("embed_width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -628,13 +585,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "site_name",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "site_name",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -646,13 +605,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

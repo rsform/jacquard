@@ -8,13 +8,7 @@
 /// A request for someone to draw something
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Request<'a> {
@@ -25,9 +19,7 @@ pub struct Request<'a> {
     /// Reference images for the request
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reference_images: std::option::Option<
-        Vec<jacquard_common::types::blob::BlobRef<'a>>,
-    >,
+    pub reference_images: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     /// Tags for categorization
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -43,7 +35,7 @@ pub struct Request<'a> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,18 +162,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -278,13 +264,7 @@ impl<'a> Request<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestGetRecordOutput<'a> {
@@ -353,9 +333,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -366,9 +344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -383,13 +359,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -397,9 +375,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tech_tokimeki_kaku_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.request"),

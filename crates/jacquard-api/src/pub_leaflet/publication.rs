@@ -8,13 +8,7 @@
 /// Record declaring a publication
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
@@ -31,9 +25,7 @@ pub struct Publication<'a> {
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub preferences: std::option::Option<
-        crate::pub_leaflet::publication::Preferences<'a>,
-    >,
+    pub preferences: std::option::Option<crate::pub_leaflet::publication::Preferences<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub theme: std::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
@@ -41,7 +33,7 @@ pub struct Publication<'a> {
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,18 +97,12 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `base_path` field (optional)
-    pub fn base_path(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn base_path(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `base_path` field to an Option value (optional)
-    pub fn maybe_base_path(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_base_path(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -124,18 +110,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -151,10 +131,7 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_icon(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -269,13 +246,7 @@ impl<'a> Publication<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicationGetRecordOutput<'a> {
@@ -332,9 +303,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -345,9 +314,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -357,9 +324,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
 }
 
-fn lexicon_doc_pub_leaflet_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_leaflet_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.leaflet.publication"),
@@ -369,316 +334,380 @@ fn lexicon_doc_pub_leaflet_publication() -> ::jacquard_lexicon::lexicon::Lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Record declaring a publication",
+                        )),
+                        key: Some(::jacquard_common::CowStr::new_static("tid")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: Some(vec![
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ]),
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "base_path",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "description",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(2000usize),
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "icon",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(
+                                            ::jacquard_lexicon::lexicon::LexBlob {
+                                                description: None,
+                                                accept: None,
+                                                max_size: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "name",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(2000usize),
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "preferences",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#preferences",
+                                                ),
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "theme",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#theme",
+                                                ),
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
                         ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                    },
+                ),
+            );
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("preferences"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                            ],
-                        ),
+                        required: None,
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "base_path",
+                                    "showComments",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
                             );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
+                                    "showInDiscover",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
                             );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "icon",
+                                    "showMentions",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
                             );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
+                                    "showPrevNext",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
                             );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "preferences",
+                                    "showRecommends",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#preferences"),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "theme",
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#theme"),
-                                }),
                             );
                             map
                         },
-                    }),
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("preferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showComments",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showInDiscover",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showMentions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showPrevNext",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showRecommends",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("theme"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accentBackground",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accentText",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundColor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundImage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "pub.leaflet.theme.backgroundImage",
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "accentBackground",
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bodyFont",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "headingFont",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pageBackground",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pageWidth",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(0i64),
-                                maximum: Some(1600i64),
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "primary",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showPageBackground",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgba",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgb",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "accentText",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgba",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgb",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "backgroundColor",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgba",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgb",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "backgroundImage",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "pub.leaflet.theme.backgroundImage",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bodyFont"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "headingFont",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "pageBackground",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgba",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgb",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("pageWidth"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(0i64),
+                                        maximum: Some(1600i64),
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("primary"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgba",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "pub.leaflet.theme.color#rgb",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "showPageBackground",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -694,7 +723,7 @@ fn lexicon_doc_pub_leaflet_publication() -> ::jacquard_lexicon::lexicon::Lexicon
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
@@ -736,7 +765,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
@@ -751,9 +780,8 @@ pub struct Theme<'a> {
     pub background_color: std::option::Option<ThemeBackgroundColor<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_image: std::option::Option<
-        crate::pub_leaflet::theme::background_image::BackgroundImage<'a>,
-    >,
+    pub background_image:
+        std::option::Option<crate::pub_leaflet::theme::background_image::BackgroundImage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub body_font: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -774,13 +802,7 @@ pub struct Theme<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -793,13 +815,7 @@ pub enum ThemeAccentBackground<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -812,13 +828,7 @@ pub enum ThemeAccentText<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -831,13 +841,7 @@ pub enum ThemeBackgroundColor<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -850,13 +854,7 @@ pub enum ThemePageBackground<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -884,9 +882,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body_font",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("body_font"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -907,9 +903,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
         if let Some(ref value) = self.page_width {
             if *value > 1600i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "page_width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("page_width"),
                     max: 1600i64,
                     actual: *value,
                 });
@@ -918,9 +912,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
         if let Some(ref value) = self.page_width {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "page_width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("page_width"),
                     min: 0i64,
                     actual: *value,
                 });

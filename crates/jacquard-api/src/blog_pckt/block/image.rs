@@ -8,13 +8,7 @@
 /// Image aspect ratio represented as width and height dimensions
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
@@ -26,7 +20,7 @@ pub struct AspectRatio<'a> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +28,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
@@ -134,8 +128,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -161,9 +155,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_block_image() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blog_pckt_block_image() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.block.image"),
@@ -173,51 +165,49 @@ fn lexicon_doc_blog_pckt_block_image() -> ::jacquard_lexicon::lexicon::LexiconDo
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("aspectRatio"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Image aspect ratio represented as width and height dimensions",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "height",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(1i64),
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(1i64),
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("imageAttrs"),
@@ -343,29 +333,29 @@ fn lexicon_doc_blog_pckt_block_image() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attrs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#imageAttrs"),
-                            }),
-                        );
-                        map
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#imageAttrs"),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -389,9 +379,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
             let value = &self.height;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -401,9 +389,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
             let value = &self.width;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -423,7 +409,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageAttrs<'a> {
@@ -438,9 +424,7 @@ pub struct ImageAttrs<'a> {
     /// Image aspect ratio for proper layout before loading
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<
-        crate::blog_pckt::block::image::AspectRatio<'a>,
-    >,
+    pub aspect_ratio: std::option::Option<crate::blog_pckt::block::image::AspectRatio<'a>>,
     /// AT Protocol blob reference (10MB max). Used when image is uploaded to PDS.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -471,9 +455,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -487,13 +469,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "alt",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -502,9 +484,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "src",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("src"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -514,9 +494,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -530,13 +508,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 200usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -546,13 +526,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageAttrs<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
@@ -563,7 +537,7 @@ pub struct Image<'a> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -596,9 +570,8 @@ pub mod image_state {
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::block::image::ImageAttrs<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<crate::blog_pckt::block::image::ImageAttrs<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 

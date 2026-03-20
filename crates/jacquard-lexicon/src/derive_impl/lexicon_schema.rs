@@ -60,7 +60,9 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
     // Generate def_name override if this is a fragment
     let def_name_fn = if built.schema_id != built.nsid {
         // Extract fragment name from schema_id (strip "nsid#")
-        let fragment_name = built.schema_id.strip_prefix(&format!("{}#", built.nsid))
+        let fragment_name = built
+            .schema_id
+            .strip_prefix(&format!("{}#", built.nsid))
             .unwrap_or("main");
         quote! {
             fn def_name() -> &'static str {
@@ -72,11 +74,12 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
     };
 
     // Generate fragment name for def_name
-    let fragment_name = if let Some(stripped) = built.schema_id.strip_prefix(&format!("{}#", built.nsid)) {
-        stripped.to_string()
-    } else {
-        "main".to_string()
-    };
+    let fragment_name =
+        if let Some(stripped) = built.schema_id.strip_prefix(&format!("{}#", built.nsid)) {
+            stripped.to_string()
+        } else {
+            "main".to_string()
+        };
 
     // Generate trait impl
     Ok(quote! {

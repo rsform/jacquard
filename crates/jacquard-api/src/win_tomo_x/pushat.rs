@@ -11,13 +11,7 @@ pub mod push_notify;
 pub type DeviceList<'a> = Vec<crate::win_tomo_x::pushat::DeviceListItem<'a>>;
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceListItem<'a> {
@@ -29,7 +23,7 @@ pub struct DeviceListItem<'a> {
 
 pub mod device_list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,50 +32,50 @@ pub mod device_list_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Current;
         type Id;
+        type Current;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Current = Unset;
         type Id = Unset;
+        type Current = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Id = S::Id;
         type Current = S::Current;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `current` field to Set
-    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrent<S> {}
-    impl<S: State> State for SetCurrent<S> {
-        type Name = S::Name;
-        type Current = Set<members::current>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Name = S::Name;
-        type Current = S::Current;
         type Id = Set<members::id>;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `current` field to Set
+    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrent<S> {}
+    impl<S: State> State for SetCurrent<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Current = Set<members::current>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `current` field
-        pub struct current(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `current` field
+        pub struct current(());
     }
 }
 
@@ -175,8 +169,8 @@ impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
     S::Name: device_list_item_state::IsSet,
-    S::Current: device_list_item_state::IsSet,
     S::Id: device_list_item_state::IsSet,
+    S::Current: device_list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeviceListItem<'a> {
@@ -204,9 +198,7 @@ where
     }
 }
 
-fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("win.tomo-x.pushat.defs"),
@@ -216,78 +208,84 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("deviceList"),
-                ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
-                    description: None,
-                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                ::jacquard_lexicon::lexicon::LexUserType::Array(
+                    ::jacquard_lexicon::lexicon::LexArray {
                         description: None,
-                        r#ref: ::jacquard_common::CowStr::new_static("#deviceListItem"),
-                    }),
-                    min_length: None,
-                    max_length: None,
-                }),
+                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
+                            ::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#deviceListItem"),
+                            },
+                        ),
+                        min_length: None,
+                        max_length: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("deviceListItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("current")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "current",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("current"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("current"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(300usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(30usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(300usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(30usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("notifyBody"),
@@ -418,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -435,13 +431,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
                     )
                     .count();
                 if count > 30usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 30usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 30usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -458,7 +456,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyBody<'a> {
@@ -468,11 +466,11 @@ pub struct NotifyBody<'a> {
     /// The URI of the icon displayed in the notification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub icon: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Experimental — do not use. The URI to open when the notification is clicked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Title text of the notification.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,

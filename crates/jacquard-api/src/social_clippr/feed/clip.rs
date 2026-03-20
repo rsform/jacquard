@@ -8,13 +8,7 @@
 /// Record containing a bookmarked item, or 'clip'.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Clip<'a> {
@@ -33,9 +27,7 @@ pub struct Clip<'a> {
     /// An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub tags: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     /// The title of the bookmark. If left empty, reuse the URL.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -46,12 +38,12 @@ pub struct Clip<'a> {
     pub unread: std::option::Option<bool>,
     /// The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod clip_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -59,83 +51,83 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Description;
+        type Unlisted;
         type Url;
         type Title;
-        type Unlisted;
-        type Description;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Description = Unset;
+        type Unlisted = Unset;
         type Url = Unset;
         type Title = Unset;
-        type Unlisted = Unset;
-        type Description = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Title = S::Title;
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Description = Set<members::description>;
         type Unlisted = S::Unlisted;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
         type Url = S::Url;
-        type Title = Set<members::title>;
-        type Unlisted = S::Unlisted;
-        type Description = S::Description;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `unlisted` field to Set
     pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnlisted<S> {}
     impl<S: State> State for SetUnlisted<S> {
+        type Description = S::Description;
+        type Unlisted = Set<members::unlisted>;
         type Url = S::Url;
         type Title = S::Title;
-        type Unlisted = Set<members::unlisted>;
-        type Description = S::Description;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Url = S::Url;
-        type Title = S::Title;
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Description = S::Description;
         type Unlisted = S::Unlisted;
-        type Description = Set<members::description>;
+        type Url = Set<members::url>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type Unlisted = S::Unlisted;
+        type Url = S::Url;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Description = S::Description;
+        type Unlisted = S::Unlisted;
         type Url = S::Url;
         type Title = S::Title;
-        type Unlisted = S::Unlisted;
-        type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `unlisted` field
+        pub struct unlisted(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `unlisted` field
-        pub struct unlisted(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -153,7 +145,7 @@ pub struct ClipBuilder<'a, S: clip_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<bool>,
         ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -170,17 +162,7 @@ impl<'a> ClipBuilder<'a, clip_state::Empty> {
     pub fn new() -> Self {
         ClipBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -245,10 +227,7 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -263,9 +242,7 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -339,7 +316,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
         self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
         ClipBuilder {
@@ -353,10 +330,10 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
+    S::Description: clip_state::IsSet,
+    S::Unlisted: clip_state::IsSet,
     S::Url: clip_state::IsSet,
     S::Title: clip_state::IsSet,
-    S::Unlisted: clip_state::IsSet,
-    S::Description: clip_state::IsSet,
     S::CreatedAt: clip_state::IsSet,
 {
     /// Build the final struct
@@ -412,13 +389,7 @@ impl<'a> Clip<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClipGetRecordOutput<'a> {
@@ -476,9 +447,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40960usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 40960usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -493,13 +462,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 4096usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 4096usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 4096usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -507,9 +478,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("languages"),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -519,9 +488,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("notes"),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -535,13 +502,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "notes",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "notes",
+                            ),
+                            max: 10000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -550,9 +519,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20480usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 20480usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -567,13 +534,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 2048usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -582,9 +551,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
                     max: 20000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -599,13 +566,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 2000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "url",
-                        ),
-                        max: 2000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
+                            max: 2000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -613,9 +580,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
     }
 }
 
-fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.clippr.feed.clip"),

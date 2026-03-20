@@ -8,13 +8,7 @@
 /// A piece (interactive program) from Aesthetic Computer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Piece<'a> {
@@ -30,7 +24,7 @@ pub struct Piece<'a> {
 
 pub mod piece_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,13 +214,7 @@ impl<'a> Piece<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PieceGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 24usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ref",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ref"),
                     max: 24usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -297,9 +283,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("slug"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -309,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
     }
 }
 
-fn lexicon_doc_computer_aesthetic_piece() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_computer_aesthetic_piece() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.piece"),

@@ -8,13 +8,7 @@
 /// Broker attestation proof for a supporter relationship. When inline, cid and signature are required. When remote, only cid is required.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BrokerProof<'a> {
@@ -33,7 +27,7 @@ pub struct BrokerProof<'a> {
 
 pub mod broker_proof_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,10 +128,7 @@ impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
         self
     }
     /// Set the `signature` field to an Option value (optional)
-    pub fn maybe_signature(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_signature(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -189,13 +180,7 @@ impl<'a> BrokerProof<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BrokerProofGetRecordOutput<'a> {
@@ -252,9 +237,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BrokerProof<'a> {
     }
 }
 
-fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.atprotofans.brokerProof"),

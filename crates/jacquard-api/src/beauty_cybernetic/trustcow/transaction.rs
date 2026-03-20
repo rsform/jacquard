@@ -8,13 +8,7 @@
 /// A verified transaction between two ATProto identities that must be stored in both parties' PDS
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction<'a> {
@@ -45,7 +39,7 @@ pub struct Transaction<'a> {
 
 pub mod transaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,65 +47,65 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ServiceProvider;
         type TransactionId;
         type ServiceConsumer;
-        type ServiceProvider;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ServiceProvider = Unset;
         type TransactionId = Unset;
         type ServiceConsumer = Unset;
-        type ServiceProvider = Unset;
         type CreatedAt = Unset;
+    }
+    ///State transition - sets the `service_provider` field to Set
+    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
+    impl<S: State> State for SetServiceProvider<S> {
+        type ServiceProvider = Set<members::service_provider>;
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `transaction_id` field to Set
     pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransactionId<S> {}
     impl<S: State> State for SetTransactionId<S> {
+        type ServiceProvider = S::ServiceProvider;
         type TransactionId = Set<members::transaction_id>;
         type ServiceConsumer = S::ServiceConsumer;
-        type ServiceProvider = S::ServiceProvider;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `service_consumer` field to Set
     pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
     impl<S: State> State for SetServiceConsumer<S> {
+        type ServiceProvider = S::ServiceProvider;
         type TransactionId = S::TransactionId;
         type ServiceConsumer = Set<members::service_consumer>;
-        type ServiceProvider = S::ServiceProvider;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
-    impl<S: State> State for SetServiceProvider<S> {
-        type TransactionId = S::TransactionId;
-        type ServiceConsumer = S::ServiceConsumer;
-        type ServiceProvider = Set<members::service_provider>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type ServiceProvider = S::ServiceProvider;
         type TransactionId = S::TransactionId;
         type ServiceConsumer = S::ServiceConsumer;
-        type ServiceProvider = S::ServiceProvider;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `service_provider` field
+        pub struct service_provider(());
         ///Marker type for the `transaction_id` field
         pub struct transaction_id(());
         ///Marker type for the `service_consumer` field
         pub struct service_consumer(());
-        ///Marker type for the `service_provider` field
-        pub struct service_provider(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -152,10 +146,7 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `amount` field (optional)
-    pub fn amount(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn amount(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -187,10 +178,7 @@ where
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `currency` field (optional)
-    pub fn currency(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn currency(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -203,18 +191,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -280,9 +262,9 @@ where
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
+    S::ServiceProvider: transaction_state::IsSet,
     S::TransactionId: transaction_state::IsSet,
     S::ServiceConsumer: transaction_state::IsSet,
-    S::ServiceProvider: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
 {
     /// Build the final struct
@@ -334,13 +316,7 @@ impl<'a> Transaction<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionGetRecordOutput<'a> {
@@ -397,9 +373,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "currency",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("currency"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -409,9 +383,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -434,14 +406,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_beauty_cybernetic_trustcow_transaction()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "beauty.cybernetic.trustcow.transaction",
-        ),
+        id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.transaction"),
         revision: None,
         description: None,
         defs: {

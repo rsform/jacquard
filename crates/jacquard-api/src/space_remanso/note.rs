@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
@@ -27,7 +21,7 @@ pub struct Image<'a> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,51 +150,49 @@ fn lexicon_doc_space_remanso_note() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("image")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alt text for the image.",
-                                    ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("alt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Alt text for the image.",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(2000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(
+                                    ::jacquard_lexicon::lexicon::LexBlob {
+                                        description: None,
+                                        accept: None,
+                                        max_size: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -430,9 +422,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -445,13 +435,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
 /// A markdown blog post with LaTeX, GitHub notes, Mermaid, YouTube and Bluesky extensions.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Note<'a> {
@@ -490,7 +474,7 @@ pub struct Note<'a> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -562,18 +546,7 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     pub fn new() -> Self {
         NoteBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -632,18 +605,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `fontFamily` field (optional)
-    pub fn font_family(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn font_family(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `fontFamily` field to an Option value (optional)
-    pub fn maybe_font_family(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_font_family(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1224,13 +1191,7 @@ impl jacquard_common::IntoStatic for NoteTheme<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NoteGetRecordOutput<'a> {
@@ -1288,9 +1249,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1300,9 +1259,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font_family",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("font_family"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1312,9 +1269,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -1324,9 +1279,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "language",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("language"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1337,9 +1290,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });

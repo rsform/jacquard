@@ -8,13 +8,7 @@
 /// User subscription to an evaluator service. Published by the user (not the evaluator) to declare they want evaluations.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Subscription<'a> {
@@ -35,7 +29,7 @@ pub struct Subscription<'a> {
 
 pub mod subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,10 +111,7 @@ impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_collections(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -232,13 +223,7 @@ impl<'a> Subscription<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscriptionGetRecordOutput<'a> {
@@ -295,9 +280,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "collections",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("collections"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -319,14 +302,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_subscription() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_evaluator_subscription()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "app.gainforest.evaluator.subscription",
-        ),
+        id: ::jacquard_common::CowStr::new_static("app.gainforest.evaluator.subscription"),
         revision: None,
         description: None,
         defs: {

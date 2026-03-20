@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Row<'a> {
@@ -44,7 +38,7 @@ pub struct Row<'a> {
 
 pub mod row_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -542,13 +536,7 @@ impl jacquard_common::IntoStatic for RowJustify<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RowOutput<'a> {
@@ -569,9 +557,8 @@ impl jacquard_common::xrpc::XrpcResp for RowResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Row<'a> {
     const NSID: &'static str = "org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RowResponse;
 }
 
@@ -580,9 +567,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Row<'a> {
 pub struct RowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Row<'de>;
     type Response = RowResponse;
 }

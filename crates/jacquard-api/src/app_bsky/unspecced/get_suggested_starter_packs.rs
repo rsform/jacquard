@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacks {
@@ -23,7 +17,7 @@ pub struct GetSuggestedStarterPacks {
 
 pub mod get_suggested_starter_packs_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -48,9 +42,7 @@ pub struct GetSuggestedStarterPacksBuilder<S: get_suggested_starter_packs_state:
 
 impl GetSuggestedStarterPacks {
     /// Create a new builder for this type
-    pub fn new() -> GetSuggestedStarterPacksBuilder<
-        get_suggested_starter_packs_state::Empty,
-    > {
+    pub fn new() -> GetSuggestedStarterPacksBuilder<get_suggested_starter_packs_state::Empty> {
         GetSuggestedStarterPacksBuilder::new()
     }
 }
@@ -92,13 +84,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacksOutput<'a> {

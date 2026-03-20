@@ -8,13 +8,7 @@
 /// A warrant where one ATProto identity vouches for the trustworthiness of another identity
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Warrant<'a> {
@@ -42,7 +36,7 @@ pub struct Warrant<'a> {
 
 pub mod warrant_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,37 +44,37 @@ pub mod warrant_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -137,18 +131,12 @@ where
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -194,10 +182,7 @@ where
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `trustLevel` field (optional)
-    pub fn trust_level(
-        mut self,
-        value: impl Into<Option<WarrantTrustLevel<'a>>>,
-    ) -> Self {
+    pub fn trust_level(mut self, value: impl Into<Option<WarrantTrustLevel<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -210,10 +195,7 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `warrantType` field (optional)
-    pub fn warrant_type(
-        mut self,
-        value: impl Into<Option<WarrantWarrantType<'a>>>,
-    ) -> Self {
+    pub fn warrant_type(mut self, value: impl Into<Option<WarrantWarrantType<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -227,8 +209,8 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
 impl<'a, S> WarrantBuilder<'a, S>
 where
     S: warrant_state::State,
-    S::CreatedAt: warrant_state::IsSet,
     S::Subject: warrant_state::IsSet,
+    S::CreatedAt: warrant_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Warrant<'a> {
@@ -480,13 +462,7 @@ impl jacquard_common::IntoStatic for WarrantWarrantType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WarrantGetRecordOutput<'a> {
@@ -543,9 +519,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -555,9 +529,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_beauty_cybernetic_trustcow_warrant()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.warrant"),

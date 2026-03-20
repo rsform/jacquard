@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stack<'a> {
@@ -47,7 +41,7 @@ pub struct Stack<'a> {
 
 pub mod stack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -561,13 +555,7 @@ impl jacquard_common::IntoStatic for StackJustify<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StackOutput<'a> {
@@ -588,9 +576,8 @@ impl jacquard_common::xrpc::XrpcResp for StackResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
     const NSID: &'static str = "org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StackResponse;
 }
 
@@ -599,9 +586,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Stack<'de>;
     type Response = StackResponse;
 }

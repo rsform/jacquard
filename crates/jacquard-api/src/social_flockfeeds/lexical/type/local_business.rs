@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Embedded<'a> {
@@ -24,9 +24,7 @@ pub struct Embedded<'a> {
     pub accepted_payment_method: std::option::Option<EmbeddedAcceptedPaymentMethod<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: std::option::Option<
-        EmbeddedActionableFeedbackPolicy<'a>,
-    >,
+    pub actionable_feedback_policy: std::option::Option<EmbeddedActionableFeedbackPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub additional_property: std::option::Option<EmbeddedAdditionalProperty<'a>>,
@@ -38,9 +36,7 @@ pub struct Embedded<'a> {
     pub address: std::option::Option<EmbeddedAddress<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: std::option::Option<
-        EmbeddedAgentInteractionStatistic<'a>,
-    >,
+    pub agent_interaction_statistic: std::option::Option<EmbeddedAgentInteractionStatistic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub aggregate_rating: std::option::Option<EmbeddedAggregateRating<'a>>,
@@ -103,9 +99,7 @@ pub struct Embedded<'a> {
     pub description: std::option::Option<EmbeddedDescription<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
-        EmbeddedDisambiguatingDescription<'a>,
-    >,
+    pub disambiguating_description: std::option::Option<EmbeddedDisambiguatingDescription<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dissolution_date: std::option::Option<EmbeddedDissolutionDate<'a>>,
@@ -114,9 +108,7 @@ pub struct Embedded<'a> {
     pub diversity_policy: std::option::Option<EmbeddedDiversityPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: std::option::Option<
-        EmbeddedDiversityStaffingReport<'a>,
-    >,
+    pub diversity_staffing_report: std::option::Option<EmbeddedDiversityStaffingReport<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub duns: std::option::Option<EmbeddedDuns<'a>>,
@@ -203,9 +195,7 @@ pub struct Embedded<'a> {
     pub has_credential: std::option::Option<EmbeddedHasCredential<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_drive_through_service: std::option::Option<
-        EmbeddedHasDriveThroughService<'a>,
-    >,
+    pub has_drive_through_service: std::option::Option<EmbeddedHasDriveThroughService<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_gs1_digital_link: std::option::Option<EmbeddedHasGs1DigitalLink<'a>>,
@@ -217,9 +207,7 @@ pub struct Embedded<'a> {
     pub has_member_program: std::option::Option<EmbeddedHasMemberProgram<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: std::option::Option<
-        EmbeddedHasMerchantReturnPolicy<'a>,
-    >,
+    pub has_merchant_return_policy: std::option::Option<EmbeddedHasMerchantReturnPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_offer_catalog: std::option::Option<EmbeddedHasOfferCatalog<'a>>,
@@ -228,9 +216,7 @@ pub struct Embedded<'a> {
     pub has_pos: std::option::Option<EmbeddedHasPos<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: std::option::Option<
-        EmbeddedHasProductReturnPolicy<'a>,
-    >,
+    pub has_product_return_policy: std::option::Option<EmbeddedHasProductReturnPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_shipping_service: std::option::Option<EmbeddedHasShippingService<'a>>,
@@ -299,9 +285,7 @@ pub struct Embedded<'a> {
     pub maps: std::option::Option<EmbeddedMaps<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub maximum_attendee_capacity: std::option::Option<
-        EmbeddedMaximumAttendeeCapacity<'a>,
-    >,
+    pub maximum_attendee_capacity: std::option::Option<EmbeddedMaximumAttendeeCapacity<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub member: std::option::Option<EmbeddedMember<'a>>,
@@ -328,9 +312,7 @@ pub struct Embedded<'a> {
     pub opening_hours: std::option::Option<EmbeddedOpeningHours<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours_specification: std::option::Option<
-        EmbeddedOpeningHoursSpecification<'a>,
-    >,
+    pub opening_hours_specification: std::option::Option<EmbeddedOpeningHoursSpecification<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ownership_funding_info: std::option::Option<EmbeddedOwnershipFundingInfo<'a>>,
@@ -387,9 +369,8 @@ pub struct Embedded<'a> {
     pub smoking_allowed: std::option::Option<EmbeddedSmokingAllowed<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub special_opening_hours_specification: std::option::Option<
-        EmbeddedSpecialOpeningHoursSpecification<'a>,
-    >,
+    pub special_opening_hours_specification:
+        std::option::Option<EmbeddedSpecialOpeningHoursSpecification<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sponsor: std::option::Option<EmbeddedSponsor<'a>>,
@@ -421,117 +402,63 @@ pub struct Embedded<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAcceptedPaymentMethod<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedActionableFeedbackPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalProperty<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalType<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAddress<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAgentInteractionStatistic<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAggregateRating<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlternateName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -542,78 +469,42 @@ pub enum EmbeddedAlumni<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAmenityFeature<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAreaServed<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAward<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAwards<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBranchCode<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -626,13 +517,7 @@ pub enum EmbeddedBranchOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -647,117 +532,63 @@ pub enum EmbeddedBrand<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCompanyRegistration<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoint<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoints<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedIn<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedInPlace<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainsPlace<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCorrectionsPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCurrenciesAccepted<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -770,110 +601,60 @@ pub enum EmbeddedDepartment<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDescription<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDisambiguatingDescription<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDissolutionDate<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>,
-    ),
+    ArticleEmbedded(Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDuns<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmail<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -884,13 +665,7 @@ pub enum EmbeddedEmployee<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -901,26 +676,14 @@ pub enum EmbeddedEmployees<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEthicsPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -931,13 +694,7 @@ pub enum EmbeddedEvent<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -948,26 +705,14 @@ pub enum EmbeddedEvents<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFaxNumber<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -982,13 +727,7 @@ pub enum EmbeddedFounder<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -999,39 +738,21 @@ pub enum EmbeddedFounders<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingDate<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingLocation<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1046,487 +767,263 @@ pub enum EmbeddedFunder<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunding<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeo<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoContains<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCoveredBy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCovers<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCrosses<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoDisjoint<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoEquals<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoIntersects<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoOverlaps<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoTouches<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoWithin<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGlobalLocationNumber<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCertification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCredential<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasDriveThroughService<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasGs1DigitalLink<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMap<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMemberProgram<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasOfferCatalog<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasPos<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasProductReturnPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasShippingService<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIdentifier<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInteractionStatistic<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsAccessibleForFree<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsicV4<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIso6523Code<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKeywords<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsAbout<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsLanguage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLatitude<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalAddress<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1537,84 +1034,46 @@ pub enum EmbeddedLegalRepresentative<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLeiCode<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLocation<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLongitude<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMainEntityOfPage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1625,52 +1084,28 @@ pub enum EmbeddedMakesOffer<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMap<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaps<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaximumAttendeeCapacity<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1685,13 +1120,7 @@ pub enum EmbeddedMember<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1704,13 +1133,7 @@ pub enum EmbeddedMemberOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1725,123 +1148,67 @@ pub enum EmbeddedMembers<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNaics<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNonprofitStatus<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNumberOfEmployees<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHours<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHoursSpecification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwnershipFundingInfo<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1854,233 +1221,127 @@ pub enum EmbeddedParentOrganization<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPaymentAccepted<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPotentialAction<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPriceRange<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublicAccess<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublishingPrinciples<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReview<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReviews<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSameAs<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSeeks<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedServiceArea<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSkills<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSlogan<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSmokingAllowed<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSpecialOpeningHoursSpecification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2095,13 +1356,7 @@ pub enum EmbeddedSponsor<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2114,13 +1369,7 @@ pub enum EmbeddedSubOrganization<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2131,90 +1380,51 @@ pub enum EmbeddedSubjectOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTaxId<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTelephone<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTourBookingPage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUnnamedSourcesPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUrl<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedVatId<'a> {}
-fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "social.flockfeeds.lexical.type.LocalBusiness",
-        ),
+        id: ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.LocalBusiness"),
         revision: None,
         description: None,
         defs: {
@@ -5665,26 +4875,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocalBusiness<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub accepted_payment_method: std::option::Option<
-        LocalBusinessAcceptedPaymentMethod<'a>,
-    >,
+    pub accepted_payment_method: std::option::Option<LocalBusinessAcceptedPaymentMethod<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: std::option::Option<
-        LocalBusinessActionableFeedbackPolicy<'a>,
-    >,
+    pub actionable_feedback_policy: std::option::Option<LocalBusinessActionableFeedbackPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub additional_property: std::option::Option<LocalBusinessAdditionalProperty<'a>>,
@@ -5696,9 +4896,8 @@ pub struct LocalBusiness<'a> {
     pub address: std::option::Option<LocalBusinessAddress<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: std::option::Option<
-        LocalBusinessAgentInteractionStatistic<'a>,
-    >,
+    pub agent_interaction_statistic:
+        std::option::Option<LocalBusinessAgentInteractionStatistic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub aggregate_rating: std::option::Option<LocalBusinessAggregateRating<'a>>,
@@ -5761,9 +4960,7 @@ pub struct LocalBusiness<'a> {
     pub description: std::option::Option<LocalBusinessDescription<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
-        LocalBusinessDisambiguatingDescription<'a>,
-    >,
+    pub disambiguating_description: std::option::Option<LocalBusinessDisambiguatingDescription<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dissolution_date: std::option::Option<LocalBusinessDissolutionDate<'a>>,
@@ -5772,9 +4969,7 @@ pub struct LocalBusiness<'a> {
     pub diversity_policy: std::option::Option<LocalBusinessDiversityPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: std::option::Option<
-        LocalBusinessDiversityStaffingReport<'a>,
-    >,
+    pub diversity_staffing_report: std::option::Option<LocalBusinessDiversityStaffingReport<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub duns: std::option::Option<LocalBusinessDuns<'a>>,
@@ -5852,9 +5047,7 @@ pub struct LocalBusiness<'a> {
     pub geo_within: std::option::Option<LocalBusinessGeoWithin<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub global_location_number: std::option::Option<
-        LocalBusinessGlobalLocationNumber<'a>,
-    >,
+    pub global_location_number: std::option::Option<LocalBusinessGlobalLocationNumber<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_certification: std::option::Option<LocalBusinessHasCertification<'a>>,
@@ -5863,9 +5056,7 @@ pub struct LocalBusiness<'a> {
     pub has_credential: std::option::Option<LocalBusinessHasCredential<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_drive_through_service: std::option::Option<
-        LocalBusinessHasDriveThroughService<'a>,
-    >,
+    pub has_drive_through_service: std::option::Option<LocalBusinessHasDriveThroughService<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_gs1_digital_link: std::option::Option<LocalBusinessHasGs1DigitalLink<'a>>,
@@ -5877,9 +5068,7 @@ pub struct LocalBusiness<'a> {
     pub has_member_program: std::option::Option<LocalBusinessHasMemberProgram<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: std::option::Option<
-        LocalBusinessHasMerchantReturnPolicy<'a>,
-    >,
+    pub has_merchant_return_policy: std::option::Option<LocalBusinessHasMerchantReturnPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_offer_catalog: std::option::Option<LocalBusinessHasOfferCatalog<'a>>,
@@ -5888,9 +5077,7 @@ pub struct LocalBusiness<'a> {
     pub has_pos: std::option::Option<LocalBusinessHasPos<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: std::option::Option<
-        LocalBusinessHasProductReturnPolicy<'a>,
-    >,
+    pub has_product_return_policy: std::option::Option<LocalBusinessHasProductReturnPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub has_shipping_service: std::option::Option<LocalBusinessHasShippingService<'a>>,
@@ -5902,14 +5089,10 @@ pub struct LocalBusiness<'a> {
     pub image: std::option::Option<LocalBusinessImage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: std::option::Option<
-        LocalBusinessInteractionStatistic<'a>,
-    >,
+    pub interaction_statistic: std::option::Option<LocalBusinessInteractionStatistic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: std::option::Option<
-        LocalBusinessIsAccessibleForFree<'a>,
-    >,
+    pub is_accessible_for_free: std::option::Option<LocalBusinessIsAccessibleForFree<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub isic_v4: std::option::Option<LocalBusinessIsicV4<'a>>,
@@ -5963,9 +5146,7 @@ pub struct LocalBusiness<'a> {
     pub maps: std::option::Option<LocalBusinessMaps<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub maximum_attendee_capacity: std::option::Option<
-        LocalBusinessMaximumAttendeeCapacity<'a>,
-    >,
+    pub maximum_attendee_capacity: std::option::Option<LocalBusinessMaximumAttendeeCapacity<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub member: std::option::Option<LocalBusinessMember<'a>>,
@@ -5992,14 +5173,11 @@ pub struct LocalBusiness<'a> {
     pub opening_hours: std::option::Option<LocalBusinessOpeningHours<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours_specification: std::option::Option<
-        LocalBusinessOpeningHoursSpecification<'a>,
-    >,
+    pub opening_hours_specification:
+        std::option::Option<LocalBusinessOpeningHoursSpecification<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ownership_funding_info: std::option::Option<
-        LocalBusinessOwnershipFundingInfo<'a>,
-    >,
+    pub ownership_funding_info: std::option::Option<LocalBusinessOwnershipFundingInfo<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub owns: std::option::Option<LocalBusinessOwns<'a>>,
@@ -6026,9 +5204,7 @@ pub struct LocalBusiness<'a> {
     pub public_access: std::option::Option<LocalBusinessPublicAccess<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: std::option::Option<
-        LocalBusinessPublishingPrinciples<'a>,
-    >,
+    pub publishing_principles: std::option::Option<LocalBusinessPublishingPrinciples<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub review: std::option::Option<LocalBusinessReview<'a>>,
@@ -6055,9 +5231,8 @@ pub struct LocalBusiness<'a> {
     pub smoking_allowed: std::option::Option<LocalBusinessSmokingAllowed<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub special_opening_hours_specification: std::option::Option<
-        LocalBusinessSpecialOpeningHoursSpecification<'a>,
-    >,
+    pub special_opening_hours_specification:
+        std::option::Option<LocalBusinessSpecialOpeningHoursSpecification<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sponsor: std::option::Option<LocalBusinessSponsor<'a>>,
@@ -6078,9 +5253,7 @@ pub struct LocalBusiness<'a> {
     pub tour_booking_page: std::option::Option<LocalBusinessTourBookingPage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub unnamed_sources_policy: std::option::Option<
-        LocalBusinessUnnamedSourcesPolicy<'a>,
-    >,
+    pub unnamed_sources_policy: std::option::Option<LocalBusinessUnnamedSourcesPolicy<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<LocalBusinessUrl<'a>>,
@@ -6091,7 +5264,7 @@ pub struct LocalBusiness<'a> {
 
 pub mod local_business_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6255,132 +5428,15 @@ impl<'a> LocalBusinessBuilder<'a, local_business_state::Empty> {
         LocalBusinessBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -6454,10 +5510,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<LocalBusinessAdditionalType<'a>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<LocalBusinessAdditionalType<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -6465,10 +5518,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `address` field (optional)
-    pub fn address(
-        mut self,
-        value: impl Into<Option<LocalBusinessAddress<'a>>>,
-    ) -> Self {
+    pub fn address(mut self, value: impl Into<Option<LocalBusinessAddress<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -6527,10 +5577,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<LocalBusinessAlternateName<'a>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<LocalBusinessAlternateName<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -6559,10 +5606,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
-    pub fn maybe_amenity_feature(
-        mut self,
-        value: Option<LocalBusinessAmenityFeature<'a>>,
-    ) -> Self {
+    pub fn maybe_amenity_feature(mut self, value: Option<LocalBusinessAmenityFeature<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -6570,18 +5614,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(
-        mut self,
-        value: impl Into<Option<LocalBusinessAreaServed<'a>>>,
-    ) -> Self {
+    pub fn area_served(mut self, value: impl Into<Option<LocalBusinessAreaServed<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
-    pub fn maybe_area_served(
-        mut self,
-        value: Option<LocalBusinessAreaServed<'a>>,
-    ) -> Self {
+    pub fn maybe_area_served(mut self, value: Option<LocalBusinessAreaServed<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -6615,18 +5653,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `branchCode` field (optional)
-    pub fn branch_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessBranchCode<'a>>>,
-    ) -> Self {
+    pub fn branch_code(mut self, value: impl Into<Option<LocalBusinessBranchCode<'a>>>) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `branchCode` field to an Option value (optional)
-    pub fn maybe_branch_code(
-        mut self,
-        value: Option<LocalBusinessBranchCode<'a>>,
-    ) -> Self {
+    pub fn maybe_branch_code(mut self, value: Option<LocalBusinessBranchCode<'a>>) -> Self {
         self.__unsafe_private_named.13 = value;
         self
     }
@@ -6634,10 +5666,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `branchOf` field (optional)
-    pub fn branch_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessBranchOf<'a>>>,
-    ) -> Self {
+    pub fn branch_of(mut self, value: impl Into<Option<LocalBusinessBranchOf<'a>>>) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
@@ -6690,10 +5719,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(
-        mut self,
-        value: Option<LocalBusinessContactPoint<'a>>,
-    ) -> Self {
+    pub fn maybe_contact_point(mut self, value: Option<LocalBusinessContactPoint<'a>>) -> Self {
         self.__unsafe_private_named.17 = value;
         self
     }
@@ -6709,10 +5735,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(
-        mut self,
-        value: Option<LocalBusinessContactPoints<'a>>,
-    ) -> Self {
+    pub fn maybe_contact_points(mut self, value: Option<LocalBusinessContactPoints<'a>>) -> Self {
         self.__unsafe_private_named.18 = value;
         self
     }
@@ -6720,18 +5743,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `containedIn` field (optional)
-    pub fn contained_in(
-        mut self,
-        value: impl Into<Option<LocalBusinessContainedIn<'a>>>,
-    ) -> Self {
+    pub fn contained_in(mut self, value: impl Into<Option<LocalBusinessContainedIn<'a>>>) -> Self {
         self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `containedIn` field to an Option value (optional)
-    pub fn maybe_contained_in(
-        mut self,
-        value: Option<LocalBusinessContainedIn<'a>>,
-    ) -> Self {
+    pub fn maybe_contained_in(mut self, value: Option<LocalBusinessContainedIn<'a>>) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -6766,10 +5783,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `containsPlace` field to an Option value (optional)
-    pub fn maybe_contains_place(
-        mut self,
-        value: Option<LocalBusinessContainsPlace<'a>>,
-    ) -> Self {
+    pub fn maybe_contains_place(mut self, value: Option<LocalBusinessContainsPlace<'a>>) -> Self {
         self.__unsafe_private_named.21 = value;
         self
     }
@@ -6815,18 +5829,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `department` field (optional)
-    pub fn department(
-        mut self,
-        value: impl Into<Option<LocalBusinessDepartment<'a>>>,
-    ) -> Self {
+    pub fn department(mut self, value: impl Into<Option<LocalBusinessDepartment<'a>>>) -> Self {
         self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
-    pub fn maybe_department(
-        mut self,
-        value: Option<LocalBusinessDepartment<'a>>,
-    ) -> Self {
+    pub fn maybe_department(mut self, value: Option<LocalBusinessDepartment<'a>>) -> Self {
         self.__unsafe_private_named.24 = value;
         self
     }
@@ -6834,18 +5842,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<LocalBusinessDescription<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<LocalBusinessDescription<'a>>>) -> Self {
         self.__unsafe_private_named.25 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<LocalBusinessDescription<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<LocalBusinessDescription<'a>>) -> Self {
         self.__unsafe_private_named.25 = value;
         self
     }
@@ -6955,10 +5957,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `employee` field (optional)
-    pub fn employee(
-        mut self,
-        value: impl Into<Option<LocalBusinessEmployee<'a>>>,
-    ) -> Self {
+    pub fn employee(mut self, value: impl Into<Option<LocalBusinessEmployee<'a>>>) -> Self {
         self.__unsafe_private_named.32 = value.into();
         self
     }
@@ -6971,10 +5970,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `employees` field (optional)
-    pub fn employees(
-        mut self,
-        value: impl Into<Option<LocalBusinessEmployees<'a>>>,
-    ) -> Self {
+    pub fn employees(mut self, value: impl Into<Option<LocalBusinessEmployees<'a>>>) -> Self {
         self.__unsafe_private_named.33 = value.into();
         self
     }
@@ -6995,10 +5991,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(
-        mut self,
-        value: Option<LocalBusinessEthicsPolicy<'a>>,
-    ) -> Self {
+    pub fn maybe_ethics_policy(mut self, value: Option<LocalBusinessEthicsPolicy<'a>>) -> Self {
         self.__unsafe_private_named.34 = value;
         self
     }
@@ -7032,18 +6025,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(
-        mut self,
-        value: impl Into<Option<LocalBusinessFaxNumber<'a>>>,
-    ) -> Self {
+    pub fn fax_number(mut self, value: impl Into<Option<LocalBusinessFaxNumber<'a>>>) -> Self {
         self.__unsafe_private_named.37 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
-    pub fn maybe_fax_number(
-        mut self,
-        value: Option<LocalBusinessFaxNumber<'a>>,
-    ) -> Self {
+    pub fn maybe_fax_number(mut self, value: Option<LocalBusinessFaxNumber<'a>>) -> Self {
         self.__unsafe_private_named.37 = value;
         self
     }
@@ -7051,10 +6038,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `founder` field (optional)
-    pub fn founder(
-        mut self,
-        value: impl Into<Option<LocalBusinessFounder<'a>>>,
-    ) -> Self {
+    pub fn founder(mut self, value: impl Into<Option<LocalBusinessFounder<'a>>>) -> Self {
         self.__unsafe_private_named.38 = value.into();
         self
     }
@@ -7067,10 +6051,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `founders` field (optional)
-    pub fn founders(
-        mut self,
-        value: impl Into<Option<LocalBusinessFounders<'a>>>,
-    ) -> Self {
+    pub fn founders(mut self, value: impl Into<Option<LocalBusinessFounders<'a>>>) -> Self {
         self.__unsafe_private_named.39 = value.into();
         self
     }
@@ -7091,10 +6072,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(
-        mut self,
-        value: Option<LocalBusinessFoundingDate<'a>>,
-    ) -> Self {
+    pub fn maybe_founding_date(mut self, value: Option<LocalBusinessFoundingDate<'a>>) -> Self {
         self.__unsafe_private_named.40 = value;
         self
     }
@@ -7134,10 +6112,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(
-        mut self,
-        value: impl Into<Option<LocalBusinessFunding<'a>>>,
-    ) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<LocalBusinessFunding<'a>>>) -> Self {
         self.__unsafe_private_named.43 = value.into();
         self
     }
@@ -7163,18 +6138,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoContains` field (optional)
-    pub fn geo_contains(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoContains<'a>>>,
-    ) -> Self {
+    pub fn geo_contains(mut self, value: impl Into<Option<LocalBusinessGeoContains<'a>>>) -> Self {
         self.__unsafe_private_named.45 = value.into();
         self
     }
     /// Set the `geoContains` field to an Option value (optional)
-    pub fn maybe_geo_contains(
-        mut self,
-        value: Option<LocalBusinessGeoContains<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_contains(mut self, value: Option<LocalBusinessGeoContains<'a>>) -> Self {
         self.__unsafe_private_named.45 = value;
         self
     }
@@ -7190,10 +6159,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `geoCoveredBy` field to an Option value (optional)
-    pub fn maybe_geo_covered_by(
-        mut self,
-        value: Option<LocalBusinessGeoCoveredBy<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_covered_by(mut self, value: Option<LocalBusinessGeoCoveredBy<'a>>) -> Self {
         self.__unsafe_private_named.46 = value;
         self
     }
@@ -7201,18 +6167,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoCovers` field (optional)
-    pub fn geo_covers(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoCovers<'a>>>,
-    ) -> Self {
+    pub fn geo_covers(mut self, value: impl Into<Option<LocalBusinessGeoCovers<'a>>>) -> Self {
         self.__unsafe_private_named.47 = value.into();
         self
     }
     /// Set the `geoCovers` field to an Option value (optional)
-    pub fn maybe_geo_covers(
-        mut self,
-        value: Option<LocalBusinessGeoCovers<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_covers(mut self, value: Option<LocalBusinessGeoCovers<'a>>) -> Self {
         self.__unsafe_private_named.47 = value;
         self
     }
@@ -7220,18 +6180,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoCrosses` field (optional)
-    pub fn geo_crosses(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoCrosses<'a>>>,
-    ) -> Self {
+    pub fn geo_crosses(mut self, value: impl Into<Option<LocalBusinessGeoCrosses<'a>>>) -> Self {
         self.__unsafe_private_named.48 = value.into();
         self
     }
     /// Set the `geoCrosses` field to an Option value (optional)
-    pub fn maybe_geo_crosses(
-        mut self,
-        value: Option<LocalBusinessGeoCrosses<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_crosses(mut self, value: Option<LocalBusinessGeoCrosses<'a>>) -> Self {
         self.__unsafe_private_named.48 = value;
         self
     }
@@ -7239,18 +6193,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoDisjoint` field (optional)
-    pub fn geo_disjoint(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoDisjoint<'a>>>,
-    ) -> Self {
+    pub fn geo_disjoint(mut self, value: impl Into<Option<LocalBusinessGeoDisjoint<'a>>>) -> Self {
         self.__unsafe_private_named.49 = value.into();
         self
     }
     /// Set the `geoDisjoint` field to an Option value (optional)
-    pub fn maybe_geo_disjoint(
-        mut self,
-        value: Option<LocalBusinessGeoDisjoint<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_disjoint(mut self, value: Option<LocalBusinessGeoDisjoint<'a>>) -> Self {
         self.__unsafe_private_named.49 = value;
         self
     }
@@ -7258,18 +6206,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoEquals` field (optional)
-    pub fn geo_equals(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoEquals<'a>>>,
-    ) -> Self {
+    pub fn geo_equals(mut self, value: impl Into<Option<LocalBusinessGeoEquals<'a>>>) -> Self {
         self.__unsafe_private_named.50 = value.into();
         self
     }
     /// Set the `geoEquals` field to an Option value (optional)
-    pub fn maybe_geo_equals(
-        mut self,
-        value: Option<LocalBusinessGeoEquals<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_equals(mut self, value: Option<LocalBusinessGeoEquals<'a>>) -> Self {
         self.__unsafe_private_named.50 = value;
         self
     }
@@ -7285,10 +6227,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `geoIntersects` field to an Option value (optional)
-    pub fn maybe_geo_intersects(
-        mut self,
-        value: Option<LocalBusinessGeoIntersects<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_intersects(mut self, value: Option<LocalBusinessGeoIntersects<'a>>) -> Self {
         self.__unsafe_private_named.51 = value;
         self
     }
@@ -7296,18 +6235,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoOverlaps` field (optional)
-    pub fn geo_overlaps(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoOverlaps<'a>>>,
-    ) -> Self {
+    pub fn geo_overlaps(mut self, value: impl Into<Option<LocalBusinessGeoOverlaps<'a>>>) -> Self {
         self.__unsafe_private_named.52 = value.into();
         self
     }
     /// Set the `geoOverlaps` field to an Option value (optional)
-    pub fn maybe_geo_overlaps(
-        mut self,
-        value: Option<LocalBusinessGeoOverlaps<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_overlaps(mut self, value: Option<LocalBusinessGeoOverlaps<'a>>) -> Self {
         self.__unsafe_private_named.52 = value;
         self
     }
@@ -7315,18 +6248,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoTouches` field (optional)
-    pub fn geo_touches(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoTouches<'a>>>,
-    ) -> Self {
+    pub fn geo_touches(mut self, value: impl Into<Option<LocalBusinessGeoTouches<'a>>>) -> Self {
         self.__unsafe_private_named.53 = value.into();
         self
     }
     /// Set the `geoTouches` field to an Option value (optional)
-    pub fn maybe_geo_touches(
-        mut self,
-        value: Option<LocalBusinessGeoTouches<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_touches(mut self, value: Option<LocalBusinessGeoTouches<'a>>) -> Self {
         self.__unsafe_private_named.53 = value;
         self
     }
@@ -7334,18 +6261,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `geoWithin` field (optional)
-    pub fn geo_within(
-        mut self,
-        value: impl Into<Option<LocalBusinessGeoWithin<'a>>>,
-    ) -> Self {
+    pub fn geo_within(mut self, value: impl Into<Option<LocalBusinessGeoWithin<'a>>>) -> Self {
         self.__unsafe_private_named.54 = value.into();
         self
     }
     /// Set the `geoWithin` field to an Option value (optional)
-    pub fn maybe_geo_within(
-        mut self,
-        value: Option<LocalBusinessGeoWithin<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_within(mut self, value: Option<LocalBusinessGeoWithin<'a>>) -> Self {
         self.__unsafe_private_named.54 = value;
         self
     }
@@ -7399,10 +6320,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(
-        mut self,
-        value: Option<LocalBusinessHasCredential<'a>>,
-    ) -> Self {
+    pub fn maybe_has_credential(mut self, value: Option<LocalBusinessHasCredential<'a>>) -> Self {
         self.__unsafe_private_named.57 = value;
         self
     }
@@ -7569,18 +6487,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<LocalBusinessIdentifier<'a>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<LocalBusinessIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.67 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(
-        mut self,
-        value: Option<LocalBusinessIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<LocalBusinessIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.67 = value;
         self
     }
@@ -7652,18 +6564,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessIso6523Code<'a>>>,
-    ) -> Self {
+    pub fn iso6523_code(mut self, value: impl Into<Option<LocalBusinessIso6523Code<'a>>>) -> Self {
         self.__unsafe_private_named.72 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(
-        mut self,
-        value: Option<LocalBusinessIso6523Code<'a>>,
-    ) -> Self {
+    pub fn maybe_iso6523_code(mut self, value: Option<LocalBusinessIso6523Code<'a>>) -> Self {
         self.__unsafe_private_named.72 = value;
         self
     }
@@ -7671,10 +6577,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<LocalBusinessKeywords<'a>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<LocalBusinessKeywords<'a>>>) -> Self {
         self.__unsafe_private_named.73 = value.into();
         self
     }
@@ -7687,18 +6590,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(
-        mut self,
-        value: impl Into<Option<LocalBusinessKnowsAbout<'a>>>,
-    ) -> Self {
+    pub fn knows_about(mut self, value: impl Into<Option<LocalBusinessKnowsAbout<'a>>>) -> Self {
         self.__unsafe_private_named.74 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
-    pub fn maybe_knows_about(
-        mut self,
-        value: Option<LocalBusinessKnowsAbout<'a>>,
-    ) -> Self {
+    pub fn maybe_knows_about(mut self, value: Option<LocalBusinessKnowsAbout<'a>>) -> Self {
         self.__unsafe_private_named.74 = value;
         self
     }
@@ -7714,10 +6611,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(
-        mut self,
-        value: Option<LocalBusinessKnowsLanguage<'a>>,
-    ) -> Self {
+    pub fn maybe_knows_language(mut self, value: Option<LocalBusinessKnowsLanguage<'a>>) -> Self {
         self.__unsafe_private_named.75 = value;
         self
     }
@@ -7725,10 +6619,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `latitude` field (optional)
-    pub fn latitude(
-        mut self,
-        value: impl Into<Option<LocalBusinessLatitude<'a>>>,
-    ) -> Self {
+    pub fn latitude(mut self, value: impl Into<Option<LocalBusinessLatitude<'a>>>) -> Self {
         self.__unsafe_private_named.76 = value.into();
         self
     }
@@ -7749,10 +6640,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(
-        mut self,
-        value: Option<LocalBusinessLegalAddress<'a>>,
-    ) -> Self {
+    pub fn maybe_legal_address(mut self, value: Option<LocalBusinessLegalAddress<'a>>) -> Self {
         self.__unsafe_private_named.77 = value;
         self
     }
@@ -7760,18 +6648,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(
-        mut self,
-        value: impl Into<Option<LocalBusinessLegalName<'a>>>,
-    ) -> Self {
+    pub fn legal_name(mut self, value: impl Into<Option<LocalBusinessLegalName<'a>>>) -> Self {
         self.__unsafe_private_named.78 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
-    pub fn maybe_legal_name(
-        mut self,
-        value: Option<LocalBusinessLegalName<'a>>,
-    ) -> Self {
+    pub fn maybe_legal_name(mut self, value: Option<LocalBusinessLegalName<'a>>) -> Self {
         self.__unsafe_private_named.78 = value;
         self
     }
@@ -7798,10 +6680,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `leiCode` field (optional)
-    pub fn lei_code(
-        mut self,
-        value: impl Into<Option<LocalBusinessLeiCode<'a>>>,
-    ) -> Self {
+    pub fn lei_code(mut self, value: impl Into<Option<LocalBusinessLeiCode<'a>>>) -> Self {
         self.__unsafe_private_named.80 = value.into();
         self
     }
@@ -7814,10 +6693,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(
-        mut self,
-        value: impl Into<Option<LocalBusinessLocation<'a>>>,
-    ) -> Self {
+    pub fn location(mut self, value: impl Into<Option<LocalBusinessLocation<'a>>>) -> Self {
         self.__unsafe_private_named.81 = value.into();
         self
     }
@@ -7843,10 +6719,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `longitude` field (optional)
-    pub fn longitude(
-        mut self,
-        value: impl Into<Option<LocalBusinessLongitude<'a>>>,
-    ) -> Self {
+    pub fn longitude(mut self, value: impl Into<Option<LocalBusinessLongitude<'a>>>) -> Self {
         self.__unsafe_private_named.83 = value.into();
         self
     }
@@ -7878,18 +6751,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(
-        mut self,
-        value: impl Into<Option<LocalBusinessMakesOffer<'a>>>,
-    ) -> Self {
+    pub fn makes_offer(mut self, value: impl Into<Option<LocalBusinessMakesOffer<'a>>>) -> Self {
         self.__unsafe_private_named.85 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
-    pub fn maybe_makes_offer(
-        mut self,
-        value: Option<LocalBusinessMakesOffer<'a>>,
-    ) -> Self {
+    pub fn maybe_makes_offer(mut self, value: Option<LocalBusinessMakesOffer<'a>>) -> Self {
         self.__unsafe_private_named.85 = value;
         self
     }
@@ -7955,10 +6822,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessMemberOf<'a>>>,
-    ) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<LocalBusinessMemberOf<'a>>>) -> Self {
         self.__unsafe_private_named.90 = value.into();
         self
     }
@@ -7971,10 +6835,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `members` field (optional)
-    pub fn members(
-        mut self,
-        value: impl Into<Option<LocalBusinessMembers<'a>>>,
-    ) -> Self {
+    pub fn members(mut self, value: impl Into<Option<LocalBusinessMembers<'a>>>) -> Self {
         self.__unsafe_private_named.91 = value.into();
         self
     }
@@ -8059,10 +6920,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `openingHours` field to an Option value (optional)
-    pub fn maybe_opening_hours(
-        mut self,
-        value: Option<LocalBusinessOpeningHours<'a>>,
-    ) -> Self {
+    pub fn maybe_opening_hours(mut self, value: Option<LocalBusinessOpeningHours<'a>>) -> Self {
         self.__unsafe_private_named.96 = value;
         self
     }
@@ -8204,18 +7062,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `priceRange` field (optional)
-    pub fn price_range(
-        mut self,
-        value: impl Into<Option<LocalBusinessPriceRange<'a>>>,
-    ) -> Self {
+    pub fn price_range(mut self, value: impl Into<Option<LocalBusinessPriceRange<'a>>>) -> Self {
         self.__unsafe_private_named.105 = value.into();
         self
     }
     /// Set the `priceRange` field to an Option value (optional)
-    pub fn maybe_price_range(
-        mut self,
-        value: Option<LocalBusinessPriceRange<'a>>,
-    ) -> Self {
+    pub fn maybe_price_range(mut self, value: Option<LocalBusinessPriceRange<'a>>) -> Self {
         self.__unsafe_private_named.105 = value;
         self
     }
@@ -8231,10 +7083,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `publicAccess` field to an Option value (optional)
-    pub fn maybe_public_access(
-        mut self,
-        value: Option<LocalBusinessPublicAccess<'a>>,
-    ) -> Self {
+    pub fn maybe_public_access(mut self, value: Option<LocalBusinessPublicAccess<'a>>) -> Self {
         self.__unsafe_private_named.106 = value;
         self
     }
@@ -8274,10 +7123,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(
-        mut self,
-        value: impl Into<Option<LocalBusinessReviews<'a>>>,
-    ) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<LocalBusinessReviews<'a>>>) -> Self {
         self.__unsafe_private_named.109 = value.into();
         self
     }
@@ -8316,18 +7162,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(
-        mut self,
-        value: impl Into<Option<LocalBusinessServiceArea<'a>>>,
-    ) -> Self {
+    pub fn service_area(mut self, value: impl Into<Option<LocalBusinessServiceArea<'a>>>) -> Self {
         self.__unsafe_private_named.112 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(
-        mut self,
-        value: Option<LocalBusinessServiceArea<'a>>,
-    ) -> Self {
+    pub fn maybe_service_area(mut self, value: Option<LocalBusinessServiceArea<'a>>) -> Self {
         self.__unsafe_private_named.112 = value;
         self
     }
@@ -8369,10 +7209,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
-    pub fn maybe_smoking_allowed(
-        mut self,
-        value: Option<LocalBusinessSmokingAllowed<'a>>,
-    ) -> Self {
+    pub fn maybe_smoking_allowed(mut self, value: Option<LocalBusinessSmokingAllowed<'a>>) -> Self {
         self.__unsafe_private_named.115 = value;
         self
     }
@@ -8399,10 +7236,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(
-        mut self,
-        value: impl Into<Option<LocalBusinessSponsor<'a>>>,
-    ) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<LocalBusinessSponsor<'a>>>) -> Self {
         self.__unsafe_private_named.117 = value.into();
         self
     }
@@ -8434,18 +7268,12 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(
-        mut self,
-        value: impl Into<Option<LocalBusinessSubjectOf<'a>>>,
-    ) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<LocalBusinessSubjectOf<'a>>>) -> Self {
         self.__unsafe_private_named.119 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(
-        mut self,
-        value: Option<LocalBusinessSubjectOf<'a>>,
-    ) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<LocalBusinessSubjectOf<'a>>) -> Self {
         self.__unsafe_private_named.119 = value;
         self
     }
@@ -8466,10 +7294,7 @@ impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
 
 impl<'a, S: local_business_state::State> LocalBusinessBuilder<'a, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(
-        mut self,
-        value: impl Into<Option<LocalBusinessTelephone<'a>>>,
-    ) -> Self {
+    pub fn telephone(mut self, value: impl Into<Option<LocalBusinessTelephone<'a>>>) -> Self {
         self.__unsafe_private_named.121 = value.into();
         self
     }
@@ -8835,117 +7660,63 @@ impl<'a> LocalBusiness<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAcceptedPaymentMethod<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessActionableFeedbackPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAdditionalProperty<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAdditionalType<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAddress<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAgentInteractionStatistic<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAggregateRating<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAlternateName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -8956,78 +7727,42 @@ pub enum LocalBusinessAlumni<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAmenityFeature<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAreaServed<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAward<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAwards<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessBranchCode<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9040,13 +7775,7 @@ pub enum LocalBusinessBranchOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9061,117 +7790,63 @@ pub enum LocalBusinessBrand<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCompanyRegistration<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContactPoint<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContactPoints<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainedIn<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainedInPlace<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainsPlace<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCorrectionsPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCurrenciesAccepted<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9184,110 +7859,60 @@ pub enum LocalBusinessDepartment<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDescription<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDisambiguatingDescription<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDissolutionDate<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDiversityPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>,
-    ),
+    ArticleEmbedded(Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDuns<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEmail<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9298,13 +7923,7 @@ pub enum LocalBusinessEmployee<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9315,26 +7934,14 @@ pub enum LocalBusinessEmployees<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEthicsPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9345,13 +7952,7 @@ pub enum LocalBusinessEvent<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9362,26 +7963,14 @@ pub enum LocalBusinessEvents<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFaxNumber<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9396,13 +7985,7 @@ pub enum LocalBusinessFounder<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9413,39 +7996,21 @@ pub enum LocalBusinessFounders<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFoundingDate<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFoundingLocation<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9460,487 +8025,263 @@ pub enum LocalBusinessFunder<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFunding<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeo<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoContains<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCoveredBy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCovers<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCrosses<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoDisjoint<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoEquals<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoIntersects<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoOverlaps<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoTouches<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoWithin<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGlobalLocationNumber<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasCertification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasCredential<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasDriveThroughService<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasGs1DigitalLink<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMap<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMemberProgram<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMerchantReturnPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasOfferCatalog<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasPos<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasProductReturnPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasShippingService<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIdentifier<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessInteractionStatistic<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIsAccessibleForFree<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIsicV4<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIso6523Code<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKeywords<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKnowsAbout<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKnowsLanguage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLatitude<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLegalAddress<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLegalName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -9951,84 +8292,46 @@ pub enum LocalBusinessLegalRepresentative<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLeiCode<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLocation<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLongitude<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMainEntityOfPage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10039,52 +8342,28 @@ pub enum LocalBusinessMakesOffer<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMap<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMaps<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMaximumAttendeeCapacity<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10099,13 +8378,7 @@ pub enum LocalBusinessMember<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10118,13 +8391,7 @@ pub enum LocalBusinessMemberOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10139,123 +8406,67 @@ pub enum LocalBusinessMembers<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNaics<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessName<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNonprofitStatus<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNumberOfEmployees<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOpeningHours<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOpeningHoursSpecification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOwnershipFundingInfo<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10268,233 +8479,127 @@ pub enum LocalBusinessParentOrganization<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPaymentAccepted<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>),
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPotentialAction<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPriceRange<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPublicAccess<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPublishingPrinciples<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessReview<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessReviews<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSameAs<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSeeks<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessServiceArea<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSkills<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSlogan<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSmokingAllowed<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSpecialOpeningHoursSpecification<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10509,13 +8614,7 @@ pub enum LocalBusinessSponsor<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10528,13 +8627,7 @@ pub enum LocalBusinessSubOrganization<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -10545,91 +8638,49 @@ pub enum LocalBusinessSubjectOf<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTaxId<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTelephone<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTourBookingPage<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessUnnamedSourcesPolicy<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessUrl<'a> {}
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessVatId<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocalBusinessGetRecordOutput<'a> {

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteGate<'a> {
@@ -27,7 +21,7 @@ pub struct DeleteGate<'a> {
 
 pub mod delete_gate_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod delete_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type GateUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type GateUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type GateUri = S::GateUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `gate_uri` field to Set
     pub struct SetGateUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGateUri<S> {}
     impl<S: State> State for SetGateUri<S> {
-        type Streamer = S::Streamer;
         type GateUri = Set<members::gate_uri>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type GateUri = S::GateUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `gate_uri` field
         pub struct gate_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> DeleteGateBuilder<'a, S>
 where
     S: delete_gate_state::State,
-    S::Streamer: delete_gate_state::IsSet,
     S::GateUri: delete_gate_state::IsSet,
+    S::Streamer: delete_gate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteGate<'a> {
@@ -174,7 +168,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteGateOutput<'a> {}
@@ -188,7 +182,7 @@ pub struct DeleteGateOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -245,9 +239,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGate<'a> {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteGateResponse;
 }
 
@@ -256,9 +249,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGate<'a> {
 pub struct DeleteGateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteGate<'de>;
     type Response = DeleteGateResponse;
 }

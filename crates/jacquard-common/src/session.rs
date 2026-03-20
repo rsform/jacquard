@@ -95,7 +95,7 @@ where
 /// Example
 /// ```ignore
 /// use jacquard::client::{AtClient, FileTokenStore};
-/// let base = url::Url::parse("https://bsky.social").unwrap();
+/// let base = jacquard_common::deps::fluent_uri::Uri::parse("https://bsky.social").unwrap().to_owned();
 /// let store = FileTokenStore::new("/tmp/jacquard-session.json");
 /// let client = AtClient::new(reqwest::Client::new(), base, store);
 /// ```

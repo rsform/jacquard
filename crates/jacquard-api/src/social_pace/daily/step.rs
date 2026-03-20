@@ -8,13 +8,7 @@
 /// A daily recording of your steps for that day. This record is expected to be update throughout the day and represent's 12am-12pm in your timezone, or what you count as a "day". The key is also traditionally the date of your "day" yyy-mm-dd.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Step<'a> {
@@ -28,7 +22,7 @@ pub struct Step<'a> {
 
 pub mod step_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,10 +132,7 @@ where
     S::Steps: step_state::IsUnset,
 {
     /// Set the `steps` field (required)
-    pub fn steps(
-        mut self,
-        value: impl Into<i64>,
-    ) -> StepBuilder<'a, step_state::SetSteps<S>> {
+    pub fn steps(mut self, value: impl Into<i64>) -> StepBuilder<'a, step_state::SetSteps<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StepBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -218,13 +209,7 @@ impl<'a> Step<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StepGetRecordOutput<'a> {
@@ -281,9 +266,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Step<'a> {
     }
 }
 
-fn lexicon_doc_social_pace_daily_step() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_pace_daily_step() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pace.daily.step"),

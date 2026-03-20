@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeleton<'a> {
@@ -31,7 +25,7 @@ pub struct SearchStarterPacksSkeleton<'a> {
 
 pub mod search_starter_packs_skeleton_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -62,10 +56,7 @@ pub mod search_starter_packs_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct SearchStarterPacksSkeletonBuilder<
-    'a,
-    S: search_starter_packs_skeleton_state::State,
-> {
+pub struct SearchStarterPacksSkeletonBuilder<'a, S: search_starter_packs_skeleton_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -78,17 +69,13 @@ pub struct SearchStarterPacksSkeletonBuilder<
 
 impl<'a> SearchStarterPacksSkeleton<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SearchStarterPacksSkeletonBuilder<
-        'a,
-        search_starter_packs_skeleton_state::Empty,
-    > {
+    pub fn new() -> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty>
+    {
         SearchStarterPacksSkeletonBuilder::new()
     }
 }
 
-impl<
-    'a,
-> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty> {
+impl<'a> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchStarterPacksSkeletonBuilder {
@@ -99,15 +86,9 @@ impl<
     }
 }
 
-impl<
-    'a,
-    S: search_starter_packs_skeleton_state::State,
-> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -118,10 +99,7 @@ impl<
     }
 }
 
-impl<
-    'a,
-    S: search_starter_packs_skeleton_state::State,
-> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -143,10 +121,7 @@ where
     pub fn q(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> SearchStarterPacksSkeletonBuilder<
-        'a,
-        search_starter_packs_skeleton_state::SetQ<S>,
-    > {
+    ) -> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::SetQ<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SearchStarterPacksSkeletonBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -156,10 +131,7 @@ where
     }
 }
 
-impl<
-    'a,
-    S: search_starter_packs_skeleton_state::State,
-> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
@@ -169,10 +141,7 @@ impl<
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -196,13 +165,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeletonOutput<'a> {
@@ -226,7 +189,7 @@ pub struct SearchStarterPacksSkeletonOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

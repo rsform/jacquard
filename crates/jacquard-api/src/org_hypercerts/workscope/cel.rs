@@ -8,13 +8,7 @@
 /// A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cel<'a> {
@@ -33,7 +27,7 @@ pub struct Cel<'a> {
 
 pub mod cel_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -331,9 +325,7 @@ impl jacquard_common::IntoStatic for CelVersion<'_> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.workscope.cel"),
@@ -473,9 +465,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "expression",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("expression"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -490,13 +480,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
                     )
                     .count();
                 if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "expression",
-                        ),
-                        max: 5000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "expression",
+                            ),
+                            max: 5000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -505,9 +497,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "used_tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("used_tags"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -518,9 +508,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
                     max: 16usize,
                     actual: <str>::len(value.as_ref()),
                 });

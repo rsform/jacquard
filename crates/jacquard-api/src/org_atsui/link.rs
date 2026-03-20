@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Link<'a> {
@@ -24,12 +18,12 @@ pub struct Link<'a> {
     #[serde(borrow)]
     pub decoration: std::option::Option<LinkDecoration<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -65,7 +59,7 @@ pub struct LinkBuilder<'a, S: link_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<LinkDecoration<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -128,7 +122,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         LinkBuilder {
@@ -260,13 +254,7 @@ impl jacquard_common::IntoStatic for LinkDecoration<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkOutput<'a> {
@@ -287,9 +275,8 @@ impl jacquard_common::xrpc::XrpcResp for LinkResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Link<'a> {
     const NSID: &'static str = "org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = LinkResponse;
 }
 
@@ -298,9 +285,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Link<'a> {
 pub struct LinkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LinkRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Link<'de>;
     type Response = LinkResponse;
 }

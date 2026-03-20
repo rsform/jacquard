@@ -1,5 +1,6 @@
 use jacquard_common::IntoStatic;
 use jacquard_common::cowstr::ToCowStr;
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{FileTokenStore, SessionStore, SessionStoreError};
 use jacquard_common::types::string::{Datetime, Did};
 use jacquard_oauth::scopes::Scope;
@@ -8,7 +9,6 @@ use jacquard_oauth::types::OAuthTokenType;
 use jose_jwk::Key;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use url::Url;
 
 /// On-disk session records for app-password and OAuth flows, sharing a single JSON map.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -48,7 +48,7 @@ pub struct OAuthSession {
     session_id: String,
 
     /// Base URL of the resource server (PDS)
-    host_url: String,
+    host_url: Uri<String>,
 
     /// Base URL of the authorization server (PDS or entryway)
     authserver_url: String,
@@ -95,7 +95,7 @@ impl From<ClientSessionData<'_>> for OAuthSession {
         OAuthSession {
             account_did: data.account_did.to_string(),
             session_id: data.session_id.to_string(),
-            host_url: data.host_url.to_string(),
+            host_url: data.host_url.clone(),
             authserver_url: data.authserver_url.to_string(),
             authserver_token_endpoint: data.authserver_token_endpoint.to_string(),
             authserver_revocation_endpoint: data
@@ -122,7 +122,7 @@ impl From<OAuthSession> for ClientSessionData<'_> {
         ClientSessionData {
             account_did: session.account_did.into(),
             session_id: session.session_id.to_cowstr(),
-            host_url: session.host_url.to_cowstr(),
+            host_url: session.host_url,
             authserver_url: session.authserver_url.to_cowstr(),
             authserver_token_endpoint: session.authserver_token_endpoint.to_cowstr(),
             authserver_revocation_endpoint: session
@@ -160,7 +160,7 @@ pub struct OAuthState {
     pub state: String,
 
     /// Base URL of the authorization server (PDS or entryway)
-    pub authserver_url: Url,
+    pub authserver_url: Uri<String>,
 
     /// Optional pre-known account DID
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -190,11 +190,11 @@ pub struct OAuthState {
 }
 
 impl TryFrom<AuthRequestData<'_>> for OAuthState {
-    type Error = url::ParseError;
+    type Error = jacquard_common::deps::fluent_uri::ParseError;
 
     fn try_from(value: AuthRequestData) -> Result<Self, Self::Error> {
         Ok(OAuthState {
-            authserver_url: Url::parse(&value.authserver_url)?,
+            authserver_url: Uri::parse(value.authserver_url.as_str())?.to_owned(),
             account_did: value.account_did.map(|s| s.to_string()),
             scopes: value.scopes.into_iter().map(|s| s.to_string()).collect(),
             request_uri: value.request_uri.to_string(),
@@ -213,7 +213,7 @@ impl TryFrom<AuthRequestData<'_>> for OAuthState {
 impl From<OAuthState> for AuthRequestData<'_> {
     fn from(value: OAuthState) -> Self {
         AuthRequestData {
-            authserver_url: value.authserver_url.to_cowstr(),
+            authserver_url: value.authserver_url.as_str().into(),
             state: value.state.to_cowstr(),
             account_did: value.account_did.map(|s| Did::from(s).into_static()),
             authserver_revocation_endpoint: value
@@ -333,10 +333,11 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         auth_req_info: &AuthRequestData<'_>,
     ) -> Result<(), SessionStoreError> {
         let key = format!("authreq_{}", auth_req_info.state);
-        let state = auth_req_info
-            .clone()
-            .try_into()
-            .map_err(|e: url::ParseError| SessionStoreError::Other(Box::new(e)))?;
+        let state = auth_req_info.clone().try_into().map_err(
+            |e: jacquard_common::deps::fluent_uri::ParseError| {
+                SessionStoreError::Other(Box::new(e))
+            },
+        )?;
         self.0.set(key, StoredSession::OAuthState(state)).await?;
         Ok(())
     }
@@ -362,7 +363,7 @@ impl FileAuthStore {
     pub fn set_atp_pds(
         &self,
         key: &crate::client::credential_session::SessionKey,
-        pds: &Url,
+        pds: &Uri<String>,
     ) -> Result<(), SessionStoreError> {
         let key_str = format!("{}_{}", key.0, key.1);
         let file = std::fs::read_to_string(&self.0.path)?;
@@ -373,7 +374,7 @@ impl FileAuthStore {
                     if let Some(inner) = outer.get_mut("Atp").and_then(|v| v.as_object_mut()) {
                         inner.insert(
                             "pds".to_string(),
-                            serde_json::Value::String(pds.to_string()),
+                            serde_json::Value::String(pds.as_str().to_string()),
                         );
                         std::fs::write(&self.0.path, serde_json::to_string_pretty(&store)?)?;
                         return Ok(());
@@ -388,7 +389,7 @@ impl FileAuthStore {
     pub fn get_atp_pds(
         &self,
         key: &crate::client::credential_session::SessionKey,
-    ) -> Result<Option<Url>, SessionStoreError> {
+    ) -> Result<Option<Uri<String>>, SessionStoreError> {
         let key_str = format!("{}_{}", key.0, key.1);
         let file = std::fs::read_to_string(&self.0.path)?;
         let store: Value = serde_json::from_str(&file)?;
@@ -396,7 +397,7 @@ impl FileAuthStore {
             if let Some(obj) = value.as_object() {
                 if let Some(serde_json::Value::Object(inner)) = obj.get("Atp") {
                     if let Some(serde_json::Value::String(pds)) = inner.get("pds") {
-                        return Ok(Url::parse(pds).ok());
+                        return Ok(Uri::parse(pds.as_str()).ok().map(|u| u.to_owned()));
                     }
                 }
             }

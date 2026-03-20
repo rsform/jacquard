@@ -8,13 +8,7 @@
 /// Per-contributor presentation defaults, reusable across boards.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contributor<'a> {
@@ -29,24 +23,24 @@ pub struct Contributor<'a> {
     /// Iframe shown on hover
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub hover_iframe_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Image overlay shown on hover
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_image_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub hover_image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Link URL for this contributor
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Direct video or Instagram URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub video_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub video_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod contributor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -54,37 +48,37 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ContributorRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ContributorRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ContributorRef = S::ContributorRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `contributor_ref` field to Set
     pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContributorRef<S> {}
     impl<S: State> State for SetContributorRef<S> {
-        type CreatedAt = S::CreatedAt;
         type ContributorRef = Set<members::contributor_ref>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ContributorRef = S::ContributorRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `contributor_ref` field
         pub struct contributor_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -95,10 +89,10 @@ pub struct ContributorBuilder<'a, S: contributor_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -176,7 +170,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -184,7 +178,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field to an Option value (optional)
     pub fn maybe_hover_iframe_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -195,7 +189,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverImageUrl` field (optional)
     pub fn hover_image_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -203,7 +197,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverImageUrl` field to an Option value (optional)
     pub fn maybe_hover_image_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -214,7 +208,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -222,7 +216,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
@@ -233,7 +227,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `videoUrl` field (optional)
     pub fn video_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -241,7 +235,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `videoUrl` field to an Option value (optional)
     pub fn maybe_video_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
@@ -251,8 +245,8 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S> ContributorBuilder<'a, S>
 where
     S: contributor_state::State,
-    S::CreatedAt: contributor_state::IsSet,
     S::ContributorRef: contributor_state::IsSet,
+    S::CreatedAt: contributor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {
@@ -303,13 +297,7 @@ impl<'a> Contributor<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorGetRecordOutput<'a> {
@@ -366,9 +354,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     }
 }
 
-fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hyperboards.contributor"),

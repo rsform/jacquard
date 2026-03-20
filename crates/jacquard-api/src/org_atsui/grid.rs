@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Grid<'a> {
@@ -30,7 +24,7 @@ pub struct Grid<'a> {
 
 pub mod grid_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -266,13 +260,7 @@ impl jacquard_common::IntoStatic for GridGap<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GridOutput<'a> {
@@ -293,9 +281,8 @@ impl jacquard_common::xrpc::XrpcResp for GridResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Grid<'a> {
     const NSID: &'static str = "org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GridResponse;
 }
 
@@ -304,9 +291,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Grid<'a> {
 pub struct GridRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Grid<'de>;
     type Response = GridResponse;
 }

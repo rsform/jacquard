@@ -8,13 +8,7 @@
 /// Maps a unique article ID to its Bluesky comments thread, preserving original creation time.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArticleLink<'a> {
@@ -24,7 +18,7 @@ pub struct ArticleLink<'a> {
     /// The URL of the article.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub article_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub article_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.
     #[serde(borrow)]
     pub comments_thread: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -34,7 +28,7 @@ pub struct ArticleLink<'a> {
 
 pub mod article_link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,50 +37,50 @@ pub mod article_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type CommentsThread;
         type ArticleId;
+        type CommentsThread;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type CommentsThread = Unset;
         type ArticleId = Unset;
+        type CommentsThread = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type ArticleId = S::ArticleId;
         type CommentsThread = S::CommentsThread;
-        type ArticleId = S::ArticleId;
-    }
-    ///State transition - sets the `comments_thread` field to Set
-    pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
-    impl<S: State> State for SetCommentsThread<S> {
-        type CreatedAt = S::CreatedAt;
-        type CommentsThread = Set<members::comments_thread>;
-        type ArticleId = S::ArticleId;
     }
     ///State transition - sets the `article_id` field to Set
     pub struct SetArticleId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArticleId<S> {}
     impl<S: State> State for SetArticleId<S> {
         type CreatedAt = S::CreatedAt;
-        type CommentsThread = S::CommentsThread;
         type ArticleId = Set<members::article_id>;
+        type CommentsThread = S::CommentsThread;
+    }
+    ///State transition - sets the `comments_thread` field to Set
+    pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
+    impl<S: State> State for SetCommentsThread<S> {
+        type CreatedAt = S::CreatedAt;
+        type ArticleId = S::ArticleId;
+        type CommentsThread = Set<members::comments_thread>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `comments_thread` field
-        pub struct comments_thread(());
         ///Marker type for the `article_id` field
         pub struct article_id(());
+        ///Marker type for the `comments_thread` field
+        pub struct comments_thread(());
     }
 }
 
@@ -95,7 +89,7 @@ pub struct ArticleLinkBuilder<'a, S: article_link_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
@@ -143,7 +137,7 @@ impl<'a, S: article_link_state::State> ArticleLinkBuilder<'a, S> {
     /// Set the `articleUrl` field (optional)
     pub fn article_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -151,7 +145,7 @@ impl<'a, S: article_link_state::State> ArticleLinkBuilder<'a, S> {
     /// Set the `articleUrl` field to an Option value (optional)
     pub fn maybe_article_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -200,8 +194,8 @@ impl<'a, S> ArticleLinkBuilder<'a, S>
 where
     S: article_link_state::State,
     S::CreatedAt: article_link_state::IsSet,
-    S::CommentsThread: article_link_state::IsSet,
     S::ArticleId: article_link_state::IsSet,
+    S::CommentsThread: article_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ArticleLink<'a> {
@@ -246,13 +240,7 @@ impl<'a> ArticleLink<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArticleLinkGetRecordOutput<'a> {
@@ -310,9 +298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "article_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("article_id"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -322,9 +308,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
     }
 }
 
-fn lexicon_doc_app_juttu_articleLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_juttu_articleLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.juttu.articleLink"),

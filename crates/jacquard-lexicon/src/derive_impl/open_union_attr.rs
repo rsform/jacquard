@@ -2,7 +2,7 @@
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, Data, DeriveInput};
+use syn::{Data, DeriveInput, parse2};
 
 /// Implementation for the open_union attribute macro
 pub fn impl_open_union(_attr: TokenStream, item: TokenStream) -> TokenStream {

@@ -8,13 +8,7 @@
 /// User profile for ATCR registry. Stores preferences like default hold for blob storage.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -23,7 +17,7 @@ pub struct Profile<'a> {
     /// Default hold endpoint for blob storage. If null, user has opted out of defaults.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_hold: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub default_hold: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Profile last updated timestamp
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -31,7 +25,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -66,7 +60,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -113,7 +107,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultHold` field (optional)
     pub fn default_hold(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -121,7 +115,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultHold` field to an Option value (optional)
     pub fn maybe_default_hold(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -193,13 +187,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -256,9 +244,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_io_atcr_sailor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_io_atcr_sailor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.sailor.profile"),

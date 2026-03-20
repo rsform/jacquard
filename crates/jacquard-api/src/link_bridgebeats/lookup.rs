@@ -8,13 +8,7 @@
 /// Result of parsing and looking up media links across supported music streaming providers.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lookup<'a> {
@@ -27,7 +21,7 @@ pub struct Lookup<'a> {
 
 pub mod lookup_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,13 +174,7 @@ impl<'a> Lookup<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LookupGetRecordOutput<'a> {
@@ -244,9 +232,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("results"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -257,9 +243,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("results"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -269,9 +253,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
     }
 }
 
-fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("link.bridgebeats.lookup"),
@@ -542,20 +524,14 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
 /// Music metadata from a specific provider's API query.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProviderResult<'a> {
     /// URL to the cover artwork image.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub art_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub art_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Primary artist name for the track or album artist.
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
@@ -577,12 +553,12 @@ pub struct ProviderResult<'a> {
     pub title: jacquard_common::CowStr<'a>,
     /// Direct web link to the track or album on the provider's platform.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod provider_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -591,9 +567,9 @@ pub mod provider_result_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MarketRegion;
-        type Url;
         type Artist;
         type Title;
+        type Url;
         type Provider;
     }
     /// Empty state - all required fields are unset
@@ -601,9 +577,9 @@ pub mod provider_result_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MarketRegion = Unset;
-        type Url = Unset;
         type Artist = Unset;
         type Title = Unset;
+        type Url = Unset;
         type Provider = Unset;
     }
     ///State transition - sets the `market_region` field to Set
@@ -611,19 +587,9 @@ pub mod provider_result_state {
     impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
     impl<S: State> State for SetMarketRegion<S> {
         type MarketRegion = Set<members::market_region>;
+        type Artist = S::Artist;
+        type Title = S::Title;
         type Url = S::Url;
-        type Artist = S::Artist;
-        type Title = S::Title;
-        type Provider = S::Provider;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type MarketRegion = S::MarketRegion;
-        type Url = Set<members::url>;
-        type Artist = S::Artist;
-        type Title = S::Title;
         type Provider = S::Provider;
     }
     ///State transition - sets the `artist` field to Set
@@ -631,9 +597,9 @@ pub mod provider_result_state {
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
         type MarketRegion = S::MarketRegion;
-        type Url = S::Url;
         type Artist = Set<members::artist>;
         type Title = S::Title;
+        type Url = S::Url;
         type Provider = S::Provider;
     }
     ///State transition - sets the `title` field to Set
@@ -641,9 +607,19 @@ pub mod provider_result_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type MarketRegion = S::MarketRegion;
-        type Url = S::Url;
         type Artist = S::Artist;
         type Title = Set<members::title>;
+        type Url = S::Url;
+        type Provider = S::Provider;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MarketRegion = S::MarketRegion;
+        type Artist = S::Artist;
+        type Title = S::Title;
+        type Url = Set<members::url>;
         type Provider = S::Provider;
     }
     ///State transition - sets the `provider` field to Set
@@ -651,9 +627,9 @@ pub mod provider_result_state {
     impl<S: State> sealed::Sealed for SetProvider<S> {}
     impl<S: State> State for SetProvider<S> {
         type MarketRegion = S::MarketRegion;
-        type Url = S::Url;
         type Artist = S::Artist;
         type Title = S::Title;
+        type Url = S::Url;
         type Provider = Set<members::provider>;
     }
     /// Marker types for field names
@@ -661,12 +637,12 @@ pub mod provider_result_state {
     pub mod members {
         ///Marker type for the `market_region` field
         pub struct market_region(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `provider` field
         pub struct provider(());
     }
@@ -676,14 +652,14 @@ pub mod provider_result_state {
 pub struct ProviderResultBuilder<'a, S: provider_result_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -710,7 +686,7 @@ impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `artUrl` field (optional)
     pub fn art_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -718,7 +694,7 @@ impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `artUrl` field to an Option value (optional)
     pub fn maybe_art_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -746,18 +722,12 @@ where
 
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `externalId` field (optional)
-    pub fn external_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn external_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `externalId` field to an Option value (optional)
-    pub fn maybe_external_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_external_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -841,7 +811,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetUrl<S>> {
         self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         ProviderResultBuilder {
@@ -856,9 +826,9 @@ impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
     S::MarketRegion: provider_result_state::IsSet,
-    S::Url: provider_result_state::IsSet,
     S::Artist: provider_result_state::IsSet,
     S::Title: provider_result_state::IsSet,
+    S::Url: provider_result_state::IsSet,
     S::Provider: provider_result_state::IsSet,
 {
     /// Build the final struct
@@ -914,9 +884,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "art_url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("art_url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -927,9 +895,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("artist"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -939,9 +905,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "external_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("external_id"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -965,9 +929,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -978,9 +940,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });

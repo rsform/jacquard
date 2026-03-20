@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountSigningKey<'a> {
@@ -26,7 +20,7 @@ pub struct UpdateAccountSigningKey<'a> {
 
 pub mod update_account_signing_key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,45 +28,42 @@ pub mod update_account_signing_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type SigningKey;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type SigningKey = S::SigningKey;
+        type Did = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigningKey<S> {}
     impl<S: State> State for SetSigningKey<S> {
-        type Did = S::Did;
         type SigningKey = Set<members::signing_key>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type SigningKey = S::SigningKey;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
-pub struct UpdateAccountSigningKeyBuilder<
-    'a,
-    S: update_account_signing_key_state::State,
-> {
+pub struct UpdateAccountSigningKeyBuilder<'a, S: update_account_signing_key_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -83,10 +74,7 @@ pub struct UpdateAccountSigningKeyBuilder<
 
 impl<'a> UpdateAccountSigningKey<'a> {
     /// Create a new builder for this type
-    pub fn new() -> UpdateAccountSigningKeyBuilder<
-        'a,
-        update_account_signing_key_state::Empty,
-    > {
+    pub fn new() -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::Empty> {
         UpdateAccountSigningKeyBuilder::new()
     }
 }
@@ -111,10 +99,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> UpdateAccountSigningKeyBuilder<
-        'a,
-        update_account_signing_key_state::SetDid<S>,
-    > {
+    ) -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::SetDid<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -133,10 +118,8 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> UpdateAccountSigningKeyBuilder<
-        'a,
-        update_account_signing_key_state::SetSigningKey<S>,
-    > {
+    ) -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::SetSigningKey<S>>
+    {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -149,8 +132,8 @@ where
 impl<'a, S> UpdateAccountSigningKeyBuilder<'a, S>
 where
     S: update_account_signing_key_state::State,
-    S::Did: update_account_signing_key_state::IsSet,
     S::SigningKey: update_account_signing_key_state::IsSet,
+    S::Did: update_account_signing_key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateAccountSigningKey<'a> {
@@ -188,9 +171,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateAccountSigningKeyResponse;
 }
 
@@ -199,9 +181,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
 pub struct UpdateAccountSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateAccountSigningKey<'de>;
     type Response = UpdateAccountSigningKeyResponse;
 }

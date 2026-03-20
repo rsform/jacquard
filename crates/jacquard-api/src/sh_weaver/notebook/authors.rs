@@ -8,13 +8,7 @@
 /// A single author in a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListItem<'a> {
@@ -27,7 +21,7 @@ pub struct AuthorListItem<'a> {
 
 pub mod author_list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,10 +94,7 @@ impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
 
 impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(
-        mut self,
-        value: impl Into<Option<AuthorListItemProfile<'a>>>,
-    ) -> Self {
+    pub fn profile(mut self, value: impl Into<Option<AuthorListItemProfile<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -145,13 +136,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -162,9 +147,7 @@ pub enum AuthorListItemProfile<'a> {
     ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
 }
 
-fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.authors"),
@@ -174,50 +157,54 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("authorListItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A single author in a Weaver notebook.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("profile, index")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "index",
+                                "profile, index",
                             ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "profile",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.actor.defs#profileView")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("index"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("profile"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static(
+                                                "app.bsky.actor.defs#profileViewBasic",
+                                            ),
+                                            ::jacquard_common::CowStr::new_static(
+                                                "sh.weaver.actor.defs#profileView",
+                                            ),
+                                        ],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -304,13 +291,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
 /// Authors of a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Authors<'a> {
@@ -322,7 +303,7 @@ pub struct Authors<'a> {
 
 pub mod authors_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -356,9 +337,7 @@ pub mod authors_state {
 pub struct AuthorsBuilder<'a, S: authors_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -464,13 +443,7 @@ impl<'a> Authors<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorsGetRecordOutput<'a> {

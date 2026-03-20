@@ -24,5 +24,5 @@ pub mod reader;
 pub mod writer;
 
 // Re-export commonly used functions and types
-pub use reader::{parse_car_bytes, read_car, read_car_header, stream_car, ParsedCar};
+pub use reader::{ParsedCar, parse_car_bytes, read_car, read_car_header, stream_car};
 pub use writer::{export_repo_car, write_car, write_car_bytes};

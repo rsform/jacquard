@@ -8,13 +8,7 @@
 /// A follow relationship between a user and a podcast show.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Follow<'a> {
@@ -26,7 +20,7 @@ pub struct Follow<'a> {
 
 pub mod follow_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +28,37 @@ pub mod follow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Show;
         type CreatedAt;
+        type Show;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Show = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `show` field to Set
-    pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShow<S> {}
-    impl<S: State> State for SetShow<S> {
-        type Show = Set<members::show>;
-        type CreatedAt = S::CreatedAt;
+        type Show = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Show = S::Show;
         type CreatedAt = Set<members::created_at>;
+        type Show = S::Show;
+    }
+    ///State transition - sets the `show` field to Set
+    pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShow<S> {}
+    impl<S: State> State for SetShow<S> {
+        type CreatedAt = S::CreatedAt;
+        type Show = Set<members::show>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show` field
-        pub struct show(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `show` field
+        pub struct show(());
     }
 }
 
@@ -137,8 +131,8 @@ where
 impl<'a, S> FollowBuilder<'a, S>
 where
     S: follow_state::State,
-    S::Show: follow_state::IsSet,
     S::CreatedAt: follow_state::IsSet,
+    S::Show: follow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Follow<'a> {
@@ -179,13 +173,7 @@ impl<'a> Follow<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowGetRecordOutput<'a> {
@@ -242,9 +230,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Follow<'a> {
     }
 }
 
-fn lexicon_doc_pink_vase_pod_follow() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pink_vase_pod_follow() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pink.vase.pod.follow"),

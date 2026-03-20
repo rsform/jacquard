@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegments<'a> {
@@ -27,7 +21,7 @@ pub struct GetSegments<'a> {
 
 pub mod get_segments_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,10 +90,7 @@ impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
         self
     }
     /// Set the `before` field to an Option value (optional)
-    pub fn maybe_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_before(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -161,15 +152,13 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegmentsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub segments: std::option::Option<
-        Vec<crate::place_stream::segment::SegmentView<'a>>,
-    >,
+    pub segments: std::option::Option<Vec<crate::place_stream::segment::SegmentView<'a>>>,
 }
 
 /// Response type for

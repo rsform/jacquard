@@ -8,13 +8,7 @@
 /// Record describing a blog post.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -45,7 +39,7 @@ pub struct Post<'a> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -54,8 +48,8 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Slug;
-        type Title;
         type Content;
+        type Title;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -63,8 +57,8 @@ pub mod post_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Slug = Unset;
-        type Title = Unset;
         type Content = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `slug` field to Set
@@ -72,17 +66,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
         type Slug = Set<members::slug>;
+        type Content = S::Content;
         type Title = S::Title;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Slug = S::Slug;
-        type Title = Set<members::title>;
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
@@ -90,8 +75,17 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
         type Slug = S::Slug;
-        type Title = S::Title;
         type Content = Set<members::content>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -99,8 +93,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Slug = S::Slug;
-        type Title = S::Title;
         type Content = S::Content;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -108,10 +102,10 @@ pub mod post_state {
     pub mod members {
         ///Marker type for the `slug` field
         pub struct slug(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -146,17 +140,7 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     pub fn new() -> Self {
         PostBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -202,10 +186,7 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `excerpt` field (optional)
-    pub fn excerpt(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn excerpt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -313,18 +294,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -334,8 +309,8 @@ impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
     S::Slug: post_state::IsSet,
-    S::Title: post_state::IsSet,
     S::Content: post_state::IsSet,
+    S::Title: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
@@ -391,13 +366,7 @@ impl<'a> Post<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
@@ -455,9 +424,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -467,9 +434,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "excerpt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("excerpt"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -480,9 +445,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("slug"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -493,9 +456,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -505,9 +466,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
 }
 
-fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("us.polhem.blog.post"),

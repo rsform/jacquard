@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Encrypt<'a> {
@@ -34,7 +34,7 @@ pub struct Encrypt<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EncryptOutput<'a> {
@@ -57,9 +57,8 @@ impl jacquard_common::xrpc::XrpcResp for EncryptResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Encrypt<'a> {
     const NSID: &'static str = "uk.skyblur.post.encrypt";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = EncryptResponse;
 }
 
@@ -68,9 +67,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Encrypt<'a> {
 pub struct EncryptRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EncryptRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.encrypt";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Encrypt<'de>;
     type Response = EncryptResponse;
 }

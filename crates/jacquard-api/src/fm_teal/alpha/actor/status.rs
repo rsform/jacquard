@@ -8,13 +8,7 @@
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the status of the actor. Only one can be shown at a time. If there are multiple, the latest record should be picked and earlier records should be deleted or tombstoned.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
@@ -29,7 +23,7 @@ pub struct Status<'a> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,10 +104,7 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
         self
     }
     /// Set the `expiry` field to an Option value (optional)
-    pub fn maybe_expiry(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_expiry(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -204,13 +195,7 @@ impl<'a> Status<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusGetRecordOutput<'a> {
@@ -267,9 +252,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.actor.status"),

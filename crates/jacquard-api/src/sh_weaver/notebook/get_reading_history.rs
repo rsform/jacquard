@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistory<'a> {
@@ -30,7 +24,7 @@ pub struct GetReadingHistory<'a> {
 
 pub mod get_reading_history_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -78,10 +72,7 @@ impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -107,10 +98,7 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -137,13 +125,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistoryOutput<'a> {
@@ -151,9 +133,7 @@ pub struct GetReadingHistoryOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub history: Vec<
-        crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>,
-    >,
+    pub history: Vec<crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>>,
 }
 
 /// Response type for
@@ -184,13 +164,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReadingHistoryItem<'a> {
@@ -206,7 +180,7 @@ pub struct ReadingHistoryItem<'a> {
 
 pub mod reading_history_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -214,37 +188,37 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Progress;
         type Notebook;
+        type Progress;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Progress = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `progress` field to Set
-    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgress<S> {}
-    impl<S: State> State for SetProgress<S> {
-        type Progress = Set<members::progress>;
-        type Notebook = S::Notebook;
+        type Progress = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Progress = S::Progress;
         type Notebook = Set<members::notebook>;
+        type Progress = S::Progress;
+    }
+    ///State transition - sets the `progress` field to Set
+    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProgress<S> {}
+    impl<S: State> State for SetProgress<S> {
+        type Notebook = S::Notebook;
+        type Progress = Set<members::progress>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `progress` field
-        pub struct progress(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `progress` field
+        pub struct progress(());
     }
 }
 
@@ -337,8 +311,8 @@ where
 impl<'a, S> ReadingHistoryItemBuilder<'a, S>
 where
     S: reading_history_item_state::State,
-    S::Progress: reading_history_item_state::IsSet,
     S::Notebook: reading_history_item_state::IsSet,
+    S::Progress: reading_history_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReadingHistoryItem<'a> {
@@ -366,14 +340,11 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_notebook_getReadingHistory()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "sh.weaver.notebook.getReadingHistory",
-        ),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.getReadingHistory"),
         revision: None,
         description: None,
         defs: {
@@ -449,57 +420,57 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "readingHistoryItem",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("readingHistoryItem"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("progress")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currentEntry",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.notebook.defs#entryView",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("progress"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "currentEntry",
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notebook",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.notebook.defs#notebookView",
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "sh.weaver.notebook.defs#entryView",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "progress",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.notebook.defs#readingProgress",
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "sh.weaver.notebook.defs#notebookView",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("progress"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "sh.weaver.notebook.defs#readingProgress",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },

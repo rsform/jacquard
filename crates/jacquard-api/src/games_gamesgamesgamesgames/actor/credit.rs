@@ -8,13 +8,7 @@
 /// A relationship between a game and a profile.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Credit<'a> {
@@ -35,7 +29,7 @@ pub struct Credit<'a> {
 
 pub mod credit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,37 +37,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Credits;
         type Game;
+        type Credits;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Credits = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `credits` field to Set
-    pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCredits<S> {}
-    impl<S: State> State for SetCredits<S> {
-        type Credits = Set<members::credits>;
-        type Game = S::Game;
+        type Credits = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Credits = S::Credits;
         type Game = Set<members::game>;
+        type Credits = S::Credits;
+    }
+    ///State transition - sets the `credits` field to Set
+    pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCredits<S> {}
+    impl<S: State> State for SetCredits<S> {
+        type Game = S::Game;
+        type Credits = Set<members::credits>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `credits` field
-        pub struct credits(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `credits` field
+        pub struct credits(());
     }
 }
 
@@ -147,18 +141,12 @@ where
 
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -186,8 +174,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Credits: credit_state::IsSet,
     S::Game: credit_state::IsSet,
+    S::Credits: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -232,13 +220,7 @@ impl<'a> Credit<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreditGetRecordOutput<'a> {
@@ -307,14 +289,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_games_gamesgamesgamesgames_actor_credit()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "games.gamesgamesgamesgames.actor.credit",
-        ),
+        id: ::jacquard_common::CowStr::new_static("games.gamesgamesgamesgames.actor.credit"),
         revision: None,
         description: None,
         defs: {

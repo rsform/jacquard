@@ -8,13 +8,7 @@
 /// Additional details (notes, photo) for a goal completion day.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionDetails<'a> {
@@ -49,7 +43,7 @@ pub struct CompletionDetails<'a> {
 
 pub mod completion_details_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,85 +51,85 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Year;
         type Month;
+        type Year;
+        type Day;
         type UpdatedAt;
         type GoalId;
-        type Day;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Year = Unset;
         type Month = Unset;
+        type Year = Unset;
+        type Day = Unset;
         type UpdatedAt = Unset;
         type GoalId = Unset;
-        type Day = Unset;
-    }
-    ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type Year = Set<members::year>;
-        type Month = S::Month;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
     }
     ///State transition - sets the `month` field to Set
     pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonth<S> {}
     impl<S: State> State for SetMonth<S> {
-        type Year = S::Year;
         type Month = Set<members::month>;
+        type Year = S::Year;
+        type Day = S::Day;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
-        type Day = S::Day;
     }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Year = S::Year;
+    ///State transition - sets the `year` field to Set
+    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetYear<S> {}
+    impl<S: State> State for SetYear<S> {
         type Month = S::Month;
-        type UpdatedAt = Set<members::updated_at>;
-        type GoalId = S::GoalId;
+        type Year = Set<members::year>;
         type Day = S::Day;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type Year = S::Year;
-        type Month = S::Month;
         type UpdatedAt = S::UpdatedAt;
-        type GoalId = Set<members::goal_id>;
-        type Day = S::Day;
+        type GoalId = S::GoalId;
     }
     ///State transition - sets the `day` field to Set
     pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDay<S> {}
     impl<S: State> State for SetDay<S> {
-        type Year = S::Year;
         type Month = S::Month;
+        type Year = S::Year;
+        type Day = Set<members::day>;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
-        type Day = Set<members::day>;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Month = S::Month;
+        type Year = S::Year;
+        type Day = S::Day;
+        type UpdatedAt = Set<members::updated_at>;
+        type GoalId = S::GoalId;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type Month = S::Month;
+        type Year = S::Year;
+        type Day = S::Day;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = Set<members::goal_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `year` field
-        pub struct year(());
         ///Marker type for the `month` field
         pub struct month(());
+        ///Marker type for the `year` field
+        pub struct year(());
+        ///Marker type for the `day` field
+        pub struct day(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
-        ///Marker type for the `day` field
-        pub struct day(());
     }
 }
 
@@ -168,17 +162,7 @@ impl<'a> CompletionDetailsBuilder<'a, completion_details_state::Empty> {
     pub fn new() -> Self {
         CompletionDetailsBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -262,10 +246,7 @@ where
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -278,18 +259,12 @@ impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `photoAlt` field (optional)
-    pub fn photo_alt(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn photo_alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `photoAlt` field to an Option value (optional)
-    pub fn maybe_photo_alt(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_photo_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -355,11 +330,11 @@ where
 impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
-    S::Year: completion_details_state::IsSet,
     S::Month: completion_details_state::IsSet,
+    S::Year: completion_details_state::IsSet,
+    S::Day: completion_details_state::IsSet,
     S::UpdatedAt: completion_details_state::IsSet,
     S::GoalId: completion_details_state::IsSet,
-    S::Day: completion_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompletionDetails<'a> {
@@ -414,13 +389,7 @@ impl<'a> CompletionDetails<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionDetailsGetRecordOutput<'a> {
@@ -477,9 +446,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.day;
             if *value > 31i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("day"),
                     max: 31i64,
                     actual: *value,
                 });
@@ -489,9 +456,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.day;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("day"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -502,9 +467,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "goal_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("goal_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -514,9 +477,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.month;
             if *value > 12i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("month"),
                     max: 12i64,
                     actual: *value,
                 });
@@ -526,9 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.month;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("month"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -538,9 +497,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 99usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("notes"),
                     max: 99usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -550,9 +507,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "photo_alt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("photo_alt"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -562,9 +517,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.year;
             if *value < 1970i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("year"),
                     min: 1970i64,
                     actual: *value,
                 });
@@ -574,9 +527,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
     }
 }
 
-fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.goals.completionDetails"),

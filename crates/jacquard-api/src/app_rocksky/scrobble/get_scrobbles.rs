@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobbles<'a> {
@@ -31,7 +25,7 @@ pub struct GetScrobbles<'a> {
 
 pub mod get_scrobbles_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,15 +154,13 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobblesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub scrobbles: std::option::Option<
-        Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>,
-    >,
+    pub scrobbles: std::option::Option<Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>>,
 }
 
 /// Response type for

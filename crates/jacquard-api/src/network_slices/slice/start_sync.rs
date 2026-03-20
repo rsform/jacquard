@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartSync<'a> {
@@ -25,9 +25,7 @@ pub struct StartSync<'a> {
     /// List of external collection NSIDs to sync (collections outside slice domain)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_collections: std::option::Option<
-        Vec<jacquard_common::types::string::Nsid<'a>>,
-    >,
+    pub external_collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     /// Maximum number of records to sync per repository
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit_per_repo: std::option::Option<i64>,
@@ -52,7 +50,7 @@ pub struct StartSync<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartSyncOutput<'a> {
@@ -76,9 +74,8 @@ impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
     const NSID: &'static str = "network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartSyncResponse;
 }
 
@@ -87,9 +84,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = StartSync<'de>;
     type Response = StartSyncResponse;
 }

@@ -8,13 +8,7 @@
 /// Profile information (bio, skills, etc.)
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -30,7 +24,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,13 +214,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -297,9 +283,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "heading",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("heading"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -309,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_io_whiteside_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_io_whiteside_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.whiteside.profile"),

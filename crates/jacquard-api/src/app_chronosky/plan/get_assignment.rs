@@ -14,16 +14,15 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAssignmentOutput<'a> {
     /// Active plan assignment (null if no active plan)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub assignment: std::option::Option<
-        crate::app_chronosky::plan::get_assignment::PlanAssignment<'a>,
-    >,
+    pub assignment:
+        std::option::Option<crate::app_chronosky::plan::get_assignment::PlanAssignment<'a>>,
     /// Response message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -39,7 +38,7 @@ pub struct GetAssignmentOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct GetAssignment;
 /// Response type for
@@ -71,13 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAssignmentRequest {
 /// Plan assignment details.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlanAssignment<'a> {
@@ -99,14 +92,12 @@ pub struct PlanAssignment<'a> {
     /// Ticket information (if redeemed from ticket)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ticket: std::option::Option<
-        crate::app_chronosky::plan::get_assignment::TicketInfo<'a>,
-    >,
+    pub ticket: std::option::Option<crate::app_chronosky::plan::get_assignment::TicketInfo<'a>>,
 }
 
 pub mod plan_assignment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,105 +105,105 @@ pub mod plan_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plan;
+        type PlanId;
         type Status;
         type Id;
-        type PlanId;
-        type ExpiresAt;
         type ActivatedAt;
+        type Plan;
+        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plan = Unset;
+        type PlanId = Unset;
         type Status = Unset;
         type Id = Unset;
-        type PlanId = Unset;
-        type ExpiresAt = Unset;
         type ActivatedAt = Unset;
-    }
-    ///State transition - sets the `plan` field to Set
-    pub struct SetPlan<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlan<S> {}
-    impl<S: State> State for SetPlan<S> {
-        type Plan = Set<members::plan>;
-        type Status = S::Status;
-        type Id = S::Id;
-        type PlanId = S::PlanId;
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Plan = S::Plan;
-        type Status = Set<members::status>;
-        type Id = S::Id;
-        type PlanId = S::PlanId;
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Plan = S::Plan;
-        type Status = S::Status;
-        type Id = Set<members::id>;
-        type PlanId = S::PlanId;
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
+        type Plan = Unset;
+        type ExpiresAt = Unset;
     }
     ///State transition - sets the `plan_id` field to Set
     pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlanId<S> {}
     impl<S: State> State for SetPlanId<S> {
-        type Plan = S::Plan;
-        type Status = S::Status;
-        type Id = S::Id;
         type PlanId = Set<members::plan_id>;
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type Plan = S::Plan;
         type Status = S::Status;
         type Id = S::Id;
-        type PlanId = S::PlanId;
-        type ExpiresAt = Set<members::expires_at>;
         type ActivatedAt = S::ActivatedAt;
+        type Plan = S::Plan;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type PlanId = S::PlanId;
+        type Status = Set<members::status>;
+        type Id = S::Id;
+        type ActivatedAt = S::ActivatedAt;
+        type Plan = S::Plan;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type PlanId = S::PlanId;
+        type Status = S::Status;
+        type Id = Set<members::id>;
+        type ActivatedAt = S::ActivatedAt;
+        type Plan = S::Plan;
+        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `activated_at` field to Set
     pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
     impl<S: State> State for SetActivatedAt<S> {
-        type Plan = S::Plan;
+        type PlanId = S::PlanId;
         type Status = S::Status;
         type Id = S::Id;
-        type PlanId = S::PlanId;
-        type ExpiresAt = S::ExpiresAt;
         type ActivatedAt = Set<members::activated_at>;
+        type Plan = S::Plan;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `plan` field to Set
+    pub struct SetPlan<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlan<S> {}
+    impl<S: State> State for SetPlan<S> {
+        type PlanId = S::PlanId;
+        type Status = S::Status;
+        type Id = S::Id;
+        type ActivatedAt = S::ActivatedAt;
+        type Plan = Set<members::plan>;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type PlanId = S::PlanId;
+        type Status = S::Status;
+        type Id = S::Id;
+        type ActivatedAt = S::ActivatedAt;
+        type Plan = S::Plan;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plan` field
-        pub struct plan(());
+        ///Marker type for the `plan_id` field
+        pub struct plan_id(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `plan_id` field
-        pub struct plan_id(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `activated_at` field
         pub struct activated_at(());
+        ///Marker type for the `plan` field
+        pub struct plan(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
     }
 }
 
@@ -226,9 +217,7 @@ pub struct PlanAssignmentBuilder<'a, S: plan_assignment_state::State> {
         ::core::option::Option<crate::app_chronosky::plan::get_assignment::PlanInfo<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            crate::app_chronosky::plan::get_assignment::TicketInfo<'a>,
-        >,
+        ::core::option::Option<crate::app_chronosky::plan::get_assignment::TicketInfo<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -369,9 +358,7 @@ impl<'a, S: plan_assignment_state::State> PlanAssignmentBuilder<'a, S> {
     /// Set the `ticket` field (optional)
     pub fn ticket(
         mut self,
-        value: impl Into<
-            Option<crate::app_chronosky::plan::get_assignment::TicketInfo<'a>>,
-        >,
+        value: impl Into<Option<crate::app_chronosky::plan::get_assignment::TicketInfo<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -389,12 +376,12 @@ impl<'a, S: plan_assignment_state::State> PlanAssignmentBuilder<'a, S> {
 impl<'a, S> PlanAssignmentBuilder<'a, S>
 where
     S: plan_assignment_state::State,
-    S::Plan: plan_assignment_state::IsSet,
+    S::PlanId: plan_assignment_state::IsSet,
     S::Status: plan_assignment_state::IsSet,
     S::Id: plan_assignment_state::IsSet,
-    S::PlanId: plan_assignment_state::IsSet,
-    S::ExpiresAt: plan_assignment_state::IsSet,
     S::ActivatedAt: plan_assignment_state::IsSet,
+    S::Plan: plan_assignment_state::IsSet,
+    S::ExpiresAt: plan_assignment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanAssignment<'a> {
@@ -430,9 +417,8 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_plan_getAssignment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_chronosky_plan_getAssignment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.chronosky.plan.getAssignment"),
@@ -442,366 +428,384 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> ::jacquard_lexicon::lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
-                    parameters: None,
-                    output: None,
-                    errors: None,
-                }),
+                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(
+                    ::jacquard_lexicon::lexicon::LexXrpcQuery {
+                        description: None,
+                        parameters: None,
+                        output: None,
+                        errors: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("planAssignment"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Plan assignment details."),
-                    ),
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Plan assignment details.",
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("planId"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("plan"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("activatedAt"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("expiresAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "activatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan activation timestamp",
-                                    ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "activatedAt",
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan activation timestamp",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expiresAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan expiration timestamp",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("expiresAt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan expiration timestamp",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan assignment ID",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan assignment ID"),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("plan"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#planInfo"),
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "plan",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#planInfo"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "planId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan ID"),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("planId"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan ID",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan assignment status",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan assignment status",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(20usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ticket",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#ticketInfo"),
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ticket"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#ticketInfo"),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("planInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Plan information."),
-                    ),
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Plan information.",
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan description"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "description",
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan ID"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan description",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxConcurrentPosts",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxImagesPerPost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxPostsPerDay",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxScheduleDays",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxThreadPosts",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "minScheduleInterval",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan name"),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan ID",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "maxConcurrentPosts",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "maxImagesPerPost",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "maxPostsPerDay",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "maxScheduleDays",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "maxThreadPosts",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "minScheduleInterval",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Plan name",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(200usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("ticketInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Ticket information."),
-                    ),
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Ticket information.",
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("code")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "code",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Ticket code"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Ticket code",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Ticket ID"),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Ticket ID",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -826,9 +830,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanAssignment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -839,9 +841,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanAssignment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "plan_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("plan_id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -852,9 +852,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanAssignment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("status"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -874,7 +872,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanAssignment<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlanInfo<'a> {
@@ -925,9 +923,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -938,9 +934,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -951,9 +945,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -973,7 +965,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanInfo<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TicketInfo<'a> {
@@ -1003,9 +995,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TicketInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "code",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("code"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1016,9 +1006,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TicketInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });

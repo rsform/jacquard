@@ -1,9 +1,9 @@
 use crate::{CowStr, IntoStatic, cowstr::ToCowStr};
+use alloc::string::{String, ToString};
 pub use cid::Cid as IpldCid;
+use core::{convert::Infallible, fmt, ops::Deref, str::FromStr};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 use smol_str::ToSmolStr;
-use alloc::string::{String, ToString};
-use core::{convert::Infallible, fmt, ops::Deref, str::FromStr};
 
 /// CID codec for AT Protocol (raw)
 pub const ATP_CID_CODEC: u64 = 0x55;

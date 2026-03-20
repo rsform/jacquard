@@ -8,13 +8,7 @@
 /// An allowlist entry for a room. When the room has allowlistEnabled, only allowlisted users can send messages. Lives in the room owner/mod's repo.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Allowlist<'a> {
@@ -30,7 +24,7 @@ pub struct Allowlist<'a> {
 
 pub mod allowlist_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,49 +32,49 @@ pub mod allowlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Subject;
+        type Room;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Subject = Unset;
+        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Room = S::Room;
         type Subject = Set<members::subject>;
+        type Room = S::Room;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Subject = S::Subject;
+        type Room = Set<members::room>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
         type Subject = S::Subject;
+        type Room = S::Room;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `room` field
+        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -175,8 +169,8 @@ where
 impl<'a, S> AllowlistBuilder<'a, S>
 where
     S: allowlist_state::State,
-    S::Room: allowlist_state::IsSet,
     S::Subject: allowlist_state::IsSet,
+    S::Room: allowlist_state::IsSet,
     S::CreatedAt: allowlist_state::IsSet,
 {
     /// Build the final struct
@@ -220,13 +214,7 @@ impl<'a> Allowlist<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AllowlistGetRecordOutput<'a> {
@@ -283,9 +271,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Allowlist<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_allowlist() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_allowlist() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.allowlist"),

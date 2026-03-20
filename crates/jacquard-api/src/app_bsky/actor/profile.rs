@@ -8,13 +8,7 @@
 /// A declaration of a Bluesky account profile.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -37,30 +31,27 @@ pub struct Profile<'a> {
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub joined_via_starter_pack: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub joined_via_starter_pack:
+        std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Self-label values, specific to the Bluesky application, on the overall account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinned_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub pinned_post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Free-form pronouns text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -90,7 +81,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -107,18 +98,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     pub fn new() -> Self {
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -183,18 +163,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -202,18 +176,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -278,10 +246,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn pronouns(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -296,7 +261,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
@@ -304,7 +269,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value;
         self
@@ -370,13 +335,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -433,9 +392,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -449,13 +406,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -479,13 +438,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "display_name",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -493,9 +454,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pronouns",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("pronouns"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -509,13 +468,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 20usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "pronouns",
-                        ),
-                        max: 20usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "pronouns",
+                            ),
+                            max: 20usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -523,9 +484,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.actor.profile"),

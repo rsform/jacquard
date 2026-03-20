@@ -8,19 +8,13 @@
 /// Link attributes
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkAttrs<'a> {
     /// The URL destination of the hyperlink
     #[serde(borrow)]
-    pub href: jacquard_common::types::string::Uri<'a>,
+    pub href: jacquard_common::types::string::UriValue<'a>,
     /// Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -37,7 +31,7 @@ pub struct LinkAttrs<'a> {
 
 pub mod link_attrs_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,7 +65,7 @@ pub mod link_attrs_state {
 pub struct LinkAttrsBuilder<'a, S: link_attrs_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -105,7 +99,7 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> LinkAttrsBuilder<'a, link_attrs_state::SetHref<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         LinkAttrsBuilder {
@@ -131,10 +125,7 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `target` field (optional)
-    pub fn target(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn target(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -147,10 +138,7 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -194,9 +182,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_mark_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blog_pckt_mark_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.mark.link"),
@@ -311,29 +297,29 @@ fn lexicon_doc_blog_pckt_mark_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attrs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#linkAttrs"),
-                            }),
-                        );
-                        map
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("attrs"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#linkAttrs"),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -358,9 +344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "href",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("href"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -370,9 +354,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rel",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rel"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -382,9 +364,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("target"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -394,9 +374,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -408,13 +386,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Link<'a> {
@@ -425,7 +397,7 @@ pub struct Link<'a> {
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -458,9 +430,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::mark::link::LinkAttrs<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<crate::blog_pckt::mark::link::LinkAttrs<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 

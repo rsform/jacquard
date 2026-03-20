@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Movie;
 impl std::fmt::Display for Movie {

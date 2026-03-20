@@ -42,7 +42,7 @@ pub enum OAuthError {
 
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::url))]
-    Url(#[from] url::ParseError),
+    Url(#[from] jacquard_common::deps::fluent_uri::ParseError),
 
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::form))]

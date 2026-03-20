@@ -8,13 +8,7 @@
 /// A poll within a chat channel. Lives in the creator's repo.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Poll<'a> {
@@ -39,7 +33,7 @@ pub struct Poll<'a> {
 
 pub mod poll_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,67 +41,67 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Question;
         type Channel;
         type Options;
+        type Question;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Question = Unset;
         type Channel = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Question = S::Question;
-        type Channel = S::Channel;
-        type Options = S::Options;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type CreatedAt = S::CreatedAt;
-        type Question = Set<members::question>;
-        type Channel = S::Channel;
-        type Options = S::Options;
+        type Question = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `channel` field to Set
     pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannel<S> {}
     impl<S: State> State for SetChannel<S> {
-        type CreatedAt = S::CreatedAt;
-        type Question = S::Question;
         type Channel = Set<members::channel>;
         type Options = S::Options;
+        type Question = S::Question;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Question = S::Question;
         type Channel = S::Channel;
         type Options = Set<members::options>;
+        type Question = S::Question;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Channel = S::Channel;
+        type Options = S::Options;
+        type Question = Set<members::question>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Channel = S::Channel;
+        type Options = S::Options;
+        type Question = S::Question;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `channel` field
         pub struct channel(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `question` field
+        pub struct question(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -254,10 +248,10 @@ where
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::CreatedAt: poll_state::IsSet,
-    S::Question: poll_state::IsSet,
     S::Channel: poll_state::IsSet,
     S::Options: poll_state::IsSet,
+    S::Question: poll_state::IsSet,
+    S::CreatedAt: poll_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Poll<'a> {
@@ -306,13 +300,7 @@ impl<'a> Poll<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PollGetRecordOutput<'a> {
@@ -370,9 +358,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "options",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("options"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -383,9 +369,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "options",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("options"),
                     min: 2usize,
                     actual: value.len(),
                 });
@@ -396,9 +380,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "question",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("question"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -408,9 +390,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_poll() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_poll() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.poll"),

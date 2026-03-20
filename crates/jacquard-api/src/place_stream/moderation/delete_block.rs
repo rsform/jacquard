@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBlock<'a> {
@@ -27,7 +21,7 @@ pub struct DeleteBlock<'a> {
 
 pub mod delete_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod delete_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type BlockUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type BlockUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type BlockUri = S::BlockUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `block_uri` field to Set
     pub struct SetBlockUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlockUri<S> {}
     impl<S: State> State for SetBlockUri<S> {
-        type Streamer = S::Streamer;
         type BlockUri = Set<members::block_uri>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type BlockUri = S::BlockUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `block_uri` field
         pub struct block_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> DeleteBlockBuilder<'a, S>
 where
     S: delete_block_state::State,
-    S::Streamer: delete_block_state::IsSet,
     S::BlockUri: delete_block_state::IsSet,
+    S::Streamer: delete_block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteBlock<'a> {
@@ -174,7 +168,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBlockOutput<'a> {}
@@ -188,7 +182,7 @@ pub struct DeleteBlockOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -245,9 +239,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBlockResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBlock<'a> {
     const NSID: &'static str = "place.stream.moderation.deleteBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteBlockResponse;
 }
 
@@ -256,9 +249,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBlock<'a> {
 pub struct DeleteBlockRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBlockRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.deleteBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteBlock<'de>;
     type Response = DeleteBlockResponse;
 }

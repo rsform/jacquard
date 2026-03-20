@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Paste<'a> {
@@ -37,7 +31,7 @@ pub struct Paste<'a> {
 
 pub mod paste_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,10 +144,7 @@ where
 
 impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn language(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -166,10 +157,7 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
 
 impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -250,13 +238,7 @@ impl<'a> Paste<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PasteGetRecordOutput<'a> {
@@ -313,9 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paste<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "language",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("language"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -325,9 +305,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paste<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -337,9 +315,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paste<'a> {
     }
 }
 
-fn lexicon_doc_moe_karashiiro_kpaste_paste() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_moe_karashiiro_kpaste_paste() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("moe.karashiiro.kpaste.paste"),

@@ -15,31 +15,29 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Strategy<'a> {
     /** The name that identifies the strategy. The following strategies are supported:
-1. `nobody` - Only the author
-2. `author-follows` - Accounts the author follows
-3. `following-author` - Accounts following the author
-4. `mutuals` - Accounts that both the author follows and are following the author
-5. `mentioned` - The author, along with any accounts "mentioned", including in-text or via reply/embed/etc. links
-6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility
-7. `circle` - Implementation-defined, generally a configurable per-author list of accounts
-8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record
+    1. `nobody` - Only the author
+    2. `author-follows` - Accounts the author follows
+    3. `following-author` - Accounts following the author
+    4. `mutuals` - Accounts that both the author follows and are following the author
+    5. `mentioned` - The author, along with any accounts "mentioned", including in-text or via reply/embed/etc. links
+    6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility
+    7. `circle` - Implementation-defined, generally a configurable per-author list of accounts
+    8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record
 
-When fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.
+    When fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.
 
-Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
-*/
+    Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
+    */
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_ooo_bsky_authfetch_strategy() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_ooo_bsky_authfetch_strategy() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ooo.bsky.authfetch.strategy"),

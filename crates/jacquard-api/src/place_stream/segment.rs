@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Audio<'a> {
@@ -25,7 +19,7 @@ pub struct Audio<'a> {
 
 pub mod audio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,51 +27,51 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rate;
         type Channels;
         type Codec;
+        type Rate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rate = Unset;
         type Channels = Unset;
         type Codec = Unset;
-    }
-    ///State transition - sets the `rate` field to Set
-    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRate<S> {}
-    impl<S: State> State for SetRate<S> {
-        type Rate = Set<members::rate>;
-        type Channels = S::Channels;
-        type Codec = S::Codec;
+        type Rate = Unset;
     }
     ///State transition - sets the `channels` field to Set
     pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannels<S> {}
     impl<S: State> State for SetChannels<S> {
-        type Rate = S::Rate;
         type Channels = Set<members::channels>;
         type Codec = S::Codec;
+        type Rate = S::Rate;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodec<S> {}
     impl<S: State> State for SetCodec<S> {
-        type Rate = S::Rate;
         type Channels = S::Channels;
         type Codec = Set<members::codec>;
+        type Rate = S::Rate;
+    }
+    ///State transition - sets the `rate` field to Set
+    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRate<S> {}
+    impl<S: State> State for SetRate<S> {
+        type Channels = S::Channels;
+        type Codec = S::Codec;
+        type Rate = Set<members::rate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rate` field
-        pub struct rate(());
         ///Marker type for the `channels` field
         pub struct channels(());
         ///Marker type for the `codec` field
         pub struct codec(());
+        ///Marker type for the `rate` field
+        pub struct rate(());
     }
 }
 
@@ -154,10 +148,7 @@ where
     S::Rate: audio_state::IsUnset,
 {
     /// Set the `rate` field (required)
-    pub fn rate(
-        mut self,
-        value: impl Into<i64>,
-    ) -> AudioBuilder<'a, audio_state::SetRate<S>> {
+    pub fn rate(mut self, value: impl Into<i64>) -> AudioBuilder<'a, audio_state::SetRate<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         AudioBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -170,9 +161,9 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
-    S::Rate: audio_state::IsSet,
     S::Channels: audio_state::IsSet,
     S::Codec: audio_state::IsSet,
+    S::Rate: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
@@ -200,9 +191,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.segment"),
@@ -212,109 +201,109 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("audio"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("codec"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("rate"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("channels")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "channels",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "codec",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("channels"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("channels"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("codec"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rate"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("framerate"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("num"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("den")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "den",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "num",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("den"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("den"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("num"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -517,129 +506,127 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("segmentView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "record",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("record"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(
+                                    ::jacquard_lexicon::lexicon::LexUnknown { description: None },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("video"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("codec"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bframes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "codec",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "framerate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#framerate"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "height",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bframes"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("codec"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("framerate"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#framerate"),
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -665,13 +652,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Framerate<'a> {
@@ -681,7 +662,7 @@ pub struct Framerate<'a> {
 
 pub mod framerate_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -836,13 +817,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
 /// Media file representing a segment of a livestream
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Segment<'a> {
@@ -851,14 +826,12 @@ pub struct Segment<'a> {
     pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rights: std::option::Option<
-        crate::place_stream::metadata::content_rights::ContentRights<'a>,
-    >,
+    pub content_rights:
+        std::option::Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: std::option::Option<
-        crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
-    >,
+    pub content_warnings:
+        std::option::Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
     #[serde(borrow)]
     pub creator: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -887,7 +860,7 @@ pub struct Segment<'a> {
 
 pub mod segment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -964,9 +937,7 @@ pub struct SegmentBuilder<'a, S: segment_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
-        ::core::option::Option<
-            crate::place_stream::metadata::content_rights::ContentRights<'a>,
-        >,
+        ::core::option::Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
         ::core::option::Option<
             crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
         >,
@@ -997,17 +968,7 @@ impl<'a> SegmentBuilder<'a, segment_state::Empty> {
         SegmentBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1037,9 +998,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `contentRights` field (optional)
     pub fn content_rights(
         mut self,
-        value: impl Into<
-            Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
-        >,
+        value: impl Into<Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -1058,9 +1017,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<
-            Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
-        >,
+        value: impl Into<Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1068,9 +1025,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `contentWarnings` field to an Option value (optional)
     pub fn maybe_content_warnings(
         mut self,
-        value: Option<
-            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
-        >,
+        value: Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -1101,11 +1056,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     pub fn distribution_policy(
         mut self,
         value: impl Into<
-            Option<
-                crate::place_stream::metadata::distribution_policy::DistributionPolicy<
-                    'a,
-                >,
-            >,
+            Option<crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>>,
         >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
@@ -1114,9 +1065,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `distributionPolicy` field to an Option value (optional)
     pub fn maybe_distribution_policy(
         mut self,
-        value: Option<
-            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
-        >,
+        value: Option<crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -1290,13 +1239,7 @@ impl<'a> Segment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SegmentGetRecordOutput<'a> {
@@ -1355,13 +1298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SegmentView<'a> {
@@ -1373,7 +1310,7 @@ pub struct SegmentView<'a> {
 
 pub mod segment_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1530,13 +1467,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
@@ -1553,7 +1484,7 @@ pub struct Video<'a> {
 
 pub mod video_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1561,51 +1492,51 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Height;
         type Codec;
         type Width;
-        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Height = Unset;
         type Codec = Unset;
         type Width = Unset;
-        type Height = Unset;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Codec = Set<members::codec>;
-        type Width = S::Width;
-        type Height = S::Height;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Codec = S::Codec;
-        type Width = Set<members::width>;
-        type Height = S::Height;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
+        type Height = Set<members::height>;
         type Codec = S::Codec;
         type Width = S::Width;
-        type Height = Set<members::height>;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Height = S::Height;
+        type Codec = Set<members::codec>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Codec = S::Codec;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `height` field
+        pub struct height(());
         ///Marker type for the `codec` field
         pub struct codec(());
         ///Marker type for the `width` field
         pub struct width(());
-        ///Marker type for the `height` field
-        pub struct height(());
     }
 }
 
@@ -1697,10 +1628,7 @@ where
     S::Height: video_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VideoBuilder<'a, video_state::SetHeight<S>> {
+    pub fn height(mut self, value: impl Into<i64>) -> VideoBuilder<'a, video_state::SetHeight<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1716,10 +1644,7 @@ where
     S::Width: video_state::IsUnset,
 {
     /// Set the `width` field (required)
-    pub fn width(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VideoBuilder<'a, video_state::SetWidth<S>> {
+    pub fn width(mut self, value: impl Into<i64>) -> VideoBuilder<'a, video_state::SetWidth<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1732,9 +1657,9 @@ where
 impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
+    S::Height: video_state::IsSet,
     S::Codec: video_state::IsSet,
     S::Width: video_state::IsSet,
-    S::Height: video_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Video<'a> {

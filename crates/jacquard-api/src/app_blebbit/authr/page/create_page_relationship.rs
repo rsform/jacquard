@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePageRelationship<'a> {
@@ -38,9 +38,8 @@ impl jacquard_common::xrpc::XrpcResp for CreatePageRelationshipResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePageRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.page.createPageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreatePageRelationshipResponse;
 }
 
@@ -49,9 +48,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePageRelationship<'a> {
 pub struct CreatePageRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePageRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.createPageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreatePageRelationship<'de>;
     type Response = CreatePageRelationshipResponse;
 }

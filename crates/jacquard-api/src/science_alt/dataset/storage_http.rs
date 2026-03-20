@@ -8,13 +8,7 @@
 /// HTTP/HTTPS storage for WebDataset tar archives. Each shard is listed individually with a checksum for integrity verification. Consumers build brace-expansion patterns on the fly when needed.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StorageHttp<'a> {
@@ -25,7 +19,7 @@ pub struct StorageHttp<'a> {
 
 pub mod storage_http_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -58,11 +52,8 @@ pub mod storage_http_state {
 /// Builder for constructing an instance of this type
 pub struct StorageHttpBuilder<'a, S: storage_http_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::science_alt::dataset::storage_http::ShardEntry<'a>>,
-        >,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<Vec<crate::science_alt::dataset::storage_http::ShardEntry<'a>>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -130,9 +121,8 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageHttp() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_science_alt_dataset_storageHttp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.storageHttp"),
@@ -181,59 +171,55 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> ::jacquard_lexicon::lexicon:
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("shardEntry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A single HTTP-accessible shard with integrity checksum",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "checksum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "science.alt.dataset.entry#shardChecksum",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "science.alt.dataset.entry#shardChecksum",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "HTTP/HTTPS URL for this WebDataset tar shard",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "HTTP/HTTPS URL for this WebDataset tar shard",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(2000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -258,9 +244,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageHttp<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shards",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("shards"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -273,13 +257,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageHttp<'a> {
 /// A single HTTP-accessible shard with integrity checksum
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShardEntry<'a> {
@@ -288,12 +266,12 @@ pub struct ShardEntry<'a> {
     pub checksum: crate::science_alt::dataset::entry::ShardChecksum<'a>,
     /// HTTP/HTTPS URL for this WebDataset tar shard
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod shard_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -301,37 +279,37 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Checksum;
         type Url;
+        type Checksum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Checksum = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecksum<S> {}
-    impl<S: State> State for SetChecksum<S> {
-        type Checksum = Set<members::checksum>;
-        type Url = S::Url;
+        type Checksum = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Checksum = S::Checksum;
         type Url = Set<members::url>;
+        type Checksum = S::Checksum;
+    }
+    ///State transition - sets the `checksum` field to Set
+    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChecksum<S> {}
+    impl<S: State> State for SetChecksum<S> {
+        type Url = S::Url;
+        type Checksum = Set<members::checksum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checksum` field
-        pub struct checksum(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `checksum` field
+        pub struct checksum(());
     }
 }
 
@@ -340,7 +318,7 @@ pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::science_alt::dataset::entry::ShardChecksum<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -390,7 +368,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetUrl<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ShardEntryBuilder {
@@ -404,8 +382,8 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsSet,
     S::Url: shard_entry_state::IsSet,
+    S::Checksum: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
@@ -449,9 +427,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardEntry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });

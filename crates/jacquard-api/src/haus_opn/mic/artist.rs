@@ -8,13 +8,7 @@
 /// Metadata for an open mic artist.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
@@ -27,9 +21,7 @@ pub struct Artist<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_links: std::option::Option<
-        Vec<jacquard_common::types::string::Uri<'a>>,
-    >,
+    pub external_links: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub genre: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -39,7 +31,7 @@ pub struct Artist<'a> {
 
 pub mod artist_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,7 +80,7 @@ pub struct ArtistBuilder<'a, S: artist_state::State> {
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -168,7 +160,7 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `externalLinks` field (optional)
     pub fn external_links(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
+        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -176,7 +168,7 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `externalLinks` field to an Option value (optional)
     pub fn maybe_external_links(
         mut self,
-        value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -185,18 +177,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_genre(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -274,13 +260,7 @@ impl<'a> Artist<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArtistGetRecordOutput<'a> {
@@ -337,9 +317,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bio",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bio"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -350,9 +328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -362,9 +338,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
 }
 
-fn lexicon_doc_haus_opn_mic_artist() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_haus_opn_mic_artist() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("haus.opn.mic.artist"),

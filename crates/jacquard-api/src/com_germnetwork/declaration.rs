@@ -8,13 +8,7 @@
 /// A declaration of a Germ Network account
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
@@ -31,9 +25,7 @@ pub struct Declaration<'a> {
     /// Controls who can message this account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub message_me: std::option::Option<
-        crate::com_germnetwork::declaration::MessageMe<'a>,
-    >,
+    pub message_me: std::option::Option<crate::com_germnetwork::declaration::MessageMe<'a>>,
     /// Semver version number, without pre-release or build information, for the format of opaque content
     #[serde(borrow)]
     pub version: jacquard_common::CowStr<'a>,
@@ -41,7 +33,7 @@ pub struct Declaration<'a> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,37 +41,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CurrentKey;
         type Version;
+        type CurrentKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CurrentKey = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `current_key` field to Set
-    pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
-    impl<S: State> State for SetCurrentKey<S> {
-        type CurrentKey = Set<members::current_key>;
-        type Version = S::Version;
+        type CurrentKey = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type CurrentKey = S::CurrentKey;
         type Version = Set<members::version>;
+        type CurrentKey = S::CurrentKey;
+    }
+    ///State transition - sets the `current_key` field to Set
+    pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
+    impl<S: State> State for SetCurrentKey<S> {
+        type Version = S::Version;
+        type CurrentKey = Set<members::current_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current_key` field
-        pub struct current_key(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `current_key` field
+        pub struct current_key(());
     }
 }
 
@@ -162,10 +154,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         self
     }
     /// Set the `keyPackage` field to an Option value (optional)
-    pub fn maybe_key_package(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_key_package(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -212,8 +201,8 @@ where
 impl<'a, S> DeclarationBuilder<'a, S>
 where
     S: declaration_state::State,
-    S::CurrentKey: declaration_state::IsSet,
     S::Version: declaration_state::IsSet,
+    S::CurrentKey: declaration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
@@ -260,13 +249,7 @@ impl<'a> Declaration<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
@@ -336,9 +319,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 14usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
                     max: 14usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -349,9 +330,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 5usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
                     min: 5usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -361,9 +340,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     }
 }
 
-fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.germnetwork.declaration"),
@@ -535,19 +512,13 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageMe<'a> {
     /// A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     #[serde(borrow)]
-    pub message_me_url: jacquard_common::types::string::Uri<'a>,
+    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
     /// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
     #[serde(borrow)]
     pub show_button_to: MessageMeShowButtonTo<'a>,
@@ -555,7 +526,7 @@ pub struct MessageMe<'a> {
 
 pub mod message_me_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -601,7 +572,7 @@ pub mod message_me_state {
 pub struct MessageMeBuilder<'a, S: message_me_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<MessageMeShowButtonTo<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -633,7 +604,7 @@ where
     /// Set the `messageMeUrl` field (required)
     pub fn message_me_url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetMessageMeUrl<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         MessageMeBuilder {
@@ -782,9 +753,7 @@ impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
             MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
             MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
             MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
-            MessageMeShowButtonTo::Other(v) => {
-                MessageMeShowButtonTo::Other(v.into_static())
-            }
+            MessageMeShowButtonTo::Other(v) => MessageMeShowButtonTo::Other(v.into_static()),
         }
     }
 }

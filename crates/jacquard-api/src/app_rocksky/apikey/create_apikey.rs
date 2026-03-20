@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateApikey<'a> {
@@ -29,13 +29,7 @@ pub struct CreateApikey<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateApikeyOutput<'a> {
@@ -56,9 +50,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateApikeyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateApikey<'a> {
     const NSID: &'static str = "app.rocksky.apikey.createApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateApikeyResponse;
 }
 
@@ -67,9 +60,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateApikey<'a> {
 pub struct CreateApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.createApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateApikey<'de>;
     type Response = CreateApikeyResponse;
 }

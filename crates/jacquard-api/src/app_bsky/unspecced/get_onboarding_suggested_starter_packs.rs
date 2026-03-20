@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacks {
@@ -23,7 +17,7 @@ pub struct GetOnboardingSuggestedStarterPacks {
 
 pub mod get_onboarding_suggested_starter_packs_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,9 +51,9 @@ impl GetOnboardingSuggestedStarterPacks {
     }
 }
 
-impl GetOnboardingSuggestedStarterPacksBuilder<
-    get_onboarding_suggested_starter_packs_state::Empty,
-> {
+impl
+    GetOnboardingSuggestedStarterPacksBuilder<get_onboarding_suggested_starter_packs_state::Empty>
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOnboardingSuggestedStarterPacksBuilder {
@@ -69,9 +63,9 @@ impl GetOnboardingSuggestedStarterPacksBuilder<
     }
 }
 
-impl<
-    S: get_onboarding_suggested_starter_packs_state::State,
-> GetOnboardingSuggestedStarterPacksBuilder<S> {
+impl<S: get_onboarding_suggested_starter_packs_state::State>
+    GetOnboardingSuggestedStarterPacksBuilder<S>
+{
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
@@ -98,13 +92,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {

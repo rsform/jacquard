@@ -8,13 +8,7 @@
 /// Normalized podping startup fields. Record TID timestamp should represent when the event was received, useful for global ordering.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Startup<'a> {
@@ -25,7 +19,7 @@ pub struct Startup<'a> {
     /// Optional, e.g. https://rpc.mahdiyari.info
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hive: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub hive: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// e.g. Podping startup complete
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
@@ -61,7 +55,7 @@ pub struct Startup<'a> {
 
 pub mod startup_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,7 +116,7 @@ pub struct StartupBuilder<'a, S: startup_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -149,17 +143,7 @@ impl<'a> StartupBuilder<'a, startup_state::Empty> {
         StartupBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -168,10 +152,7 @@ impl<'a> StartupBuilder<'a, startup_state::Empty> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `capacity` field (optional)
-    pub fn capacity(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn capacity(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -186,7 +167,7 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `hive` field (optional)
     pub fn hive(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -194,7 +175,7 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `hive` field to an Option value (optional)
     pub fn maybe_hive(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -222,18 +203,12 @@ where
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `pingingApp` field (optional)
-    pub fn pinging_app(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn pinging_app(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `pingingApp` field to an Option value (optional)
-    pub fn maybe_pinging_app(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_pinging_app(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -260,18 +235,12 @@ where
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
-    pub fn session_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn session_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
-    pub fn maybe_session_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_session_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -279,10 +248,7 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -327,10 +293,7 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `uuid` field (optional)
-    pub fn uuid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn uuid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -418,13 +381,7 @@ impl<'a> Startup<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartupGetRecordOutput<'a> {
@@ -481,9 +438,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Startup<'a> {
     }
 }
 
-fn lexicon_doc_at_podping_records_startup() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_at_podping_records_startup() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("at.podping.records.startup"),

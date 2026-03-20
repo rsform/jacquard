@@ -8,13 +8,7 @@
 /// Authors of a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
@@ -22,9 +16,7 @@ pub struct Book<'a> {
     pub authors: Vec<crate::sh_weaver::actor::Author<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: std::option::Option<
-        crate::sh_weaver::notebook::ContentWarnings<'a>,
-    >,
+    pub content_warnings: std::option::Option<crate::sh_weaver::notebook::ContentWarnings<'a>>,
     /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -55,7 +47,7 @@ pub struct Book<'a> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,37 +55,37 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
         type EntryList;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
         type EntryList = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type EntryList = S::EntryList;
+        type Authors = Unset;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
-        type Authors = S::Authors;
         type EntryList = Set<members::entry_list>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type EntryList = S::EntryList;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -129,17 +121,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
         BookBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -224,18 +206,12 @@ where
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::Path<'a>>>,
-    ) -> Self {
+    pub fn path(mut self, value: impl Into<Option<crate::sh_weaver::notebook::Path<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
-    pub fn maybe_path(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Path<'a>>,
-    ) -> Self {
+    pub fn maybe_path(mut self, value: Option<crate::sh_weaver::notebook::Path<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -275,18 +251,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<crate::sh_weaver::notebook::Tags<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -321,10 +291,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Title<'a>>,
-    ) -> Self {
+    pub fn maybe_title(mut self, value: Option<crate::sh_weaver::notebook::Title<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -352,8 +319,8 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
-    S::Authors: book_state::IsSet,
     S::EntryList: book_state::IsSet,
+    S::Authors: book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Book<'a> {
@@ -412,13 +379,7 @@ impl<'a> Book<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookGetRecordOutput<'a> {
@@ -475,9 +436,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_book() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_notebook_book() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.book"),

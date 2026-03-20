@@ -8,13 +8,7 @@
 /// Represents information about what was played
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
@@ -32,7 +26,7 @@ pub struct Log<'a> {
 
 pub mod log_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,50 +35,50 @@ pub mod log_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Item;
         type Ionosphere;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Item = Unset;
         type Ionosphere = Unset;
+        type Item = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Ionosphere = S::Ionosphere;
         type Item = S::Item;
-        type Ionosphere = S::Ionosphere;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type CreatedAt = S::CreatedAt;
-        type Item = Set<members::item>;
-        type Ionosphere = S::Ionosphere;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
         type CreatedAt = S::CreatedAt;
-        type Item = S::Item;
         type Ionosphere = Set<members::ionosphere>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type CreatedAt = S::CreatedAt;
+        type Ionosphere = S::Ionosphere;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
@@ -198,8 +192,8 @@ impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
     S::CreatedAt: log_state::IsSet,
-    S::Item: log_state::IsSet,
     S::Ionosphere: log_state::IsSet,
+    S::Item: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {
@@ -244,13 +238,7 @@ impl<'a> Log<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
@@ -308,9 +296,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ionosphere",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ionosphere"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -320,9 +306,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
 }
 
-fn lexicon_doc_media_ionosphere_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_media_ionosphere_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("media.ionosphere.log"),

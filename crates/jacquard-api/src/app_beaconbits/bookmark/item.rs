@@ -8,22 +8,15 @@
 /// A saved venue bookmark
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
     /// Structured address using community lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details: std::option::Option<
-        crate::community_lexicon::location::address::Address<'a>,
-    >,
+    pub address_details:
+        std::option::Option<crate::community_lexicon::location::address::Address<'a>>,
     /// Timestamp when the bookmark was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Reference to a bookmark folder
@@ -56,7 +49,7 @@ pub struct Item<'a> {
 
 pub mod item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -64,51 +57,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type VenueUri;
         type VenueName;
         type CreatedAt;
-        type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type VenueUri = Unset;
         type VenueName = Unset;
         type CreatedAt = Unset;
-        type VenueUri = Unset;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
-        type VenueName = Set<members::venue_name>;
-        type CreatedAt = S::CreatedAt;
-        type VenueUri = S::VenueUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type VenueName = S::VenueName;
-        type CreatedAt = Set<members::created_at>;
-        type VenueUri = S::VenueUri;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueUri<S> {}
     impl<S: State> State for SetVenueUri<S> {
+        type VenueUri = Set<members::venue_uri>;
         type VenueName = S::VenueName;
         type CreatedAt = S::CreatedAt;
-        type VenueUri = Set<members::venue_uri>;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueName<S> {}
+    impl<S: State> State for SetVenueName<S> {
+        type VenueUri = S::VenueUri;
+        type VenueName = Set<members::venue_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VenueUri = S::VenueUri;
+        type VenueName = S::VenueName;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
     }
 }
 
@@ -141,17 +134,7 @@ impl<'a> ItemBuilder<'a, item_state::Empty> {
     pub fn new() -> Self {
         ItemBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -161,9 +144,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(
         mut self,
-        value: impl Into<
-            Option<crate::community_lexicon::location::address::Address<'a>>,
-        >,
+        value: impl Into<Option<crate::community_lexicon::location::address::Address<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -237,10 +218,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -253,18 +231,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
-    pub fn venue_address(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn venue_address(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
-    pub fn maybe_venue_address(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_venue_address(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -272,18 +244,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
-    pub fn venue_category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn venue_category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
-    pub fn maybe_venue_category(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_venue_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -330,9 +296,9 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
+    S::VenueUri: item_state::IsSet,
     S::VenueName: item_state::IsSet,
     S::CreatedAt: item_state::IsSet,
-    S::VenueUri: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
@@ -387,13 +353,7 @@ impl<'a> Item<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<'a> {
@@ -454,13 +414,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
                     )
                     .count();
                 if count > 280usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "notes",
-                        ),
-                        max: 280usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "notes",
+                            ),
+                            max: 280usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -472,13 +434,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_address",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_address",
+                            ),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -490,13 +454,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_category",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_category",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -509,13 +475,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_name",
+                            ),
+                            max: 128usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -528,13 +496,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_uri",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_uri",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -542,9 +512,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_bookmark_item() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_beaconbits_bookmark_item() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.bookmark.item"),

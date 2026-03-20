@@ -8,13 +8,7 @@
 /// A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
@@ -52,7 +46,7 @@ pub struct Activity<'a> {
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -60,67 +54,67 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type CreatedAt;
         type StartedAt;
         type EndedAt;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type CreatedAt = Unset;
         type StartedAt = Unset;
         type EndedAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type StartedAt = S::StartedAt;
-        type EndedAt = S::EndedAt;
+        type Type = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
         type StartedAt = S::StartedAt;
         type EndedAt = S::EndedAt;
+        type Type = S::Type;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
         type StartedAt = Set<members::started_at>;
         type EndedAt = S::EndedAt;
+        type Type = S::Type;
     }
     ///State transition - sets the `ended_at` field to Set
     pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndedAt<S> {}
     impl<S: State> State for SetEndedAt<S> {
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
         type StartedAt = S::StartedAt;
         type EndedAt = Set<members::ended_at>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type StartedAt = S::StartedAt;
+        type EndedAt = S::EndedAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `ended_at` field
         pub struct ended_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -154,18 +148,7 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
     pub fn new() -> Self {
         ActivityBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -205,10 +188,7 @@ where
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distance` field (optional)
-    pub fn distance(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn distance(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -221,18 +201,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distanceUnits` field (optional)
-    pub fn distance_units(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn distance_units(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
-    pub fn maybe_distance_units(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_distance_units(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -267,10 +241,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         self
     }
     /// Set the `route` field to an Option value (optional)
-    pub fn maybe_route(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_route(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -286,10 +257,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         self
     }
     /// Set the `splits` field to an Option value (optional)
-    pub fn maybe_splits(
-        mut self,
-        value: Option<Vec<crate::social_pace::feed::Split<'a>>>,
-    ) -> Self {
+    pub fn maybe_splits(mut self, value: Option<Vec<crate::social_pace::feed::Split<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -349,10 +317,10 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::Type: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
     S::StartedAt: activity_state::IsSet,
     S::EndedAt: activity_state::IsSet,
+    S::Type: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -409,13 +377,7 @@ impl<'a> Activity<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
@@ -484,9 +446,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     }
 }
 
-fn lexicon_doc_social_pace_feed_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_pace_feed_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pace.feed.activity"),

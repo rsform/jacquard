@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CustomHeader<'a> {
@@ -31,9 +31,7 @@ pub struct CustomHeader<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.wisp.settings"),
@@ -276,9 +274,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -288,9 +284,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -301,9 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("value"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -316,13 +308,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
 /// Configuration settings for a static site hosted on wisp.place
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
@@ -352,7 +338,7 @@ pub struct Settings<'a> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -416,18 +402,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `custom404` field (optional)
-    pub fn custom404(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn custom404(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `custom404` field to an Option value (optional)
-    pub fn maybe_custom404(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_custom404(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -475,10 +455,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
         self
     }
     /// Set the `indexFiles` field to an Option value (optional)
-    pub fn maybe_index_files(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_index_files(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -486,10 +463,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `spaMode` field (optional)
-    pub fn spa_mode(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn spa_mode(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -551,13 +525,7 @@ impl<'a> Settings<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
@@ -614,9 +582,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "custom404",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("custom404"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -626,9 +592,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "headers",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("headers"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -638,9 +602,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "index_files",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("index_files"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -650,9 +612,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "spa_mode",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("spa_mode"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });

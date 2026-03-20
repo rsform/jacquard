@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListActivitySubscriptions<'a> {
@@ -26,7 +20,7 @@ pub struct ListActivitySubscriptions<'a> {
 
 pub mod list_activity_subscriptions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -44,10 +38,7 @@ pub mod list_activity_subscriptions_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct ListActivitySubscriptionsBuilder<
-    'a,
-    S: list_activity_subscriptions_state::State,
-> {
+pub struct ListActivitySubscriptionsBuilder<'a, S: list_activity_subscriptions_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -58,10 +49,7 @@ pub struct ListActivitySubscriptionsBuilder<
 
 impl<'a> ListActivitySubscriptions<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ListActivitySubscriptionsBuilder<
-        'a,
-        list_activity_subscriptions_state::Empty,
-    > {
+    pub fn new() -> ListActivitySubscriptionsBuilder<'a, list_activity_subscriptions_state::Empty> {
         ListActivitySubscriptionsBuilder::new()
     }
 }
@@ -77,15 +65,9 @@ impl<'a> ListActivitySubscriptionsBuilder<'a, list_activity_subscriptions_state:
     }
 }
 
-impl<
-    'a,
-    S: list_activity_subscriptions_state::State,
-> ListActivitySubscriptionsBuilder<'a, S> {
+impl<'a, S: list_activity_subscriptions_state::State> ListActivitySubscriptionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -96,10 +78,7 @@ impl<
     }
 }
 
-impl<
-    'a,
-    S: list_activity_subscriptions_state::State,
-> ListActivitySubscriptionsBuilder<'a, S> {
+impl<'a, S: list_activity_subscriptions_state::State> ListActivitySubscriptionsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -127,13 +106,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListActivitySubscriptionsOutput<'a> {

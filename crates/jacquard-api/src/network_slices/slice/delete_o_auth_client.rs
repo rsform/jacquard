@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClient<'a> {
@@ -32,7 +32,7 @@ pub struct DeleteOAuthClient<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClientOutput<'a> {
@@ -53,9 +53,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteOAuthClientResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteOAuthClient<'a> {
     const NSID: &'static str = "network.slices.slice.deleteOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteOAuthClientResponse;
 }
 
@@ -64,9 +63,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteOAuthClient<'a> {
 pub struct DeleteOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.deleteOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteOAuthClient<'de>;
     type Response = DeleteOAuthClientResponse;
 }

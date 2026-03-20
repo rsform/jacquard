@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrew<'a> {
@@ -37,7 +37,7 @@ pub struct RequestCrew<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrewOutput<'a> {
@@ -141,12 +141,8 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             RequestCrewOutputStatus::Created => RequestCrewOutputStatus::Created,
-            RequestCrewOutputStatus::AlreadyMember => {
-                RequestCrewOutputStatus::AlreadyMember
-            }
-            RequestCrewOutputStatus::Other(v) => {
-                RequestCrewOutputStatus::Other(v.into_static())
-            }
+            RequestCrewOutputStatus::AlreadyMember => RequestCrewOutputStatus::AlreadyMember,
+            RequestCrewOutputStatus::Other(v) => RequestCrewOutputStatus::Other(v.into_static()),
         }
     }
 }
@@ -161,7 +157,7 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -206,9 +202,8 @@ impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrew<'a> {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RequestCrewResponse;
 }
 
@@ -217,9 +212,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrew<'a> {
 pub struct RequestCrewRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RequestCrew<'de>;
     type Response = RequestCrewResponse;
 }

@@ -8,13 +8,7 @@
 /// Details about a specific contribution including role, description, and timeframe.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contribution<'a> {
@@ -38,7 +32,7 @@ pub struct Contribution<'a> {
 
 pub mod contribution_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,10 +152,7 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
 
 impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     /// Set the `role` field (optional)
-    pub fn role(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn role(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -241,13 +232,7 @@ impl<'a> Contribution<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributionGetRecordOutput<'a> {
@@ -320,13 +305,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contribution<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "contribution_description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "contribution_description",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -334,9 +321,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contribution<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("role"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -346,9 +331,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contribution<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_contribution() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_claim_contribution()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.claim.contribution"),

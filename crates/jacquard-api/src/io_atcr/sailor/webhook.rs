@@ -8,13 +8,7 @@
 /// Public webhook metadata stored in the user's PDS. Links to a private io.atcr.hold.webhook record on the hold where URL and secret are stored. Part of a two-record split: this record is visible via ATProto (Jetstream), the hold record is not.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Webhook<'a> {
@@ -35,7 +29,7 @@ pub struct Webhook<'a> {
 
 pub mod webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,67 +37,67 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type HoldDid;
         type CreatedAt;
-        type PrivateCid;
+        type HoldDid;
         type Triggers;
+        type PrivateCid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type HoldDid = Unset;
         type CreatedAt = Unset;
-        type PrivateCid = Unset;
+        type HoldDid = Unset;
         type Triggers = Unset;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
-    impl<S: State> State for SetHoldDid<S> {
-        type HoldDid = Set<members::hold_did>;
-        type CreatedAt = S::CreatedAt;
-        type PrivateCid = S::PrivateCid;
-        type Triggers = S::Triggers;
+        type PrivateCid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type HoldDid = S::HoldDid;
         type CreatedAt = Set<members::created_at>;
-        type PrivateCid = S::PrivateCid;
-        type Triggers = S::Triggers;
-    }
-    ///State transition - sets the `private_cid` field to Set
-    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
-    impl<S: State> State for SetPrivateCid<S> {
         type HoldDid = S::HoldDid;
-        type CreatedAt = S::CreatedAt;
-        type PrivateCid = Set<members::private_cid>;
         type Triggers = S::Triggers;
+        type PrivateCid = S::PrivateCid;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
+    impl<S: State> State for SetHoldDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type HoldDid = Set<members::hold_did>;
+        type Triggers = S::Triggers;
+        type PrivateCid = S::PrivateCid;
     }
     ///State transition - sets the `triggers` field to Set
     pub struct SetTriggers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTriggers<S> {}
     impl<S: State> State for SetTriggers<S> {
-        type HoldDid = S::HoldDid;
         type CreatedAt = S::CreatedAt;
-        type PrivateCid = S::PrivateCid;
+        type HoldDid = S::HoldDid;
         type Triggers = Set<members::triggers>;
+        type PrivateCid = S::PrivateCid;
+    }
+    ///State transition - sets the `private_cid` field to Set
+    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
+    impl<S: State> State for SetPrivateCid<S> {
+        type CreatedAt = S::CreatedAt;
+        type HoldDid = S::HoldDid;
+        type Triggers = S::Triggers;
+        type PrivateCid = Set<members::private_cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hold_did` field
-        pub struct hold_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `private_cid` field
-        pub struct private_cid(());
+        ///Marker type for the `hold_did` field
+        pub struct hold_did(());
         ///Marker type for the `triggers` field
         pub struct triggers(());
+        ///Marker type for the `private_cid` field
+        pub struct private_cid(());
     }
 }
 
@@ -236,10 +230,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::HoldDid: webhook_state::IsSet,
     S::CreatedAt: webhook_state::IsSet,
-    S::PrivateCid: webhook_state::IsSet,
+    S::HoldDid: webhook_state::IsSet,
     S::Triggers: webhook_state::IsSet,
+    S::PrivateCid: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {
@@ -286,13 +280,7 @@ impl<'a> Webhook<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebhookGetRecordOutput<'a> {
@@ -350,9 +338,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "private_cid",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("private_cid"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -362,9 +348,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             let value = &self.triggers;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "triggers",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("triggers"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -374,9 +358,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
     }
 }
 
-fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.sailor.webhook"),

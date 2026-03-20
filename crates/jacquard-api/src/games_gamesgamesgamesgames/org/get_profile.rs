@@ -14,15 +14,13 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<
-        crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>,
-    >,
+    pub profile: std::option::Option<crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>>,
 }
 
 /// XRPC request marker type
@@ -34,7 +32,7 @@ pub struct GetProfileOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct GetProfile;
 /// Response type for

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryDetail<'a> {
@@ -25,7 +19,7 @@ pub struct GetEntryDetail<'a> {
 
 pub mod get_entry_detail_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -137,13 +131,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryDetailOutput<'a> {
@@ -152,9 +140,7 @@ pub struct GetEntryDetailOutput<'a> {
     pub notebook_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub notebooks: std::option::Option<
-        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-    >,
+    pub notebooks: std::option::Option<Vec<crate::sh_weaver::notebook::NotebookView<'a>>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
 }
@@ -169,7 +155,7 @@ pub struct GetEntryDetailOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

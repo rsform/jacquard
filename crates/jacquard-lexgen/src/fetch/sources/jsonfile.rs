@@ -1,7 +1,7 @@
 use super::LexiconSource;
-use jacquard_lexicon::lexicon::LexiconDoc;
-use jacquard_common::types::value::Data;
 use jacquard_common::IntoStatic;
+use jacquard_common::types::value::Data;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{IntoDiagnostic, Result};
 use serde::Deserialize;
 use std::collections::HashMap;

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveMiniDoc<'a> {
@@ -22,7 +16,7 @@ pub struct ResolveMiniDoc<'a> {
 
 pub mod resolve_mini_doc_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,9 +49,8 @@ pub mod resolve_mini_doc_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveMiniDocBuilder<'a, S: resolve_mini_doc_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -113,13 +106,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveMiniDocOutput<'a> {
@@ -127,16 +114,16 @@ pub struct ResolveMiniDocOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     /** The validated handle of the account or `handle.invalid` if the handle
-did not bi-directionally match the DID document.*/
+    did not bi-directionally match the DID document.*/
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     /// The identity's PDS URL
     #[serde(borrow)]
-    pub pds: jacquard_common::types::string::Uri<'a>,
+    pub pds: jacquard_common::types::string::UriValue<'a>,
     /** The atproto signing key publicKeyMultibase
 
-Legacy key encoding not supported. the key is returned directly; `id`,
-`type`, and `controller` are omitted.*/
+    Legacy key encoding not supported. the key is returned directly; `id`,
+    `type`, and `controller` are omitted.*/
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,
 }

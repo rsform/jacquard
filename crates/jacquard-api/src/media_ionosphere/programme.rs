@@ -8,13 +8,7 @@
 /// A programme represents an individual piece of media. It does not represent a long-running show.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Programme<'a> {
@@ -48,14 +42,12 @@ pub struct Programme<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub presentation_language: std::option::Option<
-        jacquard_common::types::string::Language,
-    >,
+    pub presentation_language: std::option::Option<jacquard_common::types::string::Language>,
 }
 
 pub mod programme_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,49 +55,49 @@ pub mod programme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ionosphere;
         type Name;
+        type Ionosphere;
         type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ionosphere = Unset;
         type Name = Unset;
+        type Ionosphere = Unset;
         type Language = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Ionosphere = Set<members::ionosphere>;
-        type Name = S::Name;
-        type Language = S::Language;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Ionosphere = S::Ionosphere;
         type Name = Set<members::name>;
+        type Ionosphere = S::Ionosphere;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type Name = S::Name;
+        type Ionosphere = Set<members::ionosphere>;
         type Language = S::Language;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Ionosphere = S::Ionosphere;
         type Name = S::Name;
+        type Ionosphere = S::Ionosphere;
         type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ionosphere` field
-        pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `ionosphere` field
+        pub struct ionosphere(());
         ///Marker type for the `language` field
         pub struct language(());
     }
@@ -143,17 +135,7 @@ impl<'a> ProgrammeBuilder<'a, programme_state::Empty> {
         ProgrammeBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -181,18 +163,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `delivery` field (optional)
-    pub fn delivery(
-        mut self,
-        value: impl Into<Option<Vec<ProgrammeDeliveryItem<'a>>>>,
-    ) -> Self {
+    pub fn delivery(mut self, value: impl Into<Option<Vec<ProgrammeDeliveryItem<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `delivery` field to an Option value (optional)
-    pub fn maybe_delivery(
-        mut self,
-        value: Option<Vec<ProgrammeDeliveryItem<'a>>>,
-    ) -> Self {
+    pub fn maybe_delivery(mut self, value: Option<Vec<ProgrammeDeliveryItem<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -200,18 +176,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -227,10 +197,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(
-        mut self,
-        value: Option<Vec<crate::media_ionosphere::Genre<'a>>>,
-    ) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<crate::media_ionosphere::Genre<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -246,10 +213,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_icon(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -276,18 +240,12 @@ where
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -372,8 +330,8 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 impl<'a, S> ProgrammeBuilder<'a, S>
 where
     S: programme_state::State,
-    S::Ionosphere: programme_state::IsSet,
     S::Name: programme_state::IsSet,
+    S::Ionosphere: programme_state::IsSet,
     S::Language: programme_state::IsSet,
 {
     /// Build the final struct
@@ -432,13 +390,7 @@ impl<'a> Programme<'a> {
 }
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -451,13 +403,7 @@ pub enum ProgrammeDeliveryItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProgrammeGetRecordOutput<'a> {
@@ -514,9 +460,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -527,9 +471,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ionosphere",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ionosphere"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -544,13 +486,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 128usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -558,9 +502,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
     }
 }
 
-fn lexicon_doc_media_ionosphere_programme() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_media_ionosphere_programme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("media.ionosphere.programme"),

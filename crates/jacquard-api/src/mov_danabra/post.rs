@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -26,7 +20,7 @@ pub struct Post<'a> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -235,13 +229,7 @@ impl jacquard_common::IntoStatic for PostFoo<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostOutput<'a> {
@@ -262,9 +250,8 @@ impl jacquard_common::xrpc::XrpcResp for PostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Post<'a> {
     const NSID: &'static str = "mov.danabra.Post";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PostResponse;
 }
 
@@ -273,9 +260,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Post<'a> {
 pub struct PostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PostRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.Post";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Post<'de>;
     type Response = PostResponse;
 }

@@ -8,13 +8,7 @@
 /// A forum-wide announcement
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Announcement<'a> {
@@ -28,7 +22,7 @@ pub struct Announcement<'a> {
 
 pub mod announcement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,67 +30,67 @@ pub mod announcement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ExpiresAt;
+        type Title;
         type Body;
         type CreatedAt;
-        type Title;
-        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ExpiresAt = Unset;
+        type Title = Unset;
         type Body = Unset;
         type CreatedAt = Unset;
-        type Title = Unset;
-        type ExpiresAt = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type ExpiresAt = S::ExpiresAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type ExpiresAt = S::ExpiresAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
-        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `expires_at` field to Set
     pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
     impl<S: State> State for SetExpiresAt<S> {
+        type ExpiresAt = Set<members::expires_at>;
+        type Title = S::Title;
         type Body = S::Body;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type ExpiresAt = S::ExpiresAt;
+        type Title = Set<members::title>;
+        type Body = S::Body;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type ExpiresAt = S::ExpiresAt;
         type Title = S::Title;
-        type ExpiresAt = Set<members::expires_at>;
+        type Body = Set<members::body>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ExpiresAt = S::ExpiresAt;
+        type Title = S::Title;
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `body` field
         pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
     }
 }
 
@@ -209,10 +203,10 @@ where
 impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
+    S::ExpiresAt: announcement_state::IsSet,
+    S::Title: announcement_state::IsSet,
     S::Body: announcement_state::IsSet,
     S::CreatedAt: announcement_state::IsSet,
-    S::Title: announcement_state::IsSet,
-    S::ExpiresAt: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {
@@ -257,13 +251,7 @@ impl<'a> Announcement<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AnnouncementGetRecordOutput<'a> {
@@ -321,9 +309,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("body"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -334,9 +320,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("body"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -347,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -360,9 +342,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -372,9 +352,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(

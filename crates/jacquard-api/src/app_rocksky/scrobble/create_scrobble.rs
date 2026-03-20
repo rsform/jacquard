@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobble<'a> {
@@ -25,18 +25,18 @@ pub struct CreateScrobble<'a> {
     /// The URL of the album art for the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub album_art: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The Apple Music link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub apple_music_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The artist of the track being scrobbled
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
     /// The URL of the artist's picture, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_picture: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub artist_picture: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The composer of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -48,7 +48,7 @@ pub struct CreateScrobble<'a> {
     /// The Deezer link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub deezer_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub deezer_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The disc number of the track in the album, if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disc_number: std::option::Option<i64>,
@@ -62,7 +62,7 @@ pub struct CreateScrobble<'a> {
     /// The Last.fm link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lastfm_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub lastfm_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The lyrics of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -78,11 +78,11 @@ pub struct CreateScrobble<'a> {
     /// The Spotify link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub spotify_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub spotify_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The Tidal link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tidal_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub tidal_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The timestamp of the scrobble in milliseconds since epoch
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub timestamp: std::option::Option<i64>,
@@ -98,18 +98,12 @@ pub struct CreateScrobble<'a> {
     /// The Youtube link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub youtube_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub youtube_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobbleOutput<'a> {
@@ -130,9 +124,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateScrobbleResponse;
 }
 
@@ -141,9 +134,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateScrobble<'de>;
     type Response = CreateScrobbleResponse;
 }

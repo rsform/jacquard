@@ -8,13 +8,7 @@
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
@@ -49,7 +43,7 @@ pub struct Tag<'a> {
     /// URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub same_as: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     /// Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -57,14 +51,12 @@ pub struct Tag<'a> {
     /// When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub superseded_by: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub superseded_by: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -132,7 +124,7 @@ pub struct TagBuilder<'a, S: tag_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<TagReferenceDocument<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
         ::core::option::Option<TagStatus<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
@@ -152,17 +144,7 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
         TagBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -171,18 +153,12 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `aliases` field (optional)
-    pub fn aliases(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn aliases(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
-    pub fn maybe_aliases(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_aliases(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -222,18 +198,12 @@ where
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -306,10 +276,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         self
     }
     /// Set the `referenceDocument` field to an Option value (optional)
-    pub fn maybe_reference_document(
-        mut self,
-        value: Option<TagReferenceDocument<'a>>,
-    ) -> Self {
+    pub fn maybe_reference_document(mut self, value: Option<TagReferenceDocument<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -319,7 +286,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
+        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -327,7 +294,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(
         mut self,
-        value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
@@ -529,13 +496,7 @@ impl jacquard_common::IntoStatic for TagCategory<'_> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -642,13 +603,7 @@ impl jacquard_common::IntoStatic for TagStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagGetRecordOutput<'a> {
@@ -705,9 +660,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "aliases",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("aliases"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -717,9 +670,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("category"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -729,9 +680,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -745,13 +694,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -760,9 +711,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 120usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
                     max: 120usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -773,9 +722,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -785,9 +732,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "same_as",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("same_as"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -797,9 +742,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("status"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -809,9 +752,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_workscope_tag() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_workscope_tag() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.workscope.tag"),

@@ -14,28 +14,22 @@ pub mod social;
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CardRef<'a> {
     /** Oracle card URI (oracle:<uuid>) - for external indexing.
-Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
+    Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     #[serde(borrow)]
-    pub oracle_uri: jacquard_common::types::string::Uri<'a>,
+    pub oracle_uri: jacquard_common::types::string::UriValue<'a>,
     /// Scryfall printing URI (scry:<uuid>) - authoritative identifier
     #[serde(borrow)]
-    pub scryfall_uri: jacquard_common::types::string::Uri<'a>,
+    pub scryfall_uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod card_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -81,8 +75,8 @@ pub mod card_ref_state {
 pub struct CardRefBuilder<'a, S: card_ref_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -113,7 +107,7 @@ where
     /// Set the `oracleUri` field (required)
     pub fn oracle_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetOracleUri<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         CardRefBuilder {
@@ -132,7 +126,7 @@ where
     /// Set the `scryfallUri` field (required)
     pub fn scryfall_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetScryfallUri<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         CardRefBuilder {
@@ -173,9 +167,7 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.deckbelcher.defs"),

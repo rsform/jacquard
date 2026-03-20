@@ -8,13 +8,7 @@
 /// The starting point for edit history on a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Root<'a> {
@@ -26,7 +20,7 @@ pub struct Root<'a> {
 
 pub mod root_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,13 +173,7 @@ impl<'a> Root<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RootGetRecordOutput<'a> {
@@ -242,9 +230,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Root<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.root"),
@@ -254,50 +240,56 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The starting point for edit history on a notebook.",
-                        ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("doc"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("snapshot")
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "doc",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.edit.defs#docRef",
+                        )),
+                        key: Some(::jacquard_common::CowStr::new_static("tid")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: Some(vec![
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("doc"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "snapshot",
                                     ),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "snapshot",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
+                                ]),
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "doc",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "sh.weaver.edit.defs#docRef",
+                                                ),
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "snapshot",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(
+                                            ::jacquard_lexicon::lexicon::LexBlob {
+                                                description: None,
+                                                accept: None,
+                                                max_size: None,
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
+                        ),
+                    },
+                ),
             );
             map
         },

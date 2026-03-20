@@ -8,13 +8,7 @@
 /// A quiz league with quiz masters and teams
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct League<'a> {
@@ -31,7 +25,7 @@ pub struct League<'a> {
 
 pub mod league_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,51 +33,51 @@ pub mod league_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizMasters;
-        type Teams;
         type Name;
+        type Teams;
+        type QuizMasters;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizMasters = Unset;
-        type Teams = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `quiz_masters` field to Set
-    pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
-    impl<S: State> State for SetQuizMasters<S> {
-        type QuizMasters = Set<members::quiz_masters>;
-        type Teams = S::Teams;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `teams` field to Set
-    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeams<S> {}
-    impl<S: State> State for SetTeams<S> {
-        type QuizMasters = S::QuizMasters;
-        type Teams = Set<members::teams>;
-        type Name = S::Name;
+        type Teams = Unset;
+        type QuizMasters = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type QuizMasters = S::QuizMasters;
-        type Teams = S::Teams;
         type Name = Set<members::name>;
+        type Teams = S::Teams;
+        type QuizMasters = S::QuizMasters;
+    }
+    ///State transition - sets the `teams` field to Set
+    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeams<S> {}
+    impl<S: State> State for SetTeams<S> {
+        type Name = S::Name;
+        type Teams = Set<members::teams>;
+        type QuizMasters = S::QuizMasters;
+    }
+    ///State transition - sets the `quiz_masters` field to Set
+    pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
+    impl<S: State> State for SetQuizMasters<S> {
+        type Name = S::Name;
+        type Teams = S::Teams;
+        type QuizMasters = Set<members::quiz_masters>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_masters` field
-        pub struct quiz_masters(());
-        ///Marker type for the `teams` field
-        pub struct teams(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `teams` field
+        pub struct teams(());
+        ///Marker type for the `quiz_masters` field
+        pub struct quiz_masters(());
     }
 }
 
@@ -176,9 +170,9 @@ where
 impl<'a, S> LeagueBuilder<'a, S>
 where
     S: league_state::State,
-    S::QuizMasters: league_state::IsSet,
-    S::Teams: league_state::IsSet,
     S::Name: league_state::IsSet,
+    S::Teams: league_state::IsSet,
+    S::QuizMasters: league_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> League<'a> {
@@ -221,13 +215,7 @@ impl<'a> League<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LeagueGetRecordOutput<'a> {
@@ -285,9 +273,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for League<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -302,13 +288,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for League<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -343,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for League<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "teams",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("teams"),
                     max: 100usize,
                     actual: value.len(),
                 });

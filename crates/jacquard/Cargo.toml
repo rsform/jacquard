@@ -141,7 +141,6 @@ serde_html_form.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, default-features = false, features = ["sync"] }
-url.workspace = true
 smol_str.workspace = true
 webpage.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }

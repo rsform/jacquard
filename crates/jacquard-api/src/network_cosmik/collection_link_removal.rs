@@ -8,13 +8,7 @@
 /// A record representing the removal of a collection link by a collection owner when they cannot delete the original link (which exists in another user's repository). The creator of this record (determined from the AT-URI) is the user who performed the removal.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkRemoval<'a> {
@@ -30,7 +24,7 @@ pub struct CollectionLinkRemoval<'a> {
 
 pub mod collection_link_removal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,51 +32,51 @@ pub mod collection_link_removal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type RemovedLink;
         type RemovedAt;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type RemovedLink = Unset;
         type RemovedAt = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `removed_link` field to Set
-    pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
-    impl<S: State> State for SetRemovedLink<S> {
-        type RemovedLink = Set<members::removed_link>;
-        type RemovedAt = S::RemovedAt;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `removed_at` field to Set
-    pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
-    impl<S: State> State for SetRemovedAt<S> {
-        type RemovedLink = S::RemovedLink;
-        type RemovedAt = Set<members::removed_at>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
         type RemovedLink = S::RemovedLink;
         type RemovedAt = S::RemovedAt;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `removed_link` field to Set
+    pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
+    impl<S: State> State for SetRemovedLink<S> {
+        type Collection = S::Collection;
+        type RemovedLink = Set<members::removed_link>;
+        type RemovedAt = S::RemovedAt;
+    }
+    ///State transition - sets the `removed_at` field to Set
+    pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
+    impl<S: State> State for SetRemovedAt<S> {
+        type Collection = S::Collection;
+        type RemovedLink = S::RemovedLink;
+        type RemovedAt = Set<members::removed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `removed_link` field
         pub struct removed_link(());
         ///Marker type for the `removed_at` field
         pub struct removed_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
@@ -99,10 +93,7 @@ pub struct CollectionLinkRemovalBuilder<'a, S: collection_link_removal_state::St
 
 impl<'a> CollectionLinkRemoval<'a> {
     /// Create a new builder for this type
-    pub fn new() -> CollectionLinkRemovalBuilder<
-        'a,
-        collection_link_removal_state::Empty,
-    > {
+    pub fn new() -> CollectionLinkRemovalBuilder<'a, collection_link_removal_state::Empty> {
         CollectionLinkRemovalBuilder::new()
     }
 }
@@ -127,10 +118,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> CollectionLinkRemovalBuilder<
-        'a,
-        collection_link_removal_state::SetCollection<S>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<'a, collection_link_removal_state::SetCollection<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -149,10 +137,7 @@ where
     pub fn removed_at(
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> CollectionLinkRemovalBuilder<
-        'a,
-        collection_link_removal_state::SetRemovedAt<S>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<'a, collection_link_removal_state::SetRemovedAt<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -171,10 +156,7 @@ where
     pub fn removed_link(
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> CollectionLinkRemovalBuilder<
-        'a,
-        collection_link_removal_state::SetRemovedLink<S>,
-    > {
+    ) -> CollectionLinkRemovalBuilder<'a, collection_link_removal_state::SetRemovedLink<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -187,9 +169,9 @@ where
 impl<'a, S> CollectionLinkRemovalBuilder<'a, S>
 where
     S: collection_link_removal_state::State,
+    S::Collection: collection_link_removal_state::IsSet,
     S::RemovedLink: collection_link_removal_state::IsSet,
     S::RemovedAt: collection_link_removal_state::IsSet,
-    S::Collection: collection_link_removal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLinkRemoval<'a> {
@@ -232,13 +214,7 @@ impl<'a> CollectionLinkRemoval<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkRemovalGetRecordOutput<'a> {
@@ -295,14 +271,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLinkRemoval<'a>
     }
 }
 
-fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_cosmik_collectionLinkRemoval()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "network.cosmik.collectionLinkRemoval",
-        ),
+        id: ::jacquard_common::CowStr::new_static("network.cosmik.collectionLinkRemoval"),
         revision: None,
         description: None,
         defs: {

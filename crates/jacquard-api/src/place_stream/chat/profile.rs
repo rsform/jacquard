@@ -8,13 +8,7 @@
 /// Customizations for the color of a user's name in chat
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Color<'a> {
@@ -25,7 +19,7 @@ pub struct Color<'a> {
 
 pub mod color_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,10 +110,7 @@ where
     S::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
-    pub fn blue(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
+    pub fn blue(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetBlue<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -135,10 +126,7 @@ where
     S::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
-    pub fn green(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
+    pub fn green(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetGreen<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -154,10 +142,7 @@ where
     S::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
-    pub fn red(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetRed<S>> {
+    pub fn red(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetRed<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -200,9 +185,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.chat.profile"),
@@ -212,95 +195,99 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("color"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Customizations for the color of a user's name in chat",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("red"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("green"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blue")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blue",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(0i64),
-                                maximum: Some(255i64),
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "green",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(0i64),
-                                maximum: Some(255i64),
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "red",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(0i64),
-                                maximum: Some(255i64),
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Record containing customizations for a user's chat profile.",
-                        ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blue"),
+                        ]),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "color",
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("blue"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(0i64),
+                                        maximum: Some(255i64),
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#color"),
-                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("green"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(0i64),
+                                        maximum: Some(255i64),
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("red"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(0i64),
+                                        maximum: Some(255i64),
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
                             );
                             map
                         },
-                    }),
-                }),
+                    },
+                ),
+            );
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Record containing customizations for a user's chat profile.",
+                        )),
+                        key: Some(::jacquard_common::CowStr::new_static("literal:self")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: None,
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "color",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#color",
+                                                ),
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
+                        ),
+                    },
+                ),
             );
             map
         },
@@ -324,9 +311,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.blue;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blue",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blue"),
                     max: 255i64,
                     actual: *value,
                 });
@@ -336,9 +321,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.blue;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blue",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blue"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -348,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.green;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "green",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("green"),
                     max: 255i64,
                     actual: *value,
                 });
@@ -360,9 +341,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.green;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "green",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("green"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -372,9 +351,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.red;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "red",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("red"),
                     max: 255i64,
                     actual: *value,
                 });
@@ -384,9 +361,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.red;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "red",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("red"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -399,13 +374,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
 /// Record containing customizations for a user's chat profile.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -416,7 +385,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -436,9 +405,7 @@ pub mod profile_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::place_stream::chat::profile::Color<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<crate::place_stream::chat::profile::Color<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -520,13 +487,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {

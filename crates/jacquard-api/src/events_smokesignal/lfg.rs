@@ -8,13 +8,7 @@
 /// A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lfg<'a> {
@@ -36,7 +30,7 @@ pub struct Lfg<'a> {
 
 pub mod lfg_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -44,105 +38,105 @@ pub mod lfg_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Tags;
-        type StartsAt;
-        type Active;
-        type Location;
         type EndsAt;
+        type Active;
+        type CreatedAt;
+        type StartsAt;
+        type Tags;
+        type Location;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Tags = Unset;
-        type StartsAt = Unset;
-        type Active = Unset;
-        type Location = Unset;
         type EndsAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type Active = S::Active;
-        type Location = S::Location;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type CreatedAt = S::CreatedAt;
-        type Tags = Set<members::tags>;
-        type StartsAt = S::StartsAt;
-        type Active = S::Active;
-        type Location = S::Location;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type StartsAt = Set<members::starts_at>;
-        type Active = S::Active;
-        type Location = S::Location;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type Active = Set<members::active>;
-        type Location = S::Location;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type Active = S::Active;
-        type Location = Set<members::location>;
-        type EndsAt = S::EndsAt;
+        type Active = Unset;
+        type CreatedAt = Unset;
+        type StartsAt = Unset;
+        type Tags = Unset;
+        type Location = Unset;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndsAt<S> {}
     impl<S: State> State for SetEndsAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type Active = S::Active;
-        type Location = S::Location;
         type EndsAt = Set<members::ends_at>;
+        type Active = S::Active;
+        type CreatedAt = S::CreatedAt;
+        type StartsAt = S::StartsAt;
+        type Tags = S::Tags;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type EndsAt = S::EndsAt;
+        type Active = Set<members::active>;
+        type CreatedAt = S::CreatedAt;
+        type StartsAt = S::StartsAt;
+        type Tags = S::Tags;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EndsAt = S::EndsAt;
+        type Active = S::Active;
+        type CreatedAt = Set<members::created_at>;
+        type StartsAt = S::StartsAt;
+        type Tags = S::Tags;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type EndsAt = S::EndsAt;
+        type Active = S::Active;
+        type CreatedAt = S::CreatedAt;
+        type StartsAt = Set<members::starts_at>;
+        type Tags = S::Tags;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type EndsAt = S::EndsAt;
+        type Active = S::Active;
+        type CreatedAt = S::CreatedAt;
+        type StartsAt = S::StartsAt;
+        type Tags = Set<members::tags>;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type EndsAt = S::EndsAt;
+        type Active = S::Active;
+        type CreatedAt = S::CreatedAt;
+        type StartsAt = S::StartsAt;
+        type Tags = S::Tags;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
-        ///Marker type for the `active` field
-        pub struct active(());
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `active` field
+        pub struct active(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `location` field
+        pub struct location(());
     }
 }
 
@@ -184,10 +178,7 @@ where
     S::Active: lfg_state::IsUnset,
 {
     /// Set the `active` field (required)
-    pub fn active(
-        mut self,
-        value: impl Into<bool>,
-    ) -> LfgBuilder<'a, lfg_state::SetActive<S>> {
+    pub fn active(mut self, value: impl Into<bool>) -> LfgBuilder<'a, lfg_state::SetActive<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         LfgBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -295,12 +286,12 @@ where
 impl<'a, S> LfgBuilder<'a, S>
 where
     S: lfg_state::State,
-    S::CreatedAt: lfg_state::IsSet,
-    S::Tags: lfg_state::IsSet,
-    S::StartsAt: lfg_state::IsSet,
-    S::Active: lfg_state::IsSet,
-    S::Location: lfg_state::IsSet,
     S::EndsAt: lfg_state::IsSet,
+    S::Active: lfg_state::IsSet,
+    S::CreatedAt: lfg_state::IsSet,
+    S::StartsAt: lfg_state::IsSet,
+    S::Tags: lfg_state::IsSet,
+    S::Location: lfg_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lfg<'a> {
@@ -349,26 +340,14 @@ impl<'a> Lfg<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LfgLocation<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LfgGetRecordOutput<'a> {
@@ -426,9 +405,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lfg<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -439,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lfg<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -451,9 +426,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lfg<'a> {
     }
 }
 
-fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("events.smokesignal.lfg"),

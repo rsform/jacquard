@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct ArrowTensor;
 impl std::fmt::Display for ArrowTensor {
@@ -130,7 +130,7 @@ impl jacquard_common::IntoStatic for ArrayFormat<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct NdarrayBytes;
 impl std::fmt::Display for NdarrayBytes {
@@ -148,7 +148,7 @@ impl std::fmt::Display for NdarrayBytes {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Safetensors;
 impl std::fmt::Display for Safetensors {
@@ -166,7 +166,7 @@ impl std::fmt::Display for Safetensors {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct SparseBytes;
 impl std::fmt::Display for SparseBytes {
@@ -184,7 +184,7 @@ impl std::fmt::Display for SparseBytes {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct StructuredBytes;
 impl std::fmt::Display for StructuredBytes {

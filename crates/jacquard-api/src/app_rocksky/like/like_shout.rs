@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LikeShout<'a> {
@@ -26,13 +26,7 @@ pub struct LikeShout<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LikeShoutOutput<'a> {
@@ -53,9 +47,8 @@ impl jacquard_common::xrpc::XrpcResp for LikeShoutResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for LikeShout<'a> {
     const NSID: &'static str = "app.rocksky.like.likeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = LikeShoutResponse;
 }
 
@@ -64,9 +57,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for LikeShout<'a> {
 pub struct LikeShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LikeShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.likeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = LikeShout<'de>;
     type Response = LikeShoutResponse;
 }

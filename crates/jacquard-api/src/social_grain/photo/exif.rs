@@ -8,21 +8,13 @@
 /// Basic EXIF metadata for a photo. Integers are scaled by 1000000 to accommodate decimal values and potentially other tags in the future.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Exif<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date_time_original: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    pub date_time_original: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub exposure_time: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -52,7 +44,7 @@ pub struct Exif<'a> {
 
 pub mod exif_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,18 +119,7 @@ impl<'a> ExifBuilder<'a, exif_state::Empty> {
         ExifBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -211,10 +192,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `flash` field (optional)
-    pub fn flash(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn flash(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -253,18 +231,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensMake` field (optional)
-    pub fn lens_make(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn lens_make(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `lensMake` field to an Option value (optional)
-    pub fn maybe_lens_make(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_lens_make(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -272,18 +244,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensModel` field (optional)
-    pub fn lens_model(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn lens_model(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `lensModel` field to an Option value (optional)
-    pub fn maybe_lens_model(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_lens_model(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -291,10 +257,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `make` field (optional)
-    pub fn make(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn make(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -307,10 +270,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `model` field (optional)
-    pub fn model(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn model(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -405,13 +365,7 @@ impl<'a> Exif<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExifGetRecordOutput<'a> {
@@ -468,9 +422,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Exif<'a> {
     }
 }
 
-fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.grain.photo.exif"),

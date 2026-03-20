@@ -8,13 +8,7 @@
 /// A question asked on questionable.fyi
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Question<'a> {
@@ -23,9 +17,7 @@ pub struct Question<'a> {
     /// Indicates the context in which this question was asked. Currently only fyi.questionable.actor.profile
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub context_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub context_ref: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Indicates human language of the primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -37,7 +29,7 @@ pub struct Question<'a> {
 
 pub mod question_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -45,49 +37,49 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Summary;
         type CreatedAt;
+        type Summary;
         type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Summary = Unset;
         type CreatedAt = Unset;
+        type Summary = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Summary = Set<members::summary>;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Summary = S::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Summary = S::Summary;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type CreatedAt = S::CreatedAt;
+        type Summary = Set<members::summary>;
         type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Summary = S::Summary;
         type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
         type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
         ///Marker type for the `content` field
         pub struct content(());
     }
@@ -222,8 +214,8 @@ where
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Summary: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
+    S::Summary: question_state::IsSet,
     S::Content: question_state::IsSet,
 {
     /// Build the final struct
@@ -271,13 +263,7 @@ impl<'a> Question<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuestionGetRecordOutput<'a> {
@@ -334,9 +320,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("languages"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -347,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "summary",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("summary"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -360,9 +342,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "summary",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("summary"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -377,13 +357,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "summary",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "summary",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -391,9 +373,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
     }
 }
 
-fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.questionable.question"),

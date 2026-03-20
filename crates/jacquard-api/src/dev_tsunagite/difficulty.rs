@@ -8,13 +8,7 @@
 /// A difficulty slot in a game hosting leaderboards via Tsunagite.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Difficulty<'a> {
@@ -29,7 +23,7 @@ pub struct Difficulty<'a> {
 
 pub mod difficulty_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -89,10 +83,7 @@ impl<'a> DifficultyBuilder<'a, difficulty_state::Empty> {
 
 impl<'a, S: difficulty_state::State> DifficultyBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -166,13 +157,7 @@ impl<'a> Difficulty<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DifficultyGetRecordOutput<'a> {
@@ -229,9 +214,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Difficulty<'a> {
     }
 }
 
-fn lexicon_doc_dev_tsunagite_difficulty() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_tsunagite_difficulty() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.difficulty"),

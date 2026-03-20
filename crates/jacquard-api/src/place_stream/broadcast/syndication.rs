@@ -8,13 +8,7 @@
 /// Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream. NYI
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Syndication<'a> {
@@ -30,7 +24,7 @@ pub struct Syndication<'a> {
 
 pub mod syndication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,49 +32,49 @@ pub mod syndication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Broadcaster;
+        type Streamer;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Broadcaster = Unset;
+        type Streamer = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Broadcaster = S::Broadcaster;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `broadcaster` field to Set
     pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
     impl<S: State> State for SetBroadcaster<S> {
-        type Streamer = S::Streamer;
         type Broadcaster = Set<members::broadcaster>;
+        type Streamer = S::Streamer;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Broadcaster = S::Broadcaster;
+        type Streamer = Set<members::streamer>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Streamer = S::Streamer;
         type Broadcaster = S::Broadcaster;
+        type Streamer = S::Streamer;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `broadcaster` field
         pub struct broadcaster(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -175,8 +169,8 @@ where
 impl<'a, S> SyndicationBuilder<'a, S>
 where
     S: syndication_state::State,
-    S::Streamer: syndication_state::IsSet,
     S::Broadcaster: syndication_state::IsSet,
+    S::Streamer: syndication_state::IsSet,
     S::CreatedAt: syndication_state::IsSet,
 {
     /// Build the final struct
@@ -220,13 +214,7 @@ impl<'a> Syndication<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyndicationGetRecordOutput<'a> {
@@ -283,9 +271,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Syndication<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_broadcast_syndication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_broadcast_syndication()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.broadcast.syndication"),

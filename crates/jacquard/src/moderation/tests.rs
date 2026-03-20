@@ -9,7 +9,7 @@ use jacquard_api::com_atproto::label::{
     LabelValueDefinitionSeverity,
 };
 use jacquard_common::CowStr;
-use jacquard_common::types::string::{Datetime, Did, Uri};
+use jacquard_common::types::string::{Datetime, Did, UriValue};
 use serde::Deserialize;
 
 const LABELER_SERVICES_JSON: &str = include_str!("labeler_services.json");
@@ -77,7 +77,7 @@ fn test_moderate_with_default_hide() {
     let item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc123").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc123").unwrap(),
             cid: None,
             val: CowStr::from("spam"),
             neg: None,
@@ -128,7 +128,7 @@ fn test_moderate_with_user_preference() {
     let item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
             val: CowStr::from("test-label"),
             neg: None,
             cts: Datetime::now(),
@@ -173,7 +173,7 @@ fn test_label_target_detection() {
     let account_item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("did:plc:someuser").unwrap(),
+            uri: UriValue::new_owned("did:plc:someuser").unwrap(),
             val: CowStr::from("test"),
             neg: None,
             cts: Datetime::now(),
@@ -197,7 +197,7 @@ fn test_label_target_detection() {
     let content_item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:someuser/app.bsky.feed.post/abc123").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:someuser/app.bsky.feed.post/abc123").unwrap(),
             val: CowStr::from("test"),
             neg: None,
             cts: Datetime::now(),
@@ -259,7 +259,7 @@ fn test_blur_media_vs_content() {
     let media_item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
             val: CowStr::from("media-label"),
             neg: None,
             cts: Datetime::now(),
@@ -280,7 +280,7 @@ fn test_blur_media_vs_content() {
     let content_item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/xyz").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/xyz").unwrap(),
             val: CowStr::from("content-label"),
             neg: None,
             cts: Datetime::now(),
@@ -327,7 +327,7 @@ fn test_adult_only_labels_require_adult_content_enabled() {
     let item = MockLabeled {
         labels: vec![Label {
             src: labeler_did.clone(),
-            uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+            uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
             val: CowStr::from("adult-label"),
             neg: None,
             cts: Datetime::now(),
@@ -378,7 +378,7 @@ fn test_negation_labels() {
         labels: vec![
             Label {
                 src: labeler_did.clone(),
-                uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+                uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
                 val: CowStr::from("test-label"),
                 neg: None,
                 cts: Datetime::now(),
@@ -390,7 +390,7 @@ fn test_negation_labels() {
             },
             Label {
                 src: labeler_did.clone(),
-                uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+                uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
                 val: CowStr::from("test-label"),
                 neg: Some(true), // negation
                 cts: Datetime::now(),
@@ -436,7 +436,7 @@ fn test_moderate_all() {
         MockLabeled {
             labels: vec![Label {
                 src: labeler_did.clone(),
-                uri: Uri::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
+                uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
                 val: CowStr::from("porn"),
                 neg: None,
                 cts: Datetime::now(),

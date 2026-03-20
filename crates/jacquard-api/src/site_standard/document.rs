@@ -7,21 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Document<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub bsky_post_ref: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<crate::pub_leaflet::content::Content<'a>>,
@@ -37,13 +29,11 @@ pub struct Document<'a> {
     pub path: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub preferences: std::option::Option<
-        crate::pub_leaflet::publication::Preferences<'a>,
-    >,
+    pub preferences: std::option::Option<crate::pub_leaflet::publication::Preferences<'a>>,
     pub published_at: jacquard_common::types::string::Datetime,
     /// URI to the site or publication this document belongs to. Supports both AT-URIs (at://did/collection/rkey) for publication references and HTTPS URLs (https://example.com) for standalone documents or external sites.
     #[serde(borrow)]
-    pub site: jacquard_common::types::string::Uri<'a>,
+    pub site: jacquard_common::types::string::UriValue<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -62,7 +52,7 @@ pub struct Document<'a> {
 
 pub mod document_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -129,7 +119,7 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::pub_leaflet::publication::Preferences<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
@@ -152,19 +142,7 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -230,18 +208,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -249,10 +221,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn path(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -309,7 +278,7 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
         self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         DocumentBuilder {
@@ -322,18 +291,12 @@ where
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -341,18 +304,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `textContent` field (optional)
-    pub fn text_content(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn text_content(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
-    pub fn maybe_text_content(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_text_content(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -483,13 +440,7 @@ impl<'a> Document<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentGetRecordOutput<'a> {
@@ -546,9 +497,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -562,13 +511,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -577,9 +528,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -594,13 +543,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -608,9 +559,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     }
 }
 
-fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("site.standard.document"),

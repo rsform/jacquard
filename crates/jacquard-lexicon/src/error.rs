@@ -6,7 +6,12 @@ use thiserror::Error;
 fn format_parse_error(path: &PathBuf, json_path: Option<&str>, message: &str) -> String {
     match json_path {
         Some(jp) if !jp.is_empty() => {
-            format!("failed to parse lexicon {}: at {}: {}", path.display(), jp, message)
+            format!(
+                "failed to parse lexicon {}: at {}: {}",
+                path.display(),
+                jp,
+                message
+            )
         }
         _ => format!("failed to parse lexicon {}: {}", path.display(), message),
     }

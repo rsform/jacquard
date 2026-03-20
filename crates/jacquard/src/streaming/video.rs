@@ -3,8 +3,8 @@
 use bytes::Bytes;
 use jacquard_api::app_bsky::video::upload_video::{UploadVideo, UploadVideoOutput};
 use jacquard_common::{
-    xrpc::streaming::{XrpcProcedureStream, XrpcStreamResp},
     StreamError,
+    xrpc::streaming::{XrpcProcedureStream, XrpcStreamResp},
 };
 use serde::{Deserialize, Serialize};
 

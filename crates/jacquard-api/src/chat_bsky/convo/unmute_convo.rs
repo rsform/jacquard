@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteConvo<'a> {
@@ -24,13 +24,7 @@ pub struct UnmuteConvo<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteConvoOutput<'a> {
@@ -50,9 +44,8 @@ impl jacquard_common::xrpc::XrpcResp for UnmuteConvoResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteConvo<'a> {
     const NSID: &'static str = "chat.bsky.convo.unmuteConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UnmuteConvoResponse;
 }
 
@@ -61,9 +54,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteConvo<'a> {
 pub struct UnmuteConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.unmuteConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UnmuteConvo<'de>;
     type Response = UnmuteConvoResponse;
 }

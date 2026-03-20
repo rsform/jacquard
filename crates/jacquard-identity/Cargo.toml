@@ -25,16 +25,13 @@ bytes.workspace = true
 jacquard-common = { version = "0.9", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-api = {  version = "0.9", path = "../jacquard-api", default-features = false, features = ["minimal"] }
 jacquard-lexicon = { version = "0.9", path = "../jacquard-lexicon", default-features = false }
-percent-encoding.workspace = true
 reqwest.workspace = true
-url.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 miette.workspace = true
 http.workspace = true
 serde_html_form.workspace = true
-urlencoding.workspace = true
 tracing = { workspace = true, optional = true }
 n0-future.workspace = true
 mini-moka = { package = "mini-moka-wasm", version = "0.10", path = "../mini-moka-wasm",  optional = true }

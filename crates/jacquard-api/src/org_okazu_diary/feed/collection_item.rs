@@ -8,13 +8,7 @@
 /// Record declaring the inclusion of a single material or a set of materials in a specific collection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItem<'a> {
@@ -41,7 +35,7 @@ pub struct CollectionItem<'a> {
 
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,51 +43,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type Subjects;
         type CreatedAt;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type Subjects = Unset;
         type CreatedAt = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type Subjects = Set<members::subjects>;
-        type CreatedAt = S::CreatedAt;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subjects = S::Subjects;
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
         type Subjects = S::Subjects;
         type CreatedAt = S::CreatedAt;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type Collection = S::Collection;
+        type Subjects = Set<members::subjects>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Collection = S::Collection;
+        type Subjects = S::Subjects;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
@@ -215,10 +209,7 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -246,9 +237,9 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
+    S::Collection: collection_item_state::IsSet,
     S::Subjects: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
-    S::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -297,13 +288,7 @@ impl<'a> CollectionItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<'a> {
@@ -361,9 +346,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 16usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subjects",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
                     max: 16usize,
                     actual: value.len(),
                 });
@@ -374,9 +357,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subjects",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -386,9 +367,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 64usize,
                     actual: value.len(),
                 });
@@ -398,9 +377,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     }
 }
 
-fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_okazu_diary_feed_collectionItem()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.okazu-diary.feed.collectionItem"),

@@ -8,13 +8,7 @@
 /// A method of grouping posts into a single 'category'
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Category<'a> {
@@ -31,7 +25,7 @@ pub struct Category<'a> {
 
 pub mod category_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,51 +33,51 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CategoryType;
-        type Group;
         type Name;
+        type Group;
+        type CategoryType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CategoryType = Unset;
-        type Group = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `category_type` field to Set
-    pub struct SetCategoryType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategoryType<S> {}
-    impl<S: State> State for SetCategoryType<S> {
-        type CategoryType = Set<members::category_type>;
-        type Group = S::Group;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type CategoryType = S::CategoryType;
-        type Group = Set<members::group>;
-        type Name = S::Name;
+        type Group = Unset;
+        type CategoryType = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CategoryType = S::CategoryType;
-        type Group = S::Group;
         type Name = Set<members::name>;
+        type Group = S::Group;
+        type CategoryType = S::CategoryType;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type Name = S::Name;
+        type Group = Set<members::group>;
+        type CategoryType = S::CategoryType;
+    }
+    ///State transition - sets the `category_type` field to Set
+    pub struct SetCategoryType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategoryType<S> {}
+    impl<S: State> State for SetCategoryType<S> {
+        type Name = S::Name;
+        type Group = S::Group;
+        type CategoryType = Set<members::category_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `category_type` field
-        pub struct category_type(());
-        ///Marker type for the `group` field
-        pub struct group(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `group` field
+        pub struct group(());
+        ///Marker type for the `category_type` field
+        pub struct category_type(());
     }
 }
 
@@ -138,18 +132,12 @@ where
 
 impl<'a, S: category_state::State> CategoryBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -196,9 +184,9 @@ where
 impl<'a, S> CategoryBuilder<'a, S>
 where
     S: category_state::State,
-    S::CategoryType: category_state::IsSet,
-    S::Group: category_state::IsSet,
     S::Name: category_state::IsSet,
+    S::Group: category_state::IsSet,
+    S::CategoryType: category_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Category<'a> {
@@ -243,13 +231,7 @@ impl<'a> Category<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CategoryGetRecordOutput<'a> {
@@ -319,9 +301,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -332,9 +312,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -345,9 +323,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -357,9 +333,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_category() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_category()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(

@@ -13,18 +13,10 @@ fn main() -> Result<()> {
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR not set"));
 
     // Generate docs for lex-fetch
-    generate_docs_for_binary(
-        &out_dir,
-        cli::LexFetchArgs::command(),
-        "lex-fetch",
-    )?;
+    generate_docs_for_binary(&out_dir, cli::LexFetchArgs::command(), "lex-fetch")?;
 
     // Generate docs for jacquard-codegen
-    generate_docs_for_binary(
-        &out_dir,
-        cli::CodegenArgs::command(),
-        "jacquard-codegen",
-    )?;
+    generate_docs_for_binary(&out_dir, cli::CodegenArgs::command(), "jacquard-codegen")?;
 
     println!(
         "cargo:warning=Generated man pages and completions to {:?}",

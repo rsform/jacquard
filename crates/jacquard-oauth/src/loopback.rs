@@ -9,11 +9,11 @@ use crate::{
     resolver::OAuthResolver,
     types::{AuthorizeOptions, CallbackParams},
 };
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::{IntoStatic, cowstr::ToCowStr};
 use rouille::Server;
 use std::net::SocketAddr;
 use tokio::sync::mpsc;
-use url::Url;
 
 #[derive(Clone, Debug)]
 pub enum LoopbackPort {
@@ -115,12 +115,8 @@ where
         let (local_addr, handle) = one_shot_server(bind_addr);
         println!("Listening on {}", local_addr);
         // build redirect uri
-        let redirect = Url::parse(&format!(
-            "http://{}:{}/oauth/callback",
-            cfg.host,
-            local_addr.port(),
-        ))
-        .unwrap();
+        let redirect_uri = format!("http://{}:{}/oauth/callback", cfg.host, local_addr.port(),);
+        let redirect = Uri::parse(redirect_uri).unwrap();
 
         let scopes = if opts.scopes.is_empty() {
             Some(self.registry.client_data.config.scopes.clone())
@@ -130,7 +126,7 @@ where
 
         let client_data = crate::session::ClientData {
             keyset: self.registry.client_data.keyset.clone(),
-            config: AtprotoClientMetadata::new_localhost(Some(vec![redirect.clone()]), scopes),
+            config: AtprotoClientMetadata::new_localhost(Some(vec![redirect]), scopes),
         };
         // Build client using store and resolver
         let flow_client = OAuthClient::new_with_shared(

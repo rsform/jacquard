@@ -8,13 +8,7 @@
 /// A post created in response to a request
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestResponse<'a> {
@@ -33,7 +27,7 @@ pub struct RequestResponse<'a> {
 
 pub mod request_response_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,51 +35,51 @@ pub mod request_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Request;
         type Post;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Request = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Request = S::Request;
-        type Post = S::Post;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `request` field to Set
     pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRequest<S> {}
     impl<S: State> State for SetRequest<S> {
-        type CreatedAt = S::CreatedAt;
         type Request = Set<members::request>;
         type Post = S::Post;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type CreatedAt = S::CreatedAt;
         type Request = S::Request;
         type Post = Set<members::post>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Request = S::Request;
+        type Post = S::Post;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `request` field
         pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -140,10 +134,7 @@ where
 
 impl<'a, S: request_response_state::State> RequestResponseBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -195,9 +186,9 @@ where
 impl<'a, S> RequestResponseBuilder<'a, S>
 where
     S: request_response_state::State,
-    S::CreatedAt: request_response_state::IsSet,
     S::Request: request_response_state::IsSet,
     S::Post: request_response_state::IsSet,
+    S::CreatedAt: request_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestResponse<'a> {
@@ -242,13 +233,7 @@ impl<'a> RequestResponse<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestResponseGetRecordOutput<'a> {
@@ -305,9 +290,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -321,13 +304,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
                     )
                     .count();
                 if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 150usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "message",
+                            ),
+                            max: 150usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -335,9 +320,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tech_tokimeki_kaku_requestResponse()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.requestResponse"),

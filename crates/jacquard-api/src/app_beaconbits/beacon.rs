@@ -10,22 +10,15 @@ pub mod like;
 /// A location-based check-in record
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Beacon<'a> {
     /// Structured address using community lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details: std::option::Option<
-        crate::community_lexicon::location::address::Address<'a>,
-    >,
+    pub address_details:
+        std::option::Option<crate::community_lexicon::location::address::Address<'a>>,
     /// Chain emoji (root beacon only)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -47,9 +40,7 @@ pub struct Beacon<'a> {
     /// Reference to parent beacon for chaining
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_beacon: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub parent_beacon: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Reference to associated Bluesky post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -67,9 +58,7 @@ pub struct Beacon<'a> {
     /// Reference to root post for threading
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_root: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub thread_root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Human-readable address
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -91,7 +80,7 @@ pub struct Beacon<'a> {
 
 pub mod beacon_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,67 +88,67 @@ pub mod beacon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type VenueUri;
+        type Visibility;
         type CreatedAt;
         type VenueName;
-        type Visibility;
-        type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type VenueUri = Unset;
+        type Visibility = Unset;
         type CreatedAt = Unset;
         type VenueName = Unset;
-        type Visibility = Unset;
-        type VenueUri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type VenueName = S::VenueName;
-        type Visibility = S::Visibility;
-        type VenueUri = S::VenueUri;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueName = Set<members::venue_name>;
-        type Visibility = S::Visibility;
-        type VenueUri = S::VenueUri;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueName = S::VenueName;
-        type Visibility = Set<members::visibility>;
-        type VenueUri = S::VenueUri;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueUri<S> {}
     impl<S: State> State for SetVenueUri<S> {
+        type VenueUri = Set<members::venue_uri>;
+        type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
         type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type VenueUri = S::VenueUri;
+        type Visibility = Set<members::visibility>;
+        type CreatedAt = S::CreatedAt;
+        type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VenueUri = S::VenueUri;
         type Visibility = S::Visibility;
-        type VenueUri = Set<members::venue_uri>;
+        type CreatedAt = Set<members::created_at>;
+        type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueName<S> {}
+    impl<S: State> State for SetVenueName<S> {
+        type VenueUri = S::VenueUri;
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type VenueName = Set<members::venue_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
     }
 }
 
@@ -201,23 +190,8 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
         BeaconBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -228,9 +202,7 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(
         mut self,
-        value: impl Into<
-            Option<crate::community_lexicon::location::address::Address<'a>>,
-        >,
+        value: impl Into<Option<crate::community_lexicon::location::address::Address<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -247,18 +219,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainEmoji` field (optional)
-    pub fn chain_emoji(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn chain_emoji(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `chainEmoji` field to an Option value (optional)
-    pub fn maybe_chain_emoji(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_chain_emoji(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -266,18 +232,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainName` field (optional)
-    pub fn chain_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn chain_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `chainName` field to an Option value (optional)
-    pub fn maybe_chain_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_chain_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -412,10 +372,7 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `shout` field (optional)
-    pub fn shout(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn shout(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -447,18 +404,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
-    pub fn venue_address(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn venue_address(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
-    pub fn maybe_venue_address(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_venue_address(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -466,18 +417,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
-    pub fn venue_category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn venue_category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
-    pub fn maybe_venue_category(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_venue_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.13 = value;
         self
     }
@@ -543,10 +488,10 @@ where
 impl<'a, S> BeaconBuilder<'a, S>
 where
     S: beacon_state::State,
+    S::VenueUri: beacon_state::IsSet,
+    S::Visibility: beacon_state::IsSet,
     S::CreatedAt: beacon_state::IsSet,
     S::VenueName: beacon_state::IsSet,
-    S::Visibility: beacon_state::IsSet,
-    S::VenueUri: beacon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Beacon<'a> {
@@ -716,13 +661,7 @@ impl jacquard_common::IntoStatic for BeaconVisibility<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BeaconGetRecordOutput<'a> {
@@ -783,13 +722,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 8usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "chain_emoji",
-                        ),
-                        max: 8usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "chain_emoji",
+                            ),
+                            max: 8usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -801,22 +742,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "chain_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "chain_name",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.rating {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -825,9 +766,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         if let Some(ref value) = self.rating {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -841,13 +780,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 280usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "shout",
-                        ),
-                        max: 280usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "shout",
+                            ),
+                            max: 280usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -859,13 +800,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_address",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_address",
+                            ),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -877,13 +820,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_category",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_category",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -896,13 +841,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_name",
+                            ),
+                            max: 128usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -915,13 +862,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "venue_uri",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "venue_uri",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -934,13 +883,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "visibility",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "visibility",
+                            ),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -948,9 +899,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.beacon"),

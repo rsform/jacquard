@@ -8,7 +8,11 @@ use jacquard::richtext::RichText;
 use jacquard::types::string::Datetime;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Create a post with automatic facet detection")]
+#[command(
+    author,
+    version,
+    about = "Create a post with automatic facet detection"
+)]
 struct Args {
     /// Handle (e.g., alice.bsky.social), DID, or PDS URL
     input: CowStr<'static>,
@@ -37,10 +41,14 @@ async fn main() -> miette::Result<()> {
     // This detects @mentions, #hashtags, URLs, and [markdown](links)
     let richtext = RichText::parse(&args.text).build_async(&agent).await?;
 
-    println!("Detected {} facets:", richtext.facets.as_ref().map(|f| f.len()).unwrap_or(0));
+    println!(
+        "Detected {} facets:",
+        richtext.facets.as_ref().map(|f| f.len()).unwrap_or(0)
+    );
     if let Some(facets) = &richtext.facets {
         for facet in facets {
-            let text_slice = &richtext.text[facet.index.byte_start as usize..facet.index.byte_end as usize];
+            let text_slice =
+                &richtext.text[facet.index.byte_start as usize..facet.index.byte_end as usize];
             println!("  - \"{}\" ({:?})", text_slice, facet.features);
         }
     }

@@ -8,13 +8,7 @@
 /// A special spore capture record. Each steal creates a new record with a TID key. Current holder is determined by the most recent createdAt timestamp across all backlinked records for a given origin (subject).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecialSpore<'a> {
@@ -27,7 +21,7 @@ pub struct SpecialSpore<'a> {
 
 pub mod special_spore_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,13 +174,7 @@ impl<'a> SpecialSpore<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecialSporeGetRecordOutput<'a> {
@@ -243,9 +231,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecialSpore<'a> {
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_item_specialSpore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_coop_hypha_spores_item_specialSpore()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.item.specialSpore"),

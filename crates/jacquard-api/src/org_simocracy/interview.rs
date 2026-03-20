@@ -8,13 +8,7 @@
 /// An interview transcript for a sim — captures voice answers and value positions to derive the sim's constitution and speaking style.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Interview<'a> {
@@ -33,7 +27,7 @@ pub struct Interview<'a> {
 
 pub mod interview_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,67 +35,67 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OpenAnswers;
         type YesNoAnswers;
-        type Sim;
         type CreatedAt;
+        type Sim;
+        type OpenAnswers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OpenAnswers = Unset;
         type YesNoAnswers = Unset;
-        type Sim = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `open_answers` field to Set
-    pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
-    impl<S: State> State for SetOpenAnswers<S> {
-        type OpenAnswers = Set<members::open_answers>;
-        type YesNoAnswers = S::YesNoAnswers;
-        type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
+        type Sim = Unset;
+        type OpenAnswers = Unset;
     }
     ///State transition - sets the `yes_no_answers` field to Set
     pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYesNoAnswers<S> {}
     impl<S: State> State for SetYesNoAnswers<S> {
-        type OpenAnswers = S::OpenAnswers;
         type YesNoAnswers = Set<members::yes_no_answers>;
+        type CreatedAt = S::CreatedAt;
         type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
         type OpenAnswers = S::OpenAnswers;
-        type YesNoAnswers = S::YesNoAnswers;
-        type Sim = Set<members::sim>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type OpenAnswers = S::OpenAnswers;
         type YesNoAnswers = S::YesNoAnswers;
-        type Sim = S::Sim;
         type CreatedAt = Set<members::created_at>;
+        type Sim = S::Sim;
+        type OpenAnswers = S::OpenAnswers;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
+        type Sim = Set<members::sim>;
+        type OpenAnswers = S::OpenAnswers;
+    }
+    ///State transition - sets the `open_answers` field to Set
+    pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
+    impl<S: State> State for SetOpenAnswers<S> {
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
+        type Sim = S::Sim;
+        type OpenAnswers = Set<members::open_answers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `open_answers` field
-        pub struct open_answers(());
         ///Marker type for the `yes_no_answers` field
         pub struct yes_no_answers(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
+        ///Marker type for the `open_answers` field
+        pub struct open_answers(());
     }
 }
 
@@ -214,10 +208,10 @@ where
 impl<'a, S> InterviewBuilder<'a, S>
 where
     S: interview_state::State,
-    S::OpenAnswers: interview_state::IsSet,
     S::YesNoAnswers: interview_state::IsSet,
-    S::Sim: interview_state::IsSet,
     S::CreatedAt: interview_state::IsSet,
+    S::Sim: interview_state::IsSet,
+    S::OpenAnswers: interview_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Interview<'a> {
@@ -262,13 +256,7 @@ impl<'a> Interview<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterviewGetRecordOutput<'a> {
@@ -325,9 +313,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interview<'a> {
     }
 }
 
-fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.interview"),
@@ -437,120 +423,110 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("openAnswer"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A single open-ended interview answer.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("question"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "answer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The transcribed voice answer",
-                                    ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The transcribed voice answer",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(30000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(3000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(30000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(3000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "question",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The interview question that was asked",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("question"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The interview question that was asked",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("valueResponse"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A yes/no response to a value statement.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("statement"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "answer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "statement",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The value statement presented",
-                                    ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("statement"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The value statement presented",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -567,7 +543,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OpenAnswer<'a> {
@@ -597,9 +573,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("answer"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -614,13 +588,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "answer",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "answer",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -629,9 +605,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "question",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("question"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -644,13 +618,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
 /// A yes/no response to a value statement.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValueResponse<'a> {
@@ -663,7 +631,7 @@ pub struct ValueResponse<'a> {
 
 pub mod value_response_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -671,37 +639,37 @@ pub mod value_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Statement;
         type Answer;
+        type Statement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Statement = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `statement` field to Set
-    pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatement<S> {}
-    impl<S: State> State for SetStatement<S> {
-        type Statement = Set<members::statement>;
-        type Answer = S::Answer;
+        type Statement = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
-        type Statement = S::Statement;
         type Answer = Set<members::answer>;
+        type Statement = S::Statement;
+    }
+    ///State transition - sets the `statement` field to Set
+    pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatement<S> {}
+    impl<S: State> State for SetStatement<S> {
+        type Answer = S::Answer;
+        type Statement = Set<members::statement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `statement` field
-        pub struct statement(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `statement` field
+        pub struct statement(());
     }
 }
 
@@ -774,8 +742,8 @@ where
 impl<'a, S> ValueResponseBuilder<'a, S>
 where
     S: value_response_state::State,
-    S::Statement: value_response_state::IsSet,
     S::Answer: value_response_state::IsSet,
+    S::Statement: value_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValueResponse<'a> {
@@ -819,9 +787,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueResponse<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "statement",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("statement"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });

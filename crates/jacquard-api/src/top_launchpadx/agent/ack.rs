@@ -8,13 +8,7 @@
 /// Agent acknowledgment record for a processed job.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ack<'a> {
@@ -27,7 +21,7 @@ pub struct Ack<'a> {
     /// URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub subject_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Job type identifier being acknowledged by the agent.
     #[serde(borrow)]
     pub work_type: jacquard_common::CowStr<'a>,
@@ -35,7 +29,7 @@ pub struct Ack<'a> {
 
 pub mod ack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,37 +37,37 @@ pub mod ack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type WorkType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type WorkType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type WorkType = S::WorkType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `work_type` field to Set
     pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkType<S> {}
     impl<S: State> State for SetWorkType<S> {
-        type CreatedAt = S::CreatedAt;
         type WorkType = Set<members::work_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type WorkType = S::WorkType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `work_type` field
         pub struct work_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -83,7 +77,7 @@ pub struct AckBuilder<'a, S: ack_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -128,10 +122,7 @@ where
 
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -146,7 +137,7 @@ impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
     pub fn subject_uri(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -154,7 +145,7 @@ impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `subjectUri` field to an Option value (optional)
     pub fn maybe_subject_uri(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -183,8 +174,8 @@ where
 impl<'a, S> AckBuilder<'a, S>
 where
     S: ack_state::State,
-    S::CreatedAt: ack_state::IsSet,
     S::WorkType: ack_state::IsSet,
+    S::CreatedAt: ack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ack<'a> {
@@ -229,13 +220,7 @@ impl<'a> Ack<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AckGetRecordOutput<'a> {
@@ -292,9 +277,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ack<'a> {
     }
 }
 
-fn lexicon_doc_top_launchpadx_agent_ack() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_top_launchpadx_agent_ack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("top.launchpadx.agent.ack"),

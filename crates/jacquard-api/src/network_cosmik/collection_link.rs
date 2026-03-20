@@ -8,13 +8,7 @@
 /// A record representing the relationship between a card and a collection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLink<'a> {
@@ -35,9 +29,7 @@ pub struct CollectionLink<'a> {
     /// Strong reference to the original card record (may be in another library).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub original_card: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub original_card: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Optional provenance information for this link.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -46,7 +38,7 @@ pub struct CollectionLink<'a> {
 
 pub mod collection_link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,66 +47,66 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AddedAt;
-        type Collection;
         type Card;
         type AddedBy;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AddedAt = Unset;
-        type Collection = Unset;
         type Card = Unset;
         type AddedBy = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
         type AddedAt = Set<members::added_at>;
+        type Card = S::Card;
+        type AddedBy = S::AddedBy;
         type Collection = S::Collection;
-        type Card = S::Card;
-        type AddedBy = S::AddedBy;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type AddedAt = S::AddedAt;
-        type Collection = Set<members::collection>;
-        type Card = S::Card;
-        type AddedBy = S::AddedBy;
     }
     ///State transition - sets the `card` field to Set
     pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
         type AddedAt = S::AddedAt;
-        type Collection = S::Collection;
         type Card = Set<members::card>;
         type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `added_by` field to Set
     pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedBy<S> {}
     impl<S: State> State for SetAddedBy<S> {
         type AddedAt = S::AddedAt;
-        type Collection = S::Collection;
         type Card = S::Card;
         type AddedBy = Set<members::added_by>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type AddedAt = S::AddedAt;
+        type Card = S::Card;
+        type AddedBy = S::AddedBy;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `added_at` field
         pub struct added_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `card` field
         pub struct card(());
         ///Marker type for the `added_by` field
         pub struct added_by(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -288,9 +280,9 @@ impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
     S::AddedAt: collection_link_state::IsSet,
-    S::Collection: collection_link_state::IsSet,
     S::Card: collection_link_state::IsSet,
     S::AddedBy: collection_link_state::IsSet,
+    S::Collection: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {
@@ -341,13 +333,7 @@ impl<'a> CollectionLink<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkGetRecordOutput<'a> {
@@ -404,9 +390,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
     }
 }
 
-fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.cosmik.collectionLink"),

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SeekParams<'a> {
@@ -24,7 +18,7 @@ pub struct SeekParams<'a> {
 
 pub mod seek_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,18 +78,12 @@ impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
 
 impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
     /// Set the `playerId` field (optional)
-    pub fn player_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -143,7 +131,7 @@ where
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Seek;
 /// Response type for
@@ -158,9 +146,8 @@ impl jacquard_common::xrpc::XrpcResp for SeekResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
     const NSID: &'static str = "app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SeekResponse;
 }
 
@@ -169,9 +156,8 @@ impl jacquard_common::xrpc::XrpcRequest for Seek {
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Seek;
     type Response = SeekResponse;
 }

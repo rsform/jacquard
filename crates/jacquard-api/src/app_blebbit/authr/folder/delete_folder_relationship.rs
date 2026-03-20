@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteFolderRelationship<'a> {
@@ -39,9 +39,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteFolderRelationshipResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteFolderRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.deleteFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteFolderRelationshipResponse;
 }
 
@@ -50,9 +49,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteFolderRelationship<'a> {
 pub struct DeleteFolderRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.deleteFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteFolderRelationship<'de>;
     type Response = DeleteFolderRelationshipResponse;
 }

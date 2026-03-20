@@ -8,13 +8,7 @@
 /// A reaction in a Barklesheep game
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Reaction<'a> {
@@ -27,7 +21,7 @@ pub struct Reaction<'a> {
 
 pub mod reaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,51 +29,51 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameId;
         type Emoji;
         type CreatedAt;
+        type GameId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameId = Unset;
         type Emoji = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `game_id` field to Set
-    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameId<S> {}
-    impl<S: State> State for SetGameId<S> {
-        type GameId = Set<members::game_id>;
-        type Emoji = S::Emoji;
-        type CreatedAt = S::CreatedAt;
+        type GameId = Unset;
     }
     ///State transition - sets the `emoji` field to Set
     pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmoji<S> {}
     impl<S: State> State for SetEmoji<S> {
-        type GameId = S::GameId;
         type Emoji = Set<members::emoji>;
         type CreatedAt = S::CreatedAt;
+        type GameId = S::GameId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GameId = S::GameId;
         type Emoji = S::Emoji;
         type CreatedAt = Set<members::created_at>;
+        type GameId = S::GameId;
+    }
+    ///State transition - sets the `game_id` field to Set
+    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameId<S> {}
+    impl<S: State> State for SetGameId<S> {
+        type Emoji = S::Emoji;
+        type CreatedAt = S::CreatedAt;
+        type GameId = Set<members::game_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_id` field
-        pub struct game_id(());
         ///Marker type for the `emoji` field
         pub struct emoji(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `game_id` field
+        pub struct game_id(());
     }
 }
 
@@ -172,9 +166,9 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
-    S::GameId: reaction_state::IsSet,
     S::Emoji: reaction_state::IsSet,
     S::CreatedAt: reaction_state::IsSet,
+    S::GameId: reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reaction<'a> {
@@ -217,13 +211,7 @@ impl<'a> Reaction<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionGetRecordOutput<'a> {
@@ -281,9 +269,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "emoji",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("emoji"),
                     max: 4usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -293,9 +279,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reaction<'a> {
     }
 }
 
-fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_games_firehose_barklesheep_reaction()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("games.firehose.barklesheep.reaction"),

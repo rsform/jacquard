@@ -8,13 +8,7 @@
 /// A songwriter, composer, or music publisher who owns the publishing rights to a song or musical work
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingOwner<'a> {
@@ -38,7 +32,7 @@ pub struct PublishingOwner<'a> {
 
 pub mod publishing_owner_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,10 +90,7 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
         self
     }
     /// Set the `collectingSociety` field to an Option value (optional)
-    pub fn maybe_collecting_society(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_collecting_society(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -107,18 +98,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `companyName` field (optional)
-    pub fn company_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn company_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `companyName` field to an Option value (optional)
-    pub fn maybe_company_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_company_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -126,18 +111,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `firstName` field (optional)
-    pub fn first_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn first_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `firstName` field to an Option value (optional)
-    pub fn maybe_first_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_first_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -158,18 +137,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `lastName` field (optional)
-    pub fn last_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn last_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `lastName` field to an Option value (optional)
-    pub fn maybe_last_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_last_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -224,13 +197,7 @@ impl<'a> PublishingOwner<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingOwnerGetRecordOutput<'a> {
@@ -311,9 +278,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "first_name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("first_name"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -323,9 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 11usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ipi",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ipi"),
                     max: 11usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -335,9 +298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "last_name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("last_name"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -347,14 +308,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
     }
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "ch.indiemusi.alpha.actor.publishingOwner",
-        ),
+        id: ::jacquard_common::CowStr::new_static("ch.indiemusi.alpha.actor.publishingOwner"),
         revision: None,
         description: None,
         defs: {

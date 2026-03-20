@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatus<'a> {
@@ -22,7 +16,7 @@ pub struct GetRepoStatus<'a> {
 
 pub mod get_repo_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,9 +49,7 @@ pub mod get_repo_status_state {
 /// Builder for constructing an instance of this type
 pub struct GetRepoStatusBuilder<'a, S: get_repo_status_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -113,13 +105,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatusOutput<'a> {
@@ -236,12 +222,8 @@ impl jacquard_common::IntoStatic for GetRepoStatusOutputStatus<'_> {
             GetRepoStatusOutputStatus::Takendown => GetRepoStatusOutputStatus::Takendown,
             GetRepoStatusOutputStatus::Suspended => GetRepoStatusOutputStatus::Suspended,
             GetRepoStatusOutputStatus::Deleted => GetRepoStatusOutputStatus::Deleted,
-            GetRepoStatusOutputStatus::Deactivated => {
-                GetRepoStatusOutputStatus::Deactivated
-            }
-            GetRepoStatusOutputStatus::Desynchronized => {
-                GetRepoStatusOutputStatus::Desynchronized
-            }
+            GetRepoStatusOutputStatus::Deactivated => GetRepoStatusOutputStatus::Deactivated,
+            GetRepoStatusOutputStatus::Desynchronized => GetRepoStatusOutputStatus::Desynchronized,
             GetRepoStatusOutputStatus::Throttled => GetRepoStatusOutputStatus::Throttled,
             GetRepoStatusOutputStatus::Other(v) => {
                 GetRepoStatusOutputStatus::Other(v.into_static())
@@ -260,7 +242,7 @@ impl jacquard_common::IntoStatic for GetRepoStatusOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

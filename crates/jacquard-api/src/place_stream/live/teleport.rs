@@ -8,13 +8,7 @@
 /// Record defining a 'teleport', that is active during a certain time.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Teleport<'a> {
@@ -30,7 +24,7 @@ pub struct Teleport<'a> {
 
 pub mod teleport_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,37 +32,37 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartsAt;
         type Streamer;
+        type StartsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartsAt = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type StartsAt = Set<members::starts_at>;
-        type Streamer = S::Streamer;
+        type StartsAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type StartsAt = S::StartsAt;
         type Streamer = Set<members::streamer>;
+        type StartsAt = S::StartsAt;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type Streamer = S::Streamer;
+        type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
     }
 }
 
@@ -155,8 +149,8 @@ where
 impl<'a, S> TeleportBuilder<'a, S>
 where
     S: teleport_state::State,
-    S::StartsAt: teleport_state::IsSet,
     S::Streamer: teleport_state::IsSet,
+    S::StartsAt: teleport_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Teleport<'a> {
@@ -199,13 +193,7 @@ impl<'a> Teleport<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TeleportGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Teleport<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_live_teleport() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_live_teleport() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.live.teleport"),

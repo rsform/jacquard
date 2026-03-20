@@ -8,13 +8,7 @@
 /// A reference to a locked file.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lock<'a> {
@@ -24,7 +18,7 @@ pub struct Lock<'a> {
 
 pub mod lock_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,13 +114,7 @@ impl<'a> Lock<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LockGetRecordOutput<'a> {
@@ -183,9 +171,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lock<'a> {
     }
 }
 
-fn lexicon_doc_blue_zio_atfile_lock() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_zio_atfile_lock() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.zio.atfile.lock"),
@@ -195,34 +181,38 @@ fn lexicon_doc_blue_zio_atfile_lock() -> ::jacquard_lexicon::lexicon::LexiconDoc
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A reference to a locked file.",
+                        )),
+                        key: Some(::jacquard_common::CowStr::new_static("any")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: None,
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "lock",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                            ::jacquard_lexicon::lexicon::LexBoolean {
+                                                description: None,
+                                                default: None,
+                                                r#const: None,
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
                         ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "lock",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
+                    },
+                ),
             );
             map
         },

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Binding<'a> {
@@ -24,7 +18,7 @@ pub struct Binding<'a> {
 
 pub mod binding_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,13 +121,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BindingOutput<'a> {
@@ -154,9 +142,8 @@ impl jacquard_common::xrpc::XrpcResp for BindingResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Binding<'a> {
     const NSID: &'static str = "at.inlay.Binding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = BindingResponse;
 }
 
@@ -165,9 +152,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Binding<'a> {
 pub struct BindingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BindingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Binding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Binding<'de>;
     type Response = BindingResponse;
 }

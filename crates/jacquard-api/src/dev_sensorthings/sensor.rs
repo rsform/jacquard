@@ -8,13 +8,7 @@
 /// An instrument or procedure that produces observations.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sensor<'a> {
@@ -35,7 +29,7 @@ pub struct Sensor<'a> {
 
 pub mod sensor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,18 +137,12 @@ where
 
 impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -181,10 +169,7 @@ where
 
 impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -266,13 +251,7 @@ impl<'a> Sensor<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SensorGetRecordOutput<'a> {
@@ -329,9 +308,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sensor<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -354,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sensor<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "metadata",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("metadata"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -367,9 +342,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sensor<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -379,9 +352,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sensor<'a> {
     }
 }
 
-fn lexicon_doc_dev_sensorthings_sensor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_sensorthings_sensor() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.sensorthings.sensor"),

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateEmail<'a> {
@@ -38,7 +38,7 @@ pub struct UpdateEmail<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -92,9 +92,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
     const NSID: &'static str = "com.atproto.server.updateEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateEmailResponse;
 }
 
@@ -103,9 +102,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
 pub struct UpdateEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.updateEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateEmail<'de>;
     type Response = UpdateEmailResponse;
 }

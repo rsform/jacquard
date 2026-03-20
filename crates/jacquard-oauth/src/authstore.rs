@@ -19,8 +19,10 @@ pub trait ClientAuthStore {
         session_id: &str,
     ) -> impl Future<Output = Result<Option<ClientSessionData<'_>>, SessionStoreError>>;
 
-    fn upsert_session(&self, session: ClientSessionData<'_>)
-    -> impl Future<Output = Result<(), SessionStoreError>>;
+    fn upsert_session(
+        &self,
+        session: ClientSessionData<'_>,
+    ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
     fn delete_session(
         &self,
@@ -38,7 +40,10 @@ pub trait ClientAuthStore {
         auth_req_info: &AuthRequestData<'_>,
     ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
-    fn delete_auth_req_info(&self, state: &str) -> impl Future<Output = Result<(), SessionStoreError>>;
+    fn delete_auth_req_info(
+        &self,
+        state: &str,
+    ) -> impl Future<Output = Result<(), SessionStoreError>>;
 }
 
 pub struct MemoryAuthStore {

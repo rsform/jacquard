@@ -196,7 +196,11 @@ impl AgentError {
     ///
     /// Use this when a record operation fails to indicate the target collection.
     pub fn for_collection(self, operation: &str, collection_nsid: &str) -> Self {
-        self.append_context(smol_str::format_smolstr!("{} [{}]", operation, collection_nsid))
+        self.append_context(smol_str::format_smolstr!(
+            "{} [{}]",
+            operation,
+            collection_nsid
+        ))
     }
 
     /// Add XRPC error data to this error for observability

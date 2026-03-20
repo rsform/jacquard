@@ -3,9 +3,9 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
+use super::CodeGenerator;
 use super::nsid_utils::NsidPath;
 use super::utils::{make_ident, sanitize_name};
-use super::CodeGenerator;
 
 impl<'c> CodeGenerator<'c> {
     /// Generate all code for the corpus, organized by file
@@ -163,7 +163,8 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate module tree iteratively until no new files appear
         loop {
-            let module_map = self.generate_module_tree(&all_files, &defs_files, &subscription_files);
+            let module_map =
+                self.generate_module_tree(&all_files, &defs_files, &subscription_files);
             let old_count = all_files.len();
 
             // Merge new module files
@@ -187,11 +188,12 @@ impl<'c> CodeGenerator<'c> {
             }
 
             // Format code
-            let file: syn::File = syn::parse2(tokens.clone()).map_err(|e| CodegenError::TokenParseError {
-                path: path.clone(),
-                source: e,
-                tokens: tokens.to_string(),
-            })?;
+            let file: syn::File =
+                syn::parse2(tokens.clone()).map_err(|e| CodegenError::TokenParseError {
+                    path: path.clone(),
+                    source: e,
+                    tokens: tokens.to_string(),
+                })?;
             let mut formatted = prettyplease::unparse(&file);
 
             // Add blank lines between top-level items for better readability
@@ -236,9 +238,7 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Get namespace dependencies collected during code generation
-    pub fn get_namespace_dependencies(
-        &self,
-    ) -> HashMap<String, HashSet<String>> {
+    pub fn get_namespace_dependencies(&self) -> HashMap<String, HashSet<String>> {
         self.namespace_deps.borrow().clone()
     }
 
@@ -247,8 +247,7 @@ impl<'c> CodeGenerator<'c> {
         use std::fmt::Write;
 
         let deps = self.namespace_deps.borrow();
-        let mut all_namespaces: HashSet<String> =
-            HashSet::new();
+        let mut all_namespaces: HashSet<String> = HashSet::new();
 
         // Collect all namespaces from the corpus (first two segments of each NSID)
         for (nsid, _doc) in self.corpus.iter() {
@@ -304,8 +303,7 @@ impl<'c> CodeGenerator<'c> {
         feature_names.sort();
 
         // Map namespace to feature name for dependency lookup
-        let mut ns_to_feature: HashMap<&str, String> =
-            HashMap::new();
+        let mut ns_to_feature: HashMap<&str, String> = HashMap::new();
         for ns in &all_namespaces {
             ns_to_feature.insert(ns.as_str(), to_feature_name(ns));
         }

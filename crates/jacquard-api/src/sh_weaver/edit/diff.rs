@@ -8,13 +8,7 @@
 /// An edit record for a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
@@ -39,7 +33,7 @@ pub struct Diff<'a> {
 
 pub mod diff_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -161,10 +155,7 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
         self
     }
     /// Set the `inlineDiff` field to an Option value (optional)
-    pub fn maybe_inline_diff(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_inline_diff(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -280,13 +271,7 @@ impl<'a> Diff<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DiffGetRecordOutput<'a> {
@@ -343,9 +328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.diff"),

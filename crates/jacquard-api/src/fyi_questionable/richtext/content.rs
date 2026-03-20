@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
@@ -24,7 +18,7 @@ pub struct Content<'a> {
 
 pub mod content_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -127,13 +121,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -149,9 +137,7 @@ pub enum ContentItemsItem<'a> {
     #[serde(rename = "fyi.questionable.richtext.header")]
     Header(Box<crate::fyi_questionable::richtext::header::Header<'a>>),
     #[serde(rename = "fyi.questionable.richtext.horizontalRule")]
-    HorizontalRule(
-        Box<crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule<'a>>,
-    ),
+    HorizontalRule(Box<crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule<'a>>),
     #[serde(rename = "fyi.questionable.richtext.image")]
     Image(Box<crate::fyi_questionable::richtext::image::Image<'a>>),
     #[serde(rename = "fyi.questionable.richtext.math")]
@@ -162,9 +148,8 @@ pub enum ContentItemsItem<'a> {
     Website(Box<crate::fyi_questionable::richtext::website::Website<'a>>),
 }
 
-fn lexicon_doc_fyi_questionable_richtext_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fyi_questionable_richtext_content()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.content"),
@@ -174,51 +159,73 @@ fn lexicon_doc_fyi_questionable_richtext_content() -> ::jacquard_lexicon::lexico
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "items",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Array of content blocks",
-                                    ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Array of content blocks",
+                                        )),
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(
+                                            ::jacquard_lexicon::lexicon::LexRefUnion {
+                                                description: None,
+                                                refs: vec![
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.text",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.blockquote",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.bskyPost",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.code",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.header",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.horizontalRule",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.image",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.math",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.text",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.list",
+                                                    ),
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "fyi.questionable.richtext.website",
+                                                    ),
+                                                ],
+                                                closed: Some(false),
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                    },
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.text"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.blockquote"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.bskyPost"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.code"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.header"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.horizontalRule"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.image"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.math"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.text"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.list"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.website")
-                                    ],
-                                    closed: Some(false),
-                                }),
-                                min_length: None,
-                                max_length: Some(1000usize),
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -243,9 +250,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("items"),
                     max: 1000usize,
                     actual: value.len(),
                 });

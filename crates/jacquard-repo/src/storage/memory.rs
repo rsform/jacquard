@@ -103,7 +103,10 @@ impl BlockStore for MemoryBlockStore {
         Ok(self.blocks.read().unwrap().contains_key(cid))
     }
 
-    async fn put_many(&self, blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send) -> Result<()> {
+    async fn put_many(
+        &self,
+        blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send,
+    ) -> Result<()> {
         let mut store = self.blocks.write().unwrap();
         for (cid, data) in blocks {
             store.insert(cid, data);

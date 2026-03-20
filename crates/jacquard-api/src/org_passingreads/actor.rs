@@ -12,13 +12,7 @@ pub mod profile;
 /// Profile view of a user for API responses. Based on the actor.profile record but with resolved avatar URL.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
@@ -29,16 +23,14 @@ pub struct ProfileView<'a> {
     /// Resolved URL to the avatar image
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Rich text facets for the description
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -50,7 +42,7 @@ pub struct ProfileView<'a> {
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,7 +89,7 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -127,18 +119,12 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatarAlt` field (optional)
-    pub fn avatar_alt(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn avatar_alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `avatarAlt` field to an Option value (optional)
-    pub fn maybe_avatar_alt(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_avatar_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -148,7 +134,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatarUrl` field (optional)
     pub fn avatar_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -156,7 +142,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatarUrl` field to an Option value (optional)
     pub fn maybe_avatar_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -165,18 +151,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -222,18 +202,12 @@ where
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -298,9 +272,7 @@ where
     }
 }
 
-fn lexicon_doc_org_passingreads_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_passingreads_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.passingreads.actor.defs"),
@@ -488,9 +460,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "avatar_alt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("avatar_alt"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -500,9 +470,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });

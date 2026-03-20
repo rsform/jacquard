@@ -8,13 +8,7 @@
 ///
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Work<'a> {
@@ -35,7 +29,7 @@ pub struct Work<'a> {
 
 pub mod work_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,37 +37,37 @@ pub mod work_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type WorkType;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type WorkType = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type WorkType = S::WorkType;
+        type Title = Unset;
     }
     ///State transition - sets the `work_type` field to Set
     pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkType<S> {}
     impl<S: State> State for SetWorkType<S> {
-        type Title = S::Title;
         type WorkType = Set<members::work_type>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type WorkType = S::WorkType;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `work_type` field
         pub struct work_type(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -174,8 +168,8 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
 impl<'a, S> WorkBuilder<'a, S>
 where
     S: work_state::State,
-    S::Title: work_state::IsSet,
     S::WorkType: work_state::IsSet,
+    S::Title: work_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Work<'a> {
@@ -304,13 +298,7 @@ impl jacquard_common::IntoStatic for WorkWorkType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkGetRecordOutput<'a> {
@@ -367,9 +355,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -383,13 +369,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "id",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -398,9 +384,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -415,13 +399,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -430,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "work_type",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("work_type"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -447,22 +431,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "work_type",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "work_type",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.year {
             if *value > 2199i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("year"),
                     max: 2199i64,
                     actual: *value,
                 });
@@ -471,9 +455,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
         if let Some(ref value) = self.year {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("year"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -483,9 +465,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
     }
 }
 
-fn lexicon_doc_social_lexical_works_work() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_lexical_works_work() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.lexical.works.work"),
@@ -495,95 +475,107 @@ fn lexicon_doc_social_lexical_works_work() -> ::jacquard_lexicon::lexicon::Lexic
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(::jacquard_common::CowStr::new_static("")),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("workType")
-                            ],
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static("")),
+                        key: Some(::jacquard_common::CowStr::new_static("any")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: Some(vec![
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "workType",
+                                    ),
+                                ]),
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "id",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: Some(
+                                                    ::jacquard_common::CowStr::new_static(""),
+                                                ),
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(64usize),
+                                                min_graphemes: None,
+                                                max_graphemes: Some(32usize),
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "title",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: Some(
+                                                    ::jacquard_common::CowStr::new_static(""),
+                                                ),
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(1024usize),
+                                                min_graphemes: None,
+                                                max_graphemes: Some(512usize),
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "workType",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: Some(
+                                                    ::jacquard_common::CowStr::new_static(""),
+                                                ),
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(128usize),
+                                                min_graphemes: None,
+                                                max_graphemes: Some(64usize),
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "year",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                            ::jacquard_lexicon::lexicon::LexInteger {
+                                                description: None,
+                                                default: None,
+                                                minimum: Some(0i64),
+                                                maximum: Some(2199i64),
+                                                r#enum: None,
+                                                r#const: None,
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
                         ),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "id",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(""),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(32usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(""),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(1024usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "workType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(""),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "year",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: Some(0i64),
-                                    maximum: Some(2199i64),
-                                    r#enum: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
+                    },
+                ),
             );
             map
         },

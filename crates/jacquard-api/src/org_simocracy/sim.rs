@@ -8,13 +8,7 @@
 /// An avatar/sim record. One user can have multiple sims.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sim<'a> {
@@ -34,7 +28,7 @@ pub struct Sim<'a> {
 
 pub mod sim_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,49 +36,49 @@ pub mod sim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
         type Settings;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
         type Settings = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Settings = S::Settings;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Settings = S::Settings;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
         type Settings = S::Settings;
     }
     ///State transition - sets the `settings` field to Set
     pub struct SetSettings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSettings<S> {}
     impl<S: State> State for SetSettings<S> {
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Settings = Set<members::settings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `settings` field
         pub struct settings(());
     }
@@ -149,10 +143,7 @@ impl<'a, S: sim_state::State> SimBuilder<'a, S> {
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_image(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -199,8 +190,8 @@ where
 impl<'a, S> SimBuilder<'a, S>
 where
     S: sim_state::State,
-    S::Name: sim_state::IsSet,
     S::CreatedAt: sim_state::IsSet,
+    S::Name: sim_state::IsSet,
     S::Settings: sim_state::IsSet,
 {
     /// Build the final struct
@@ -246,13 +237,7 @@ impl<'a> Sim<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SimGetRecordOutput<'a> {
@@ -310,9 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sim<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });

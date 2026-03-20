@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DislikeShout<'a> {
@@ -26,13 +26,7 @@ pub struct DislikeShout<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DislikeShoutOutput<'a> {
@@ -53,9 +47,8 @@ impl jacquard_common::xrpc::XrpcResp for DislikeShoutResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DislikeShout<'a> {
     const NSID: &'static str = "app.rocksky.like.dislikeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DislikeShoutResponse;
 }
 
@@ -64,9 +57,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DislikeShout<'a> {
 pub struct DislikeShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DislikeShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.dislikeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DislikeShout<'de>;
     type Response = DislikeShoutResponse;
 }

@@ -28,9 +28,9 @@ pub struct ParsedCar {
 /// For large CAR files, consider using `stream_car()` instead.
 pub async fn read_car(path: impl AsRef<Path>) -> Result<BTreeMap<IpldCid, Bytes>> {
     let path = path.as_ref();
-    let file = File::open(path)
-        .await
-        .map_err(|e| RepoError::io(e).with_context(format!("opening CAR file: {}", path.display())))?;
+    let file = File::open(path).await.map_err(|e| {
+        RepoError::io(e).with_context(format!("opening CAR file: {}", path.display()))
+    })?;
 
     let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 
@@ -51,9 +51,9 @@ pub async fn read_car(path: impl AsRef<Path>) -> Result<BTreeMap<IpldCid, Bytes>
 /// Useful for checking roots without loading all blocks.
 pub async fn read_car_header(path: impl AsRef<Path>) -> Result<Vec<IpldCid>> {
     let path = path.as_ref();
-    let file = File::open(path)
-        .await
-        .map_err(|e| RepoError::io(e).with_context(format!("opening CAR file: {}", path.display())))?;
+    let file = File::open(path).await.map_err(|e| {
+        RepoError::io(e).with_context(format!("opening CAR file: {}", path.display()))
+    })?;
 
     let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 
@@ -92,9 +92,9 @@ pub async fn parse_car_bytes(data: &[u8]) -> Result<ParsedCar> {
 /// Useful for processing large CAR files incrementally.
 pub async fn stream_car(path: impl AsRef<Path>) -> Result<CarBlockStream> {
     let path = path.as_ref();
-    let file = File::open(path)
-        .await
-        .map_err(|e| RepoError::io(e).with_context(format!("opening CAR file: {}", path.display())))?;
+    let file = File::open(path).await.map_err(|e| {
+        RepoError::io(e).with_context(format!("opening CAR file: {}", path.display()))
+    })?;
 
     let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 

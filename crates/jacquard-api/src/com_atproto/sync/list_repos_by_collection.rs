@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListReposByCollection<'a> {
@@ -28,7 +22,7 @@ pub struct ListReposByCollection<'a> {
 
 pub mod list_repos_by_collection_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,10 +65,7 @@ pub struct ListReposByCollectionBuilder<'a, S: list_repos_by_collection_state::S
 
 impl<'a> ListReposByCollection<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ListReposByCollectionBuilder<
-        'a,
-        list_repos_by_collection_state::Empty,
-    > {
+    pub fn new() -> ListReposByCollectionBuilder<'a, list_repos_by_collection_state::Empty> {
         ListReposByCollectionBuilder::new()
     }
 }
@@ -99,10 +90,7 @@ where
     pub fn collection(
         mut self,
         value: impl Into<jacquard_common::types::string::Nsid<'a>>,
-    ) -> ListReposByCollectionBuilder<
-        'a,
-        list_repos_by_collection_state::SetCollection<S>,
-    > {
+    ) -> ListReposByCollectionBuilder<'a, list_repos_by_collection_state::SetCollection<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ListReposByCollectionBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -114,10 +102,7 @@ where
 
 impl<'a, S: list_repos_by_collection_state::State> ListReposByCollectionBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -158,13 +143,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListReposByCollectionOutput<'a> {
@@ -203,13 +182,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListReposByCollectionRequest {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
@@ -219,7 +192,7 @@ pub struct Repo<'a> {
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -252,9 +225,7 @@ pub mod repo_state {
 /// Builder for constructing an instance of this type
 pub struct RepoBuilder<'a, S: repo_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -322,14 +293,11 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_atproto_sync_listReposByCollection()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "com.atproto.sync.listReposByCollection",
-        ),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.sync.listReposByCollection"),
         revision: None,
         description: None,
         defs: {
@@ -408,39 +376,39 @@ fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::l
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("repo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },

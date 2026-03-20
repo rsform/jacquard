@@ -3,8 +3,8 @@
 use bytes::Bytes;
 use jacquard_api::com_atproto::repo::import_repo::ImportRepo;
 use jacquard_common::{
-    xrpc::streaming::{XrpcProcedureStream, XrpcStreamResp},
     StreamError,
+    xrpc::streaming::{XrpcProcedureStream, XrpcStreamResp},
 };
 use serde::{Deserialize, Serialize};
 

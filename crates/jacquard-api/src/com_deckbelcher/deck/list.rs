@@ -8,13 +8,7 @@
 /// A card entry in a decklist.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Card<'a> {
@@ -34,7 +28,7 @@ pub struct Card<'a> {
 
 pub mod card_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,49 +36,49 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quantity;
         type Section;
+        type Quantity;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quantity = Unset;
         type Section = Unset;
+        type Quantity = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type Quantity = Set<members::quantity>;
-        type Section = S::Section;
-        type Ref = S::Ref;
     }
     ///State transition - sets the `section` field to Set
     pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSection<S> {}
     impl<S: State> State for SetSection<S> {
-        type Quantity = S::Quantity;
         type Section = Set<members::section>;
+        type Quantity = S::Quantity;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type Section = S::Section;
+        type Quantity = Set<members::quantity>;
         type Ref = S::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Quantity = S::Quantity;
         type Section = S::Section;
+        type Quantity = S::Quantity;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `section` field
         pub struct section(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
@@ -179,18 +173,12 @@ where
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -199,8 +187,8 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
-    S::Quantity: card_state::IsSet,
     S::Section: card_state::IsSet,
+    S::Quantity: card_state::IsSet,
     S::Ref: card_state::IsSet,
 {
     /// Build the final struct
@@ -231,9 +219,7 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_deck_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_deckbelcher_deck_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.deckbelcher.deck.list"),
@@ -329,20 +315,22 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("format"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Game format for a deck."),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: Some(320usize),
-                    min_graphemes: None,
-                    max_graphemes: Some(32usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Game format for a deck.",
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: Some(320usize),
+                        min_graphemes: None,
+                        max_graphemes: Some(32usize),
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -517,41 +505,39 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("primerUri"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "External primer content. Typically a URL, but any valid URI scheme.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(10000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(1000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(10000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(1000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("section"),
@@ -594,9 +580,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
             let value = &self.quantity;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("quantity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -606,9 +590,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 128usize,
                     actual: value.len(),
                 });
@@ -809,13 +791,7 @@ impl jacquard_common::IntoStatic for Format<'_> {
 /// A Magic: The Gathering decklist.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
@@ -842,7 +818,7 @@ pub struct List<'a> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -850,51 +826,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
         type Cards;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
         type Cards = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Cards = S::Cards;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Cards = S::Cards;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `cards` field to Set
     pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCards<S> {}
     impl<S: State> State for SetCards<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Cards = Set<members::cards>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Cards = S::Cards;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cards = S::Cards;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `cards` field
         pub struct cards(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1041,9 +1017,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::CreatedAt: list_state::IsSet,
-    S::Name: list_state::IsSet,
     S::Cards: list_state::IsSet,
+    S::Name: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -1092,13 +1068,7 @@ impl<'a> List<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1113,13 +1083,7 @@ pub enum ListPrimer<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
@@ -1177,9 +1141,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1280usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 1280usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1194,13 +1156,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 128usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1211,13 +1175,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PrimerRef<'a> {
@@ -1227,7 +1185,7 @@ pub struct PrimerRef<'a> {
 
 pub mod primer_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1260,9 +1218,8 @@ pub mod primer_ref_state {
 /// Builder for constructing an instance of this type
 pub struct PrimerRefBuilder<'a, S: primer_ref_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1357,7 +1314,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerRef<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PrimerUri<'a> {
@@ -1383,9 +1340,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uri",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uri"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1400,13 +1355,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "uri",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("uri"),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

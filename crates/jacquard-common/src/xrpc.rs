@@ -15,9 +15,7 @@ pub mod streaming;
 
 use alloc::borrow::ToOwned;
 use alloc::boxed::Box;
-use alloc::string::String;
-#[cfg(feature = "streaming")]
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use ipld_core::ipld::Ipld;
 #[cfg(feature = "streaming")]
@@ -49,13 +47,31 @@ use http::{
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
+use crate::deps::fluent_uri::Uri;
 #[cfg(feature = "websocket")]
 pub use subscription::{
     BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
     SubscriptionEndpoint, SubscriptionExt, SubscriptionOptions, SubscriptionResp,
     SubscriptionStream, TungsteniteSubscriptionClient, XrpcSubscription,
 };
-use url::Url;
+
+/// Normalize a base URI by removing trailing slashes.
+///
+/// This is useful for XRPC clients where the base URI might be provided with
+/// a trailing slash (e.g., "https://bsky.social/") but needs to be normalized
+/// for consistent path building. Since trimming a trailing slash from a valid URI
+/// always yields a valid URI, the result is guaranteed to be valid.
+pub fn normalize_base_uri(uri: Uri<String>) -> Uri<String> {
+    let s = uri.as_str();
+    if s.ends_with('/') && s.len() > 1 {
+        let trimmed = s.trim_end_matches('/');
+        // Invariant: trimming trailing slashes from a valid URI always yields a valid URI.
+        Uri::parse(trimmed.to_string())
+            .expect("trimming trailing slash from valid URI yields valid URI")
+    } else {
+        uri
+    }
+}
 
 /// Error type for encoding XRPC requests
 #[derive(Debug, thiserror::Error)]
@@ -250,16 +266,17 @@ impl IntoStatic for CallOptions<'_> {
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// use jacquard_common::xrpc::XrpcExt;
 /// use jacquard_common::http_client::HttpClient;
+/// use jacquard_common::deps::fluent_uri::Uri;
 ///
 /// let http = reqwest::Client::new();
-/// let base = url::Url::parse("https://public.api.bsky.app")?;
+/// let base = Uri::parse("https://public.api.bsky.app").unwrap().to_owned();
 /// // let resp = http.xrpc(base).send(&request).await?;
 /// # Ok(())
 /// # }
 /// ```
 pub trait XrpcExt: HttpClient {
-    /// Start building an XRPC call for the given base URL.
-    fn xrpc<'a>(&'a self, base: Url) -> XrpcCall<'a, Self>
+    /// Start building an XRPC call for the given base URI.
+    fn xrpc<'a>(&'a self, base: Uri<String>) -> XrpcCall<'a, Self>
     where
         Self: Sized,
     {
@@ -280,11 +297,13 @@ pub type XrpcResponse<R> = Response<<R as XrpcRequest>::Response>;
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait XrpcClient: HttpClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> impl Future<Output = CowStr<'static>>;
+    fn base_uri(&self) -> impl Future<Output = Uri<String>>;
 
     /// Set the base URI for the client.
-    fn set_base_uri(&self, url: Url) -> impl Future<Output = ()> {
-        let _ = url;
+    ///
+    /// The implementation should strip any trailing slash from the URI path before storing.
+    fn set_base_uri(&self, uri: Uri<String>) -> impl Future<Output = ()> {
+        let _ = uri;
         async {}
     }
 
@@ -406,9 +425,10 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// use jacquard_common::xrpc::XrpcExt;
 /// use jacquard_common::{AuthorizationToken, CowStr};
+/// use jacquard_common::deps::fluent_uri::Uri;
 ///
 /// let http = reqwest::Client::new();
-/// let base = url::Url::parse("https://public.api.bsky.app")?;
+/// let base = Uri::parse("https://public.api.bsky.app").unwrap().to_owned();
 /// let call = http
 ///     .xrpc(base)
 ///     .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))
@@ -420,7 +440,7 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 /// ```
 pub struct XrpcCall<'a, C: HttpClient> {
     pub(crate) client: &'a C,
-    pub(crate) base: Url,
+    pub(crate) base: Uri<String>,
     pub(crate) opts: CallOptions<'a>,
 }
 
@@ -536,9 +556,58 @@ impl From<Header> for HeaderName {
     }
 }
 
-/// Build an HTTP request for an XRPC call given base URL and options
+/// Construct an XRPC endpoint URI from a base URI, NSID, and optional query string.
+///
+/// This helper:
+/// 1. Extracts scheme and authority from the base URI
+/// 2. Gets the base path (already guaranteed no trailing slash from `set_base_uri`)
+/// 3. Builds new path: `{base_path}/xrpc/{nsid}`
+/// 4. Optionally sets query from serialized parameters
+/// 5. Returns the constructed URI
+fn xrpc_endpoint_uri(
+    base: &Uri<String>,
+    nsid: &str,
+    query: Option<&str>,
+) -> XrpcResult<Uri<String>> {
+    use crate::error::ClientError;
+
+    let base_path = base.path().as_str().trim_end_matches('/');
+
+    // Calculate approximate capacity: scheme + "://" + authority + base_path + "/xrpc/" + nsid + optional query
+    let capacity = base.scheme().as_str().len()
+        + 3 // "://"
+        + base.authority().map(|a| a.as_str().len()).unwrap_or(0)
+        + base_path.len()
+        + 6 // "/xrpc/"
+        + nsid.len()
+        + query.map(|q| q.len() + 1).unwrap_or(0); // query + "?"
+
+    // Build new path string: {base_path}/xrpc/{nsid}
+    let mut uri_str = String::with_capacity(capacity);
+    uri_str.push_str(base.scheme().as_str());
+    uri_str.push_str("://");
+
+    if let Some(authority) = base.authority() {
+        uri_str.push_str(authority.as_str());
+    }
+
+    uri_str.push_str(base_path);
+    uri_str.push_str("/xrpc/");
+    uri_str.push_str(nsid);
+
+    if let Some(q) = query {
+        uri_str.push('?');
+        uri_str.push_str(q);
+    }
+
+    Uri::parse(uri_str)
+        .map(|u| u.to_owned())
+        .map_err(|_| ClientError::invalid_request("Failed to construct XRPC endpoint URI"))
+}
+
+/// Build an HTTP request for an XRPC call given base URI and options
 pub fn build_http_request<'s, R>(
-    base: &Url,
+    base: &Uri<String>,
     req: &R,
     opts: &CallOptions<'_>,
 ) -> XrpcResult<Request<Vec<u8>>>
@@ -547,30 +616,25 @@ where
 {
     use crate::error::ClientError;
 
-    let mut url = base.clone();
-    let mut path = url.path().trim_end_matches('/').to_owned();
-    path.push_str("/xrpc/");
-    path.push_str(<R as XrpcRequest>::NSID);
-    url.set_path(&path);
-    // Check if extra_headers already contains Content-Type
-
-    if let XrpcMethod::Query = <R as XrpcRequest>::METHOD {
+    // Determine query string for Query methods
+    let query_string = if let XrpcMethod::Query = <R as XrpcRequest>::METHOD {
         let qs = serde_html_form::to_string(&req).map_err(|e| {
             ClientError::invalid_request(format!("Failed to serialize query: {}", e))
         })?;
-        if !qs.is_empty() {
-            url.set_query(Some(&qs));
-        } else {
-            url.set_query(None);
-        }
-    }
+        if !qs.is_empty() { Some(qs) } else { None }
+    } else {
+        None
+    };
+
+    // Construct the XRPC endpoint URI using the helper
+    let uri = xrpc_endpoint_uri(base, <R as XrpcRequest>::NSID, query_string.as_deref())?;
 
     let method = match <R as XrpcRequest>::METHOD {
         XrpcMethod::Query => http::Method::GET,
         XrpcMethod::Procedure(_) => http::Method::POST,
     };
 
-    let mut builder = Request::builder().method(method).uri(url.as_str());
+    let mut builder = Request::builder().method(method).uri(uri.as_str());
 
     let has_content_type = opts
         .extra_headers
@@ -1147,13 +1211,11 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
     {
         use futures::TryStreamExt;
 
-        let mut url = self.base;
-        let mut path = url.path().trim_end_matches('/').to_owned();
-        path.push_str("/xrpc/");
-        path.push_str(<S::Request as XrpcRequest>::NSID);
-        url.set_path(&path);
+        let uri = xrpc_endpoint_uri(&self.base, <S::Request as XrpcRequest>::NSID, None).map_err(
+            |e| StreamError::protocol(format!("Failed to construct endpoint URI: {}", e)),
+        )?;
 
-        let mut builder = http::Request::post(url.to_string());
+        let mut builder = http::Request::post(uri.as_str());
 
         if let Some(token) = &self.opts.auth {
             let hv = match token {
@@ -1280,6 +1342,266 @@ mod tests {
     }
 
     #[test]
+    fn xrpc_uri_construction_basic() {
+        use crate::alloc::string::ToString;
+        #[derive(Serialize, Deserialize)]
+        struct Req;
+        #[derive(Deserialize, Serialize, Debug, thiserror::Error)]
+        #[error("{0}")]
+        struct Err<'a>(#[serde(borrow)] CowStr<'a>);
+        impl IntoStatic for Err<'_> {
+            type Output = Err<'static>;
+            fn into_static(self) -> Self::Output {
+                Err(self.0.into_static())
+            }
+        }
+        struct Resp;
+        impl XrpcResp for Resp {
+            const NSID: &'static str = "com.example.test";
+            const ENCODING: &'static str = "application/json";
+            type Output<'de> = ();
+            type Err<'de> = Err<'de>;
+        }
+        impl XrpcRequest for Req {
+            const NSID: &'static str = "com.example.test";
+            const METHOD: XrpcMethod = XrpcMethod::Query;
+            type Response = Resp;
+        }
+
+        let opts = CallOptions::default();
+
+        // AC1.1: Base URI without trailing slash + NSID produces correct `/xrpc/{nsid}` path
+        let base1 = Uri::parse("https://pds.example.com")
+            .expect("URI should be valid")
+            .to_owned();
+        let req1 = build_http_request(&base1, &Req, &opts).unwrap();
+        let uri1 = req1.uri().to_string();
+        assert!(
+            uri1.contains("/xrpc/com.example.test"),
+            "AC1.1: URI {} should contain '/xrpc/com.example.test'",
+            uri1
+        );
+        assert_eq!(
+            uri1, "https://pds.example.com/xrpc/com.example.test",
+            "AC1.1: URI should be exact match"
+        );
+
+        // AC1.2: Base URI with sub-path preserves it: `/base/xrpc/{nsid}`
+        let base2 = Uri::parse("https://pds.example.com/base")
+            .expect("URI should be valid")
+            .to_owned();
+        let req2 = build_http_request(&base2, &Req, &opts).unwrap();
+        let uri2 = req2.uri().to_string();
+        assert!(
+            uri2.contains("/base/xrpc/com.example.test"),
+            "AC1.2: URI {} should contain '/base/xrpc/com.example.test'",
+            uri2
+        );
+        assert_eq!(
+            uri2, "https://pds.example.com/base/xrpc/com.example.test",
+            "AC1.2: URI should preserve sub-path"
+        );
+
+        // AC1.5: Base URI with trailing slash is normalized (slash stripped) before construction
+        let base_with_slash = Uri::parse("https://pds.example.com/")
+            .expect("URI should be valid")
+            .to_owned();
+        let req_slash = build_http_request(&base_with_slash, &Req, &opts).unwrap();
+        let uri_slash = req_slash.uri().to_string();
+        assert!(
+            !uri_slash.contains("//xrpc"),
+            "AC1.5: URI {} should not contain '//xrpc'",
+            uri_slash
+        );
+        assert_eq!(
+            uri_slash, "https://pds.example.com/xrpc/com.example.test",
+            "AC1.5: URI should handle trailing slash"
+        );
+    }
+
+    #[test]
+    fn xrpc_uri_query_parameters() {
+        use crate::alloc::string::ToString;
+        use serde::Serialize;
+
+        #[derive(Serialize)]
+        struct QueryReq {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            param1: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            param2: Option<String>,
+        }
+
+        #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
+        #[error("test error")]
+        struct Err;
+        impl IntoStatic for Err {
+            type Output = Err;
+            fn into_static(self) -> Self::Output {
+                self
+            }
+        }
+
+        struct Resp;
+        impl XrpcResp for Resp {
+            const NSID: &'static str = "com.example.test";
+            const ENCODING: &'static str = "application/json";
+            type Output<'de> = ();
+            type Err<'de> = Err;
+        }
+        impl XrpcRequest for QueryReq {
+            const NSID: &'static str = "com.example.test";
+            const METHOD: XrpcMethod = XrpcMethod::Query;
+            type Response = Resp;
+        }
+
+        let opts = CallOptions::default();
+        let base = Uri::parse("https://pds.example.com")
+            .expect("URI should be valid")
+            .to_owned();
+
+        // AC1.3: Query parameters from serde serialisation are set correctly
+        let req_with_params = QueryReq {
+            param1: Some("value1".to_string()),
+            param2: Some("value2".to_string()),
+        };
+        let http_req = build_http_request(&base, &req_with_params, &opts).unwrap();
+        let uri_str = http_req.uri().to_string();
+        assert!(
+            uri_str.contains("?"),
+            "AC1.3: URI should contain query string"
+        );
+        assert!(
+            uri_str.contains("param1=value1"),
+            "AC1.3: URI should contain param1"
+        );
+        assert!(
+            uri_str.contains("param2=value2"),
+            "AC1.3: URI should contain param2"
+        );
+
+        // AC1.4: Empty/default query parameters result in no `?` in the constructed URI
+        let req_empty_params = QueryReq {
+            param1: None,
+            param2: None,
+        };
+        let http_req_empty = build_http_request(&base, &req_empty_params, &opts).unwrap();
+        let uri_str_empty = http_req_empty.uri().to_string();
+        assert!(
+            !uri_str_empty.contains("?"),
+            "AC1.4: URI {} should not contain '?' with empty params",
+            uri_str_empty
+        );
+        assert_eq!(
+            uri_str_empty, "https://pds.example.com/xrpc/com.example.test",
+            "AC1.4: URI should have no query string"
+        );
+    }
+
+    #[test]
+    fn xrpc_uri_special_characters_in_query() {
+        use crate::alloc::string::ToString;
+        use serde::Serialize;
+
+        #[derive(Serialize)]
+        struct QueryReq {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            search: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            filter: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            unicode_param: Option<String>,
+        }
+
+        #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
+        #[error("test error")]
+        struct Err;
+        impl IntoStatic for Err {
+            type Output = Err;
+            fn into_static(self) -> Self::Output {
+                self
+            }
+        }
+
+        struct Resp;
+        impl XrpcResp for Resp {
+            const NSID: &'static str = "com.example.test";
+            const ENCODING: &'static str = "application/json";
+            type Output<'de> = ();
+            type Err<'de> = Err;
+        }
+        impl XrpcRequest for QueryReq {
+            const NSID: &'static str = "com.example.test";
+            const METHOD: XrpcMethod = XrpcMethod::Query;
+            type Response = Resp;
+        }
+
+        let opts = CallOptions::default();
+        let base = Uri::parse("https://pds.example.com")
+            .expect("URI should be valid")
+            .to_owned();
+
+        // AC1.3: Test with spaces (serde_html_form uses + for spaces per application/x-www-form-urlencoded)
+        let req_spaces = QueryReq {
+            search: Some("hello world".to_string()),
+            filter: None,
+            unicode_param: None,
+        };
+        let http_req_spaces = build_http_request(&base, &req_spaces, &opts).unwrap();
+        let uri_spaces = http_req_spaces.uri().to_string();
+        assert!(
+            uri_spaces.contains("search=hello"),
+            "AC1.3: URI should contain search param"
+        );
+        // serde_html_form encodes spaces as +
+        assert!(
+            uri_spaces.contains("hello+world") || uri_spaces.contains("hello%20world"),
+            "AC1.3: URI {} should encode space in 'hello world'",
+            uri_spaces
+        );
+
+        // AC1.3: Test with special characters: &, =, +
+        let req_special = QueryReq {
+            search: Some("a=b&c+d".to_string()),
+            filter: None,
+            unicode_param: None,
+        };
+        let http_req_special = build_http_request(&base, &req_special, &opts).unwrap();
+        let uri_special = http_req_special.uri().to_string();
+        assert!(
+            uri_special.contains("?"),
+            "AC1.3: URI should contain query string for special chars"
+        );
+        // Verify the URI can be parsed successfully (fluent-uri handles encoded values)
+        let parsed = Uri::parse(uri_special.clone());
+        assert!(
+            parsed.is_ok(),
+            "AC1.3: URI {} should be parseable by fluent-uri",
+            uri_special
+        );
+
+        // AC1.3: Test with unicode characters
+        let req_unicode = QueryReq {
+            search: None,
+            filter: None,
+            unicode_param: Some("你好世界".to_string()),
+        };
+        let http_req_unicode = build_http_request(&base, &req_unicode, &opts).unwrap();
+        let uri_unicode = http_req_unicode.uri().to_string();
+        assert!(
+            uri_unicode.contains("?"),
+            "AC1.3: URI should contain query string for unicode"
+        );
+        // Verify the URI can be parsed successfully
+        let parsed_unicode = Uri::parse(uri_unicode.clone());
+        assert!(
+            parsed_unicode.is_ok(),
+            "AC1.3: URI {} should be parseable for unicode params",
+            uri_unicode
+        );
+    }
+
+    #[test]
     fn no_double_slash_in_path() {
         use crate::alloc::string::ToString;
         #[derive(Serialize, Deserialize)]
@@ -1307,15 +1629,28 @@ mod tests {
         }
 
         let opts = CallOptions::default();
-        for base in [
-            Url::parse("https://pds").unwrap(),
-            Url::parse("https://pds/").unwrap(),
-            Url::parse("https://pds/base/").unwrap(),
-        ] {
-            let req = build_http_request(&base, &Req, &opts).unwrap();
-            let uri = req.uri().to_string();
-            assert!(uri.contains("/xrpc/com.example.test"));
-            assert!(!uri.contains("//xrpc"));
-        }
+
+        // Ensure no double slashes in path
+        let base1 = Uri::parse("https://pds")
+            .expect("URI should be valid")
+            .to_owned();
+        let req1 = build_http_request(&base1, &Req, &opts).unwrap();
+        let uri1 = req1.uri().to_string();
+        assert!(
+            !uri1.contains("//xrpc"),
+            "URI {} should not contain '//xrpc'",
+            uri1
+        );
+
+        let base2 = Uri::parse("https://pds/base")
+            .expect("URI should be valid")
+            .to_owned();
+        let req2 = build_http_request(&base2, &Req, &opts).unwrap();
+        let uri2 = req2.uri().to_string();
+        assert!(
+            !uri2.contains("//xrpc"),
+            "URI {} should not contain '//xrpc'",
+            uri2
+        );
     }
 }

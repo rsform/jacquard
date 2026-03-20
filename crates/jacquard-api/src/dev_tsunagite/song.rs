@@ -8,13 +8,7 @@
 /// A song included in a game hosting leaderboards via Tsunagite.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
@@ -51,7 +45,7 @@ pub struct Song<'a> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -59,51 +53,51 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Title;
         type Composer;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Title = Unset;
         type Composer = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Title = S::Title;
-        type Composer = S::Composer;
+        type Game = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Game = S::Game;
         type Title = Set<members::title>;
         type Composer = S::Composer;
+        type Game = S::Game;
     }
     ///State transition - sets the `composer` field to Set
     pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComposer<S> {}
     impl<S: State> State for SetComposer<S> {
-        type Game = S::Game;
         type Title = S::Title;
         type Composer = Set<members::composer>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Title = S::Title;
+        type Composer = S::Composer;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `composer` field
         pub struct composer(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -189,10 +183,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -246,10 +237,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_source(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -296,9 +284,9 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Game: song_state::IsSet,
     S::Title: song_state::IsSet,
     S::Composer: song_state::IsSet,
+    S::Game: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -351,13 +339,7 @@ impl<'a> Song<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {

@@ -8,13 +8,7 @@
 /// The record containing a Cumulus Market
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Market<'a> {
@@ -27,7 +21,7 @@ pub struct Market<'a> {
 
 pub mod market_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,67 +29,67 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Question;
         type Liquidity;
         type CreatedAt;
         type ClosesAt;
+        type Question;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Question = Unset;
         type Liquidity = Unset;
         type CreatedAt = Unset;
         type ClosesAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type Liquidity = S::Liquidity;
-        type CreatedAt = S::CreatedAt;
-        type ClosesAt = S::ClosesAt;
+        type Question = Unset;
     }
     ///State transition - sets the `liquidity` field to Set
     pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLiquidity<S> {}
     impl<S: State> State for SetLiquidity<S> {
-        type Question = S::Question;
         type Liquidity = Set<members::liquidity>;
         type CreatedAt = S::CreatedAt;
         type ClosesAt = S::ClosesAt;
+        type Question = S::Question;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
         type Liquidity = S::Liquidity;
         type CreatedAt = Set<members::created_at>;
         type ClosesAt = S::ClosesAt;
+        type Question = S::Question;
     }
     ///State transition - sets the `closes_at` field to Set
     pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClosesAt<S> {}
     impl<S: State> State for SetClosesAt<S> {
-        type Question = S::Question;
         type Liquidity = S::Liquidity;
         type CreatedAt = S::CreatedAt;
         type ClosesAt = Set<members::closes_at>;
+        type Question = S::Question;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Liquidity = S::Liquidity;
+        type CreatedAt = S::CreatedAt;
+        type ClosesAt = S::ClosesAt;
+        type Question = Set<members::question>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `liquidity` field
         pub struct liquidity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
+        ///Marker type for the `question` field
+        pub struct question(());
     }
 }
 
@@ -208,10 +202,10 @@ where
 impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
-    S::Question: market_state::IsSet,
     S::Liquidity: market_state::IsSet,
     S::CreatedAt: market_state::IsSet,
     S::ClosesAt: market_state::IsSet,
+    S::Question: market_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Market<'a> {
@@ -256,13 +250,7 @@ impl<'a> Market<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MarketGetRecordOutput<'a> {
@@ -320,9 +308,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Market<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 140usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "question",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("question"),
                     max: 140usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -332,9 +318,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Market<'a> {
     }
 }
 
-fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("za.co.ciaran.cumulus.market"),

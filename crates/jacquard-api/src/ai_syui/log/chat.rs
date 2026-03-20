@@ -8,22 +8,14 @@
 /// Record containing a chat message. Compatible with site.standard.document.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Chat<'a> {
     /// Strong reference to a Bluesky post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub bsky_post_ref: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Open union for content. Supports markdown and other formats via $type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -55,7 +47,7 @@ pub struct Chat<'a> {
     pub root: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     /// Points to a publication record (at://) or a publication URL (https://).
     #[serde(borrow)]
-    pub site: jacquard_common::types::string::Uri<'a>,
+    pub site: jacquard_common::types::string::UriValue<'a>,
     /// Tags to categorize the message.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -78,7 +70,7 @@ pub struct Chat<'a> {
 
 pub mod chat_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,51 +78,51 @@ pub mod chat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PublishedAt;
         type Title;
         type Site;
-        type PublishedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PublishedAt = Unset;
         type Title = Unset;
         type Site = Unset;
-        type PublishedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Site = S::Site;
-        type PublishedAt = S::PublishedAt;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Title = S::Title;
-        type Site = Set<members::site>;
-        type PublishedAt = S::PublishedAt;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
+        type PublishedAt = Set<members::published_at>;
         type Title = S::Title;
         type Site = S::Site;
-        type PublishedAt = Set<members::published_at>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type PublishedAt = S::PublishedAt;
+        type Title = Set<members::title>;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `site` field
         pub struct site(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
     }
 }
 
@@ -147,7 +139,7 @@ pub struct ChatBuilder<'a, S: chat_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -170,20 +162,7 @@ impl<'a> ChatBuilder<'a, chat_state::Empty> {
         ChatBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _phantom: ::core::marker::PhantomData,
@@ -220,10 +199,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(
-        mut self,
-        value: Option<crate::ai_syui::log::chat::Markdown<'a>>,
-    ) -> Self {
+    pub fn maybe_content(mut self, value: Option<crate::ai_syui::log::chat::Markdown<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -250,18 +226,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -307,10 +277,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn path(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -350,10 +317,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
         self
     }
     /// Set the `root` field to an Option value (optional)
-    pub fn maybe_root(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_root(mut self, value: Option<jacquard_common::types::string::AtUri<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -367,7 +331,7 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> ChatBuilder<'a, chat_state::SetSite<S>> {
         self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         ChatBuilder {
@@ -380,18 +344,12 @@ where
 
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -399,18 +357,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `textContent` field (optional)
-    pub fn text_content(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn text_content(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
-    pub fn maybe_text_content(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_text_content(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -476,9 +428,9 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S> ChatBuilder<'a, S>
 where
     S: chat_state::State,
+    S::PublishedAt: chat_state::IsSet,
     S::Title: chat_state::IsSet,
     S::Site: chat_state::IsSet,
-    S::PublishedAt: chat_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chat<'a> {
@@ -545,13 +497,7 @@ impl<'a> Chat<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChatGetRecordOutput<'a> {
@@ -608,9 +554,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -624,13 +568,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -638,9 +584,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "langs",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("langs"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -651,9 +595,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -668,13 +610,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1020,125 +964,131 @@ fn lexicon_doc_ai_syui_log_chat() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("markdown"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Markdown content format."),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("text")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "text",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Markdown text content.",
-                                    ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
+                            "Markdown content format.",
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Markdown text content.",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(100000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(100000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("translation"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A translation of a chat message.",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "content",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(100000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(5000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(500usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                        )),
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(100000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(5000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(500usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("translationMap"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Map of language codes to translations.",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("en"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#translation"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ja"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#translation"),
-                            }),
-                        );
-                        map
+                        )),
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("en"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#translation",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ja"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#translation",
+                                        ),
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -1155,7 +1105,7 @@ fn lexicon_doc_ai_syui_log_chat() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Markdown<'a> {
@@ -1182,9 +1132,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 1000000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1199,13 +1147,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
                     )
                     .count();
                 if count > 100000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 100000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 100000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1223,7 +1173,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Translation<'a> {
@@ -1252,9 +1202,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 1000000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1268,13 +1216,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
                     )
                     .count();
                 if count > 100000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        max: 100000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "content",
+                            ),
+                            max: 100000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1282,9 +1232,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1298,13 +1246,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1322,7 +1272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TranslationMap<'a> {

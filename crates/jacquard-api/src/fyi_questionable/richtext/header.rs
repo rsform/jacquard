@@ -7,21 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Header<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
-        Vec<crate::fyi_questionable::richtext::facet::Facet<'a>>,
-    >,
+    pub facets: std::option::Option<Vec<crate::fyi_questionable::richtext::facet::Facet<'a>>>,
     pub level: i64,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
@@ -29,7 +21,7 @@ pub struct Header<'a> {
 
 pub mod header_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +29,37 @@ pub mod header_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plaintext;
         type Level;
+        type Plaintext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plaintext = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
-    impl<S: State> State for SetPlaintext<S> {
-        type Plaintext = Set<members::plaintext>;
-        type Level = S::Level;
+        type Plaintext = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Plaintext = S::Plaintext;
         type Level = Set<members::level>;
+        type Plaintext = S::Plaintext;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
+    impl<S: State> State for SetPlaintext<S> {
+        type Level = S::Level;
+        type Plaintext = Set<members::plaintext>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
     }
 }
 
@@ -104,9 +96,7 @@ impl<'a, S: header_state::State> HeaderBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::fyi_questionable::richtext::facet::Facet<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::fyi_questionable::richtext::facet::Facet<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -127,10 +117,7 @@ where
     S::Level: header_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(
-        mut self,
-        value: impl Into<i64>,
-    ) -> HeaderBuilder<'a, header_state::SetLevel<S>> {
+    pub fn level(mut self, value: impl Into<i64>) -> HeaderBuilder<'a, header_state::SetLevel<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         HeaderBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -162,8 +149,8 @@ where
 impl<'a, S> HeaderBuilder<'a, S>
 where
     S: header_state::State,
-    S::Plaintext: header_state::IsSet,
     S::Level: header_state::IsSet,
+    S::Plaintext: header_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Header<'a> {
@@ -191,9 +178,8 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.header"),
@@ -203,67 +189,69 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("plaintext"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "facets",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "fyi.questionable.richtext.facet",
-                                    ),
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(1i64),
-                                maximum: Some(6i64),
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "plaintext",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(1000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("facets"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "fyi.questionable.richtext.facet",
+                                                ),
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(1i64),
+                                        maximum: Some(6i64),
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("plaintext"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(2000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(1000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -287,9 +275,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
             let value = &self.level;
             if *value > 6i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("level"),
                     max: 6i64,
                     actual: *value,
                 });
@@ -299,9 +285,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
             let value = &self.level;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -312,9 +296,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "plaintext",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("plaintext"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -329,13 +311,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "plaintext",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "plaintext",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

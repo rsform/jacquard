@@ -1,6 +1,6 @@
+use super::CodeGenerator;
 use super::nsid_utils::NsidPath;
 use super::utils::{namespace_prefix, sanitize_name, sanitize_name_cow};
-use super::CodeGenerator;
 use heck::{ToPascalCase, ToSnakeCase};
 
 impl<'c> CodeGenerator<'c> {
@@ -39,7 +39,12 @@ impl<'c> CodeGenerator<'c> {
         field_name: &str,
         suffix: &str, // "" for union/object, "Item" for array unions
     ) -> String {
-        let base_name = format!("{}{}{}", parent_type_name, field_name.to_pascal_case(), suffix);
+        let base_name = format!(
+            "{}{}{}",
+            parent_type_name,
+            field_name.to_pascal_case(),
+            suffix
+        );
 
         // Check for collisions with lexicon defs
         if let Some(doc) = self.corpus.get(nsid) {
@@ -56,7 +61,13 @@ impl<'c> CodeGenerator<'c> {
                 } else {
                     "Record"
                 };
-                return format!("{}{}{}{}", parent_type_name, disambiguator, field_name.to_pascal_case(), suffix);
+                return format!(
+                    "{}{}{}{}",
+                    parent_type_name,
+                    disambiguator,
+                    field_name.to_pascal_case(),
+                    suffix
+                );
             }
         }
 
@@ -92,8 +103,7 @@ impl<'c> CodeGenerator<'c> {
     fn apply_prelude_collision_fix(&self, nsid: &str, def_name: &str, base_name: String) -> String {
         // Prelude types that would shadow if used as type names
         const PRELUDE_TYPES: &[&str] = &[
-            "Option", "Result", "String", "Vec", "Box",
-            "Some", "None", "Ok", "Err",
+            "Option", "Result", "String", "Vec", "Box", "Some", "None", "Ok", "Err",
         ];
 
         if !PRELUDE_TYPES.contains(&base_name.as_str()) {

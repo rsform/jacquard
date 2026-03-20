@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateHandle<'a> {
@@ -24,7 +18,7 @@ pub struct UpdateHandle<'a> {
 
 pub mod update_handle_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,9 +51,7 @@ pub mod update_handle_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateHandleBuilder<'a, S: update_handle_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Handle<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -139,9 +131,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
     const NSID: &'static str = "com.atproto.identity.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateHandleResponse;
 }
 
@@ -150,9 +141,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
 pub struct UpdateHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateHandle<'de>;
     type Response = UpdateHandleResponse;
 }

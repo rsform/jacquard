@@ -8,13 +8,7 @@
 /// A reading list curated by a librarian
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
@@ -39,7 +33,7 @@ pub struct List<'a> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,85 +41,85 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Librarians;
         type Duedate;
+        type Books;
         type Title;
         type CreatedAt;
-        type Books;
-        type Librarians;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Librarians = Unset;
         type Duedate = Unset;
+        type Books = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-        type Books = Unset;
-        type Librarians = Unset;
-    }
-    ///State transition - sets the `duedate` field to Set
-    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuedate<S> {}
-    impl<S: State> State for SetDuedate<S> {
-        type Duedate = Set<members::duedate>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Duedate = S::Duedate;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Books = Set<members::books>;
-        type Librarians = S::Librarians;
     }
     ///State transition - sets the `librarians` field to Set
     pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLibrarians<S> {}
     impl<S: State> State for SetLibrarians<S> {
+        type Librarians = Set<members::librarians>;
         type Duedate = S::Duedate;
+        type Books = S::Books;
         type Title = S::Title;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duedate` field to Set
+    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuedate<S> {}
+    impl<S: State> State for SetDuedate<S> {
+        type Librarians = S::Librarians;
+        type Duedate = Set<members::duedate>;
         type Books = S::Books;
-        type Librarians = Set<members::librarians>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = Set<members::books>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = S::Books;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = S::Books;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
         ///Marker type for the `duedate` field
         pub struct duedate(());
+        ///Marker type for the `books` field
+        pub struct books(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `books` field
-        pub struct books(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
     }
 }
 
@@ -201,18 +195,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -278,11 +266,11 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
+    S::Librarians: list_state::IsSet,
     S::Duedate: list_state::IsSet,
+    S::Books: list_state::IsSet,
     S::Title: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
-    S::Books: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -331,13 +319,7 @@ impl<'a> List<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
@@ -394,9 +376,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -410,13 +390,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -425,9 +407,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -442,13 +422,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

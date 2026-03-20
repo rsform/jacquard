@@ -8,13 +8,7 @@
 /// User preferences for fragrance review scoring
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
@@ -43,7 +37,7 @@ pub struct Settings<'a> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -166,10 +160,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `scoreLens` field (optional)
-    pub fn score_lens(
-        mut self,
-        value: impl Into<Option<SettingsScoreLens<'a>>>,
-    ) -> Self {
+    pub fn score_lens(mut self, value: impl Into<Option<SettingsScoreLens<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -355,13 +346,7 @@ impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
@@ -484,9 +469,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "score_lens",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("score_lens"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -518,9 +501,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
 }
 
-fn lexicon_doc_social_drydown_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_drydown_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.drydown.settings"),

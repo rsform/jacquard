@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DataPoint<'a> {
@@ -24,7 +18,7 @@ pub struct DataPoint<'a> {
 
 pub mod data_point_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,53 +166,53 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("dataPoint"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("date"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "date",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("date"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -390,81 +384,83 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("trendSummary"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "average",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "best",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "count",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "total",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "worst",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("average"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("best"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("worst"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -491,13 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataPoint<'a> {
 /// A shared fitness trend or dashboard snapshot
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Trend<'a> {
@@ -526,7 +516,7 @@ pub struct Trend<'a> {
 
 pub mod trend_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -534,85 +524,85 @@ pub mod trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Period;
-        type Summary;
         type WidgetType;
-        type Metric;
         type CreatedAt;
+        type Summary;
+        type Period;
+        type Metric;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Period = Unset;
-        type Summary = Unset;
         type WidgetType = Unset;
-        type Metric = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
-        type Period = Set<members::period>;
-        type Summary = S::Summary;
-        type WidgetType = S::WidgetType;
-        type Metric = S::Metric;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Period = S::Period;
-        type Summary = Set<members::summary>;
-        type WidgetType = S::WidgetType;
-        type Metric = S::Metric;
-        type CreatedAt = S::CreatedAt;
+        type Summary = Unset;
+        type Period = Unset;
+        type Metric = Unset;
     }
     ///State transition - sets the `widget_type` field to Set
     pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidgetType<S> {}
     impl<S: State> State for SetWidgetType<S> {
-        type Period = S::Period;
-        type Summary = S::Summary;
         type WidgetType = Set<members::widget_type>;
-        type Metric = S::Metric;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Period = S::Period;
         type Summary = S::Summary;
-        type WidgetType = S::WidgetType;
-        type Metric = Set<members::metric>;
-        type CreatedAt = S::CreatedAt;
+        type Period = S::Period;
+        type Metric = S::Metric;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Period = S::Period;
-        type Summary = S::Summary;
         type WidgetType = S::WidgetType;
-        type Metric = S::Metric;
         type CreatedAt = Set<members::created_at>;
+        type Summary = S::Summary;
+        type Period = S::Period;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Summary = Set<members::summary>;
+        type Period = S::Period;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeriod<S> {}
+    impl<S: State> State for SetPeriod<S> {
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
+        type Period = Set<members::period>;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
+        type Period = S::Period;
+        type Metric = Set<members::metric>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `period` field
-        pub struct period(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+        ///Marker type for the `period` field
+        pub struct period(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
     }
 }
 
@@ -645,17 +635,7 @@ impl<'a> TrendBuilder<'a, trend_state::Empty> {
     pub fn new() -> Self {
         TrendBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -663,10 +643,7 @@ impl<'a> TrendBuilder<'a, trend_state::Empty> {
 
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -738,10 +715,7 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_image(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -826,11 +800,11 @@ where
 impl<'a, S> TrendBuilder<'a, S>
 where
     S: trend_state::State,
-    S::Period: trend_state::IsSet,
-    S::Summary: trend_state::IsSet,
     S::WidgetType: trend_state::IsSet,
-    S::Metric: trend_state::IsSet,
     S::CreatedAt: trend_state::IsSet,
+    S::Summary: trend_state::IsSet,
+    S::Period: trend_state::IsSet,
+    S::Metric: trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Trend<'a> {
@@ -1292,13 +1266,7 @@ impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendGetRecordOutput<'a> {
@@ -1355,9 +1323,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "caption",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("caption"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1367,9 +1333,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "chart_style",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("chart_style"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1380,9 +1344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "metric",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("metric"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1393,9 +1355,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "period",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("period"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1406,9 +1366,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "widget_type",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("widget_type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1427,7 +1385,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendSummary<'a> {

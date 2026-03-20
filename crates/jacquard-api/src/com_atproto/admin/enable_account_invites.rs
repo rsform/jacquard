@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EnableAccountInvites<'a> {
@@ -27,7 +21,7 @@ pub struct EnableAccountInvites<'a> {
 
 pub mod enable_account_invites_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -69,10 +63,7 @@ pub struct EnableAccountInvitesBuilder<'a, S: enable_account_invites_state::Stat
 
 impl<'a> EnableAccountInvites<'a> {
     /// Create a new builder for this type
-    pub fn new() -> EnableAccountInvitesBuilder<
-        'a,
-        enable_account_invites_state::Empty,
-    > {
+    pub fn new() -> EnableAccountInvitesBuilder<'a, enable_account_invites_state::Empty> {
         EnableAccountInvitesBuilder::new()
     }
 }
@@ -109,10 +100,7 @@ where
 
 impl<'a, S: enable_account_invites_state::State> EnableAccountInvitesBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -164,9 +152,8 @@ impl jacquard_common::xrpc::XrpcResp for EnableAccountInvitesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for EnableAccountInvites<'a> {
     const NSID: &'static str = "com.atproto.admin.enableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = EnableAccountInvitesResponse;
 }
 
@@ -175,9 +162,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for EnableAccountInvites<'a> {
 pub struct EnableAccountInvitesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EnableAccountInvitesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.enableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = EnableAccountInvites<'de>;
     type Response = EnableAccountInvitesResponse;
 }

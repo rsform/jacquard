@@ -8,13 +8,7 @@
 /// Gate settings for a ROOM post (like threadgate)
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGate<'a> {
@@ -30,7 +24,7 @@ pub struct RoomGate<'a> {
 
 pub mod room_gate_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,37 +32,37 @@ pub mod room_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Room;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Room = S::Room;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoom<S> {}
     impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
         type Room = Set<members::room>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Room = S::Room;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -155,8 +149,8 @@ where
 impl<'a, S> RoomGateBuilder<'a, S>
 where
     S: room_gate_state::State,
-    S::CreatedAt: room_gate_state::IsSet,
     S::Room: room_gate_state::IsSet,
+    S::CreatedAt: room_gate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoomGate<'a> {
@@ -199,13 +193,7 @@ impl<'a> RoomGate<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGateGetRecordOutput<'a> {
@@ -262,9 +250,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomGate<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.roomGate"),

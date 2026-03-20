@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
@@ -29,7 +23,7 @@ pub struct Event<'a> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +31,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartDate;
         type Title;
+        type StartDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartDate = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type StartDate = Set<members::start_date>;
-        type Title = S::Title;
+        type StartDate = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type StartDate = S::StartDate;
         type Title = Set<members::title>;
+        type StartDate = S::StartDate;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Title = S::Title;
+        type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
     }
 }
 
@@ -103,18 +97,12 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -180,8 +168,8 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::StartDate: event_state::IsSet,
     S::Title: event_state::IsSet,
+    S::StartDate: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -213,13 +201,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventOutput<'a> {
@@ -240,9 +222,8 @@ impl jacquard_common::xrpc::XrpcResp for EventResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Event<'a> {
     const NSID: &'static str = "st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = EventResponse;
 }
 
@@ -251,9 +232,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Event<'a> {
 pub struct EventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EventRequest {
     const PATH: &'static str = "/xrpc/st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Event<'de>;
     type Response = EventResponse;
 }

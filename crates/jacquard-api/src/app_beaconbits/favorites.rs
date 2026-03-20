@@ -8,13 +8,7 @@
 /// A list of favorited user DIDs (legacy singleton record).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Favorites<'a> {
@@ -27,7 +21,7 @@ pub struct Favorites<'a> {
 
 pub mod favorites_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod favorites_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Dids;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Dids = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Dids = S::Dids;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDids<S> {}
     impl<S: State> State for SetDids<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Dids = Set<members::dids>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Dids = S::Dids;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `dids` field
         pub struct dids(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> FavoritesBuilder<'a, S>
 where
     S: favorites_state::State,
-    S::UpdatedAt: favorites_state::IsSet,
     S::Dids: favorites_state::IsSet,
+    S::UpdatedAt: favorites_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorites<'a> {
@@ -180,13 +174,7 @@ impl<'a> Favorites<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavoritesGetRecordOutput<'a> {
@@ -244,9 +232,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dids",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("dids"),
                     max: 500usize,
                     actual: value.len(),
                 });
@@ -256,9 +242,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_favorites() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_beaconbits_favorites() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.favorites"),

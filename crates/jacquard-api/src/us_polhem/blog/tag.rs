@@ -8,13 +8,7 @@
 /// Record describing a blog tag.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
@@ -29,7 +23,7 @@ pub struct Tag<'a> {
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,66 +32,66 @@ pub mod tag_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Slug;
         type Description;
         type CreatedAt;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Slug = Unset;
         type Description = Unset;
         type CreatedAt = Unset;
+        type Slug = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
         type Slug = S::Slug;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Name = S::Name;
-        type Slug = Set<members::slug>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type Name = S::Name;
-        type Slug = S::Slug;
         type Description = Set<members::description>;
         type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Slug = S::Slug;
         type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Name = S::Name;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -211,9 +205,9 @@ impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
     S::Name: tag_state::IsSet,
-    S::Slug: tag_state::IsSet,
     S::Description: tag_state::IsSet,
     S::CreatedAt: tag_state::IsSet,
+    S::Slug: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
@@ -258,13 +252,7 @@ impl<'a> Tag<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagGetRecordOutput<'a> {
@@ -322,9 +310,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -335,9 +321,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -348,9 +332,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("slug"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });

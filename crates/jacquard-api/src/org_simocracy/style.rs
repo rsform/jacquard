@@ -8,13 +8,7 @@
 /// Speaking and reply style for a sim — describes how the sim communicates.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Style<'a> {
@@ -24,16 +18,14 @@ pub struct Style<'a> {
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub sim: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod style_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,51 +33,51 @@ pub mod style_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Sim;
         type Description;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Sim = Unset;
         type Description = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type Sim = Set<members::sim>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Sim = S::Sim;
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Sim = S::Sim;
         type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = Set<members::sim>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = S::Sim;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -198,9 +190,9 @@ where
 impl<'a, S> StyleBuilder<'a, S>
 where
     S: style_state::State,
+    S::CreatedAt: style_state::IsSet,
     S::Sim: style_state::IsSet,
     S::Description: style_state::IsSet,
-    S::CreatedAt: style_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Style<'a> {
@@ -245,13 +237,7 @@ impl<'a> Style<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StyleGetRecordOutput<'a> {
@@ -309,9 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Style<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -326,13 +310,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Style<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -340,9 +326,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Style<'a> {
     }
 }
 
-fn lexicon_doc_org_simocracy_style() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_style() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.style"),

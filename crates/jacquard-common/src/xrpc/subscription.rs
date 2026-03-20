@@ -3,6 +3,17 @@
 //! This module defines traits and types for typed WebSocket subscriptions,
 //! mirroring the request/response pattern used for HTTP XRPC endpoints.
 
+use crate::deps::fluent_uri::{
+    ParseError, Uri,
+    pct_enc::{
+        EString,
+        encoder::{Data as EncData, Query},
+    },
+};
+use crate::error::DecodeError;
+use crate::stream::StreamError;
+use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
+use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
 use alloc::borrow::ToOwned;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -15,13 +26,6 @@ use n0_future::stream::Boxed;
 #[cfg(target_arch = "wasm32")]
 use n0_future::stream::BoxedLocal as Boxed;
 use serde::{Deserialize, Serialize};
-use url::Url;
-
-use crate::cowstr::ToCowStr;
-use crate::error::DecodeError;
-use crate::stream::StreamError;
-use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
-use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
 
 /// Encoding format for subscription messages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -754,8 +758,8 @@ impl IntoStatic for SubscriptionOptions<'_> {
 ///
 /// Provides a builder pattern for establishing WebSocket subscriptions with custom options.
 pub trait SubscriptionExt: WebSocketClient {
-    /// Start building a subscription call for the given base URL.
-    fn subscription<'a>(&'a self, base: Url) -> SubscriptionCall<'a, Self>
+    /// Start building a subscription call for the given base URI.
+    fn subscription<'a>(&'a self, base: Uri<String>) -> SubscriptionCall<'a, Self>
     where
         Self: Sized,
     {
@@ -769,12 +773,93 @@ pub trait SubscriptionExt: WebSocketClient {
 
 impl<T: WebSocketClient> SubscriptionExt for T {}
 
+/// Build a subscription URI from a base URI, optional custom path, and query parameters.
+///
+/// This is a pure function that constructs the complete subscription WebSocket URI.
+/// It supports both standard NSID-based paths (e.g., `/xrpc/{nsid}`) and custom paths
+/// (e.g., Jetstream's `/subscribe`).
+///
+/// # Arguments
+///
+/// - `base`: The base URI (e.g., `wss://bsky.social`)
+/// - `nsid`: The subscription NSID (e.g., `com.atproto.sync.subscribeRepos`)
+/// - `custom_path`: Optional custom path to use instead of `/xrpc/{nsid}`
+/// - `query_params`: Query parameters as (key, value) pairs
+///
+/// # Returns
+///
+/// A complete subscription URI with scheme, authority, path, and optional query string,
+/// or a parse error if the constructed URI is invalid.
+fn build_subscription_uri(
+    base: &Uri<String>,
+    nsid: &str,
+    custom_path: Option<&str>,
+    query_params: &[(String, String)],
+) -> Result<Uri<String>, ParseError> {
+    let base_path = base.path().as_str().trim_end_matches('/');
+
+    // Build the path: base_path + custom_path or "/xrpc/{nsid}"
+    let mut path = String::with_capacity(base_path.len() + 50);
+    path.push_str(base_path);
+    if let Some(custom_path) = custom_path {
+        path.push_str(custom_path);
+    } else {
+        path.push_str("/xrpc/");
+        path.push_str(nsid);
+    }
+
+    // Build query string from parameters with percent-encoding
+    let query_str = if !query_params.is_empty() {
+        query_params
+            .iter()
+            .map(|(k, v)| {
+                let mut enc_k = EString::<Query>::new();
+                enc_k.encode_str::<EncData>(k.as_str());
+                let mut enc_v = EString::<Query>::new();
+                enc_v.encode_str::<EncData>(v.as_str());
+                alloc::format!("{}={}", enc_k, enc_v)
+            })
+            .collect::<Vec<_>>()
+            .join("&")
+    } else {
+        String::new()
+    };
+
+    // Calculate approximate capacity for the final URI string
+    let capacity = base.scheme().as_str().len()
+        + 3 // "://"
+        + base.authority().map(|a| a.as_str().len()).unwrap_or(0)
+        + path.len()
+        + query_str.len()
+        + if !query_str.is_empty() { 1 } else { 0 }; // "?"
+
+    // Construct the URI using fluent-uri builder pattern
+    let mut uri_str = String::with_capacity(capacity);
+    uri_str.push_str(base.scheme().as_str());
+    uri_str.push_str("://");
+
+    if let Some(authority) = base.authority() {
+        uri_str.push_str(authority.as_str());
+    }
+
+    uri_str.push_str(&path);
+
+    if !query_str.is_empty() {
+        uri_str.push('?');
+        uri_str.push_str(&query_str);
+    }
+
+    Uri::parse(uri_str)
+        .map(|u| u.to_owned())
+        .map_err(|(e, _)| e)
+}
+
 /// Stateless subscription call builder.
 ///
 /// Provides methods for adding headers and establishing typed subscriptions.
 pub struct SubscriptionCall<'a, C: WebSocketClient> {
     pub(crate) client: &'a C,
-    pub(crate) base: Url,
+    pub(crate) base: Uri<String>,
     pub(crate) opts: SubscriptionOptions<'a>,
 }
 
@@ -793,7 +878,7 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
 
     /// Subscribe to the given XRPC subscription endpoint.
     ///
-    /// Builds a WebSocket URL from the base, appends the NSID path,
+    /// Builds a WebSocket URI from the base, appends the NSID path,
     /// encodes query parameters from the subscription type, and connects.
     /// Returns a typed SubscriptionStream that automatically decodes messages.
     pub async fn subscribe<Sub>(
@@ -803,33 +888,13 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
     where
         Sub: XrpcSubscription,
     {
-        let mut url = self.base.clone();
-
-        // Use custom path if provided, otherwise construct from NSID
-        let mut path = url.path().trim_end_matches('/').to_owned();
-        if let Some(custom_path) = Sub::CUSTOM_PATH {
-            path.push_str(custom_path);
-        } else {
-            path.push_str("/xrpc/");
-            path.push_str(Sub::NSID);
-        }
-        url.set_path(&path);
-
         let query_params = params.query_params();
-        if !query_params.is_empty() {
-            let qs = query_params
-                .iter()
-                .map(|(k, v)| format!("{}={}", k, v))
-                .collect::<Vec<_>>()
-                .join("&");
-            url.set_query(Some(&qs));
-        } else {
-            url.set_query(None);
-        }
+        let uri = build_subscription_uri(&self.base, Sub::NSID, Sub::CUSTOM_PATH, &query_params)
+            .expect("subscription URI must be valid (base_uri + path always yields a valid URI)");
 
         let connection = self
             .client
-            .connect_with_headers(url, self.opts.headers)
+            .connect_with_headers(uri.borrow(), self.opts.headers)
             .await?;
 
         Ok(SubscriptionStream::new(connection))
@@ -843,7 +908,7 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait SubscriptionClient: WebSocketClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> impl Future<Output = CowStr<'static>>;
+    fn base_uri(&self) -> impl Future<Output = Uri<String>>;
 
     /// Get the subscription options for the client.
     fn subscription_opts(&self) -> impl Future<Output = SubscriptionOptions<'_>> {
@@ -898,17 +963,16 @@ pub trait SubscriptionClient: WebSocketClient {
 /// or when you want to handle auth manually via headers.
 pub struct BasicSubscriptionClient<W: WebSocketClient> {
     client: W,
-    base_uri: CowStr<'static>,
+    base_uri: Uri<String>,
     opts: SubscriptionOptions<'static>,
 }
 
 impl<W: WebSocketClient> BasicSubscriptionClient<W> {
     /// Create a new basic subscription client with the given WebSocket client and base URI.
-    pub fn new(client: W, base_uri: Url) -> Self {
-        let base_uri = base_uri.as_str().trim_end_matches("/");
+    pub fn new(client: W, base_uri: Uri<String>) -> Self {
         Self {
             client,
-            base_uri: base_uri.to_cowstr().into_static(),
+            base_uri,
             opts: SubscriptionOptions::default(),
         }
     }
@@ -928,21 +992,21 @@ impl<W: WebSocketClient> BasicSubscriptionClient<W> {
 impl<W: WebSocketClient> WebSocketClient for BasicSubscriptionClient<W> {
     type Error = W::Error;
 
-    async fn connect(&self, url: Url) -> Result<WebSocketConnection, Self::Error> {
-        self.client.connect(url).await
+    async fn connect(&self, uri: Uri<&str>) -> Result<WebSocketConnection, Self::Error> {
+        self.client.connect(uri).await
     }
 
     async fn connect_with_headers(
         &self,
-        url: Url,
+        uri: Uri<&str>,
         headers: Vec<(CowStr<'_>, CowStr<'_>)>,
     ) -> Result<WebSocketConnection, Self::Error> {
-        self.client.connect_with_headers(url, headers).await
+        self.client.connect_with_headers(uri, headers).await
     }
 }
 
 impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
-    async fn base_uri(&self) -> CowStr<'static> {
+    async fn base_uri(&self) -> Uri<String> {
         self.base_uri.clone()
     }
 
@@ -986,7 +1050,6 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         Self: Sync,
     {
         let base = self.base_uri().await;
-        let base = Url::parse(&base).expect("Failed to parse base URL");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)
@@ -1003,7 +1066,6 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         Sub: XrpcSubscription + Send + Sync,
     {
         let base = self.base_uri().await;
-        let base = Url::parse(&base).expect("Failed to parse base URL");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)
@@ -1020,10 +1082,10 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
 ///
 /// ```no_run
 /// # use jacquard_common::xrpc::{TungsteniteSubscriptionClient, SubscriptionClient};
-/// # use url::Url;
+/// # use jacquard_common::deps::fluent_uri::Uri;
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let base = Url::parse("wss://bsky.network")?;
+/// let base = Uri::parse("wss://bsky.network")?.to_owned();
 /// let client = TungsteniteSubscriptionClient::from_base_uri(base);
 /// // let conn = client.subscribe(&params).await?;
 /// # Ok(())
@@ -1034,8 +1096,125 @@ pub type TungsteniteSubscriptionClient =
 
 impl TungsteniteSubscriptionClient {
     /// Create a new Tungstenite-backed subscription client with the given base URI.
-    pub fn from_base_uri(base_uri: Url) -> Self {
+    pub fn from_base_uri(base_uri: Uri<String>) -> Self {
         let client = crate::websocket::tungstenite_client::TungsteniteClient::new();
         BasicSubscriptionClient::new(client, base_uri)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Test uri-and-deps.AC3.1: Subscription URL construction with NSID path.
+    ///
+    /// Verifies that the build_subscription_uri() function constructs the correct
+    /// `/xrpc/{nsid}` path with query parameters properly encoded.
+    #[test]
+    fn test_subscription_uri_with_nsid_path() {
+        let base_uri = Uri::parse("wss://bsky.social/xrpc").unwrap().to_owned();
+        let nsid = "com.example.subscribe";
+        let query_params = vec![
+            ("cursor".to_string(), "abc123".to_string()),
+            ("filter".to_string(), "like".to_string()),
+        ];
+
+        let uri = build_subscription_uri(&base_uri, nsid, None, &query_params)
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify the URI contains the correct NSID path
+        let uri_str = uri.as_str();
+        assert!(uri_str.contains("/xrpc/com.example.subscribe"));
+        assert!(uri_str.contains("cursor=abc123"));
+        assert!(uri_str.contains("filter=like"));
+        assert!(!uri_str.contains("//xrpc"));
+    }
+
+    /// Test uri-and-deps.AC3.2: Subscription with custom path.
+    ///
+    /// Verifies that build_subscription_uri() uses CUSTOM_PATH (e.g., `/subscribe` for Jetstream)
+    /// instead of the default `/xrpc/{nsid}` path.
+    #[test]
+    fn test_subscription_uri_with_custom_path() {
+        let base_uri = Uri::parse("wss://jetstream.example.com")
+            .unwrap()
+            .to_owned();
+        let custom_path = "/subscribe";
+
+        let uri = build_subscription_uri(&base_uri, "com.example.sub", Some(custom_path), &[])
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify custom path is used instead of /xrpc/{nsid}
+        let uri_str = uri.as_str();
+        assert!(uri_str.contains("/subscribe"));
+        assert!(!uri_str.contains("/xrpc/"));
+    }
+
+    /// Test uri-and-deps.AC3.3: WebSocketClient::connect() accepts Uri<String>.
+    ///
+    /// Verifies that the trait signature accepts Uri<String> and that SubscriptionCall
+    /// correctly passes Uri<String> to the WebSocket client.
+    #[test]
+    fn test_subscription_uri_scheme_and_authority() {
+        let base_uri = Uri::parse("wss://example.com:8080/path")
+            .unwrap()
+            .to_owned();
+        let nsid = "com.example.test";
+
+        let uri = build_subscription_uri(&base_uri, nsid, None, &[])
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify the URI preserves scheme and authority correctly
+        let uri_str = uri.as_str();
+        assert!(uri_str.starts_with("wss://example.com:8080"));
+        assert!(uri_str.contains("/path/xrpc/com.example.test"));
+    }
+
+    /// Test query parameter encoding with multiple parameters.
+    #[test]
+    fn test_query_parameters_encoding() {
+        let base_uri = Uri::parse("wss://example.com").unwrap().to_owned();
+        let params = vec![
+            ("cursor".to_string(), "abc123".to_string()),
+            ("filter".to_string(), "like".to_string()),
+        ];
+
+        let uri = build_subscription_uri(&base_uri, "com.test", None, &params)
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify query parameters are correctly encoded
+        let uri_str = uri.as_str();
+        assert!(uri_str.contains("?"));
+        assert!(uri_str.contains("cursor=abc123"));
+        assert!(uri_str.contains("filter=like"));
+        assert!(uri_str.contains("&"));
+    }
+
+    /// Test URI construction with trailing slash handling.
+    #[test]
+    fn test_uri_trailing_slash_handling() {
+        let base_uri = Uri::parse("wss://example.com/xrpc/").unwrap().to_owned();
+
+        let uri = build_subscription_uri(&base_uri, "com.example.test", None, &[])
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify no double slashes in path
+        let uri_str = uri.as_str();
+        assert!(!uri_str.contains("//xrpc"));
+        assert!(uri_str.contains("/xrpc/com.example.test"));
+    }
+
+    /// Test empty query parameters do not add trailing question mark.
+    #[test]
+    fn test_empty_query_parameters() {
+        let base_uri = Uri::parse("wss://example.com").unwrap().to_owned();
+
+        let uri = build_subscription_uri(&base_uri, "com.example.test", None, &[])
+            .expect("valid base uri and path should produce valid uri");
+
+        // Verify no trailing question mark with empty query
+        let uri_str = uri.as_str();
+        assert!(!uri_str.contains("?"));
+        assert!(uri_str.ends_with("com.example.test"));
     }
 }

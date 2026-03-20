@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrl<'a> {
@@ -26,7 +20,7 @@ pub struct GetPartUploadUrl<'a> {
 
 pub mod get_part_upload_url_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +28,37 @@ pub mod get_part_upload_url_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PartNumber;
         type UploadId;
+        type PartNumber;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PartNumber = Unset;
         type UploadId = Unset;
-    }
-    ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type PartNumber = Set<members::part_number>;
-        type UploadId = S::UploadId;
+        type PartNumber = Unset;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
-        type PartNumber = S::PartNumber;
         type UploadId = Set<members::upload_id>;
+        type PartNumber = S::PartNumber;
+    }
+    ///State transition - sets the `part_number` field to Set
+    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
+    impl<S: State> State for SetPartNumber<S> {
+        type UploadId = S::UploadId;
+        type PartNumber = Set<members::part_number>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `part_number` field
-        pub struct part_number(());
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
+        ///Marker type for the `part_number` field
+        pub struct part_number(());
     }
 }
 
@@ -137,8 +131,8 @@ where
 impl<'a, S> GetPartUploadUrlBuilder<'a, S>
 where
     S: get_part_upload_url_state::State,
-    S::PartNumber: get_part_upload_url_state::IsSet,
     S::UploadId: get_part_upload_url_state::IsSet,
+    S::PartNumber: get_part_upload_url_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPartUploadUrl<'a> {
@@ -166,13 +160,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrlOutput<'a> {
@@ -186,7 +174,7 @@ pub struct GetPartUploadUrlOutput<'a> {
     pub method: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URL to PUT the part data to
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -199,7 +187,7 @@ pub struct GetPartUploadUrlOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -244,9 +232,8 @@ impl jacquard_common::xrpc::XrpcResp for GetPartUploadUrlResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<'a> {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetPartUploadUrlResponse;
 }
 
@@ -255,9 +242,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<'a> {
 pub struct GetPartUploadUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = GetPartUploadUrl<'de>;
     type Response = GetPartUploadUrlResponse;
 }

@@ -1,6 +1,7 @@
 //! WebSocket client abstraction
 
 use crate::CowStr;
+use crate::deps::fluent_uri::Uri;
 use crate::stream::StreamError;
 use alloc::boxed::Box;
 use alloc::string::String;
@@ -13,7 +14,6 @@ use core::future::Future;
 use core::ops::Deref;
 use core::pin::Pin;
 use n0_future::Stream;
-use url::Url;
 
 /// UTF-8 validated bytes for WebSocket text messages
 #[repr(transparent)]
@@ -448,7 +448,10 @@ pub trait WebSocketClient: Sync {
     type Error: core::error::Error + Send + Sync + 'static;
 
     /// Connect to a WebSocket endpoint
-    fn connect(&self, url: Url) -> impl Future<Output = Result<WebSocketConnection, Self::Error>>;
+    fn connect(
+        &self,
+        uri: Uri<&str>,
+    ) -> impl Future<Output = Result<WebSocketConnection, Self::Error>>;
 
     /// Connect to a WebSocket endpoint with custom headers
     ///
@@ -456,10 +459,10 @@ pub trait WebSocketClient: Sync {
     /// Override this method to support authentication headers for subscriptions.
     fn connect_with_headers(
         &self,
-        url: Url,
+        uri: Uri<&str>,
         _headers: Vec<(CowStr<'_>, CowStr<'_>)>,
     ) -> impl Future<Output = Result<WebSocketConnection, Self::Error>> {
-        async move { self.connect(url).await }
+        async move { self.connect(uri).await }
     }
 }
 
@@ -533,8 +536,8 @@ pub mod tungstenite_client {
     impl WebSocketClient for TungsteniteClient {
         type Error = tokio_tungstenite_wasm::Error;
 
-        async fn connect(&self, url: Url) -> Result<WebSocketConnection, Self::Error> {
-            let ws_stream = tokio_tungstenite_wasm::connect(url.as_str()).await?;
+        async fn connect(&self, uri: Uri<&str>) -> Result<WebSocketConnection, Self::Error> {
+            let ws_stream = tokio_tungstenite_wasm::connect(uri.as_str()).await?;
 
             let (sink, stream) = ws_stream.split();
 

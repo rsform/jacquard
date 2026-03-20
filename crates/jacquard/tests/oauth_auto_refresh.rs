@@ -4,6 +4,7 @@ use std::sync::Arc;
 use bytes::Bytes;
 use http::{HeaderValue, Method, Response as HttpResponse, StatusCode};
 use jacquard::client::Agent;
+use jacquard::deps::fluent_uri::Uri;
 use jacquard::types::did::Did;
 use jacquard::xrpc::XrpcClient;
 use jacquard::{CowStr, IntoStatic};
@@ -123,8 +124,11 @@ impl OAuthResolver for MockClient {
         &self,
         _server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         _sub: &Did<'_>,
-    ) -> Result<url::Url, jacquard_oauth::resolver::ResolverError> {
-        Ok(url::Url::parse("https://pds").unwrap())
+    ) -> Result<jacquard::deps::fluent_uri::Uri<String>, jacquard_oauth::resolver::ResolverError>
+    {
+        Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds")
+            .unwrap()
+            .to_owned())
     }
 }
 
@@ -217,7 +221,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: CowStr::new_static("https://pds"),
+        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
         authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -246,7 +250,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let data_store = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: CowStr::new_static("https://pds"),
+        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
         authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -348,7 +352,7 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: CowStr::new_static("https://pds"),
+        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
         authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,

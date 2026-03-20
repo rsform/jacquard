@@ -8,13 +8,7 @@
 /// A master record validating one player's stats for one system. Multiple GMs can validate the same player.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Master<'a> {
@@ -47,7 +41,7 @@ pub struct Master<'a> {
 
 pub mod master_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,51 +49,51 @@ pub mod master_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type System;
         type Player;
         type CreatedAt;
+        type System;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type System = Unset;
         type Player = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `system` field to Set
-    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSystem<S> {}
-    impl<S: State> State for SetSystem<S> {
-        type System = Set<members::system>;
-        type Player = S::Player;
-        type CreatedAt = S::CreatedAt;
+        type System = Unset;
     }
     ///State transition - sets the `player` field to Set
     pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayer<S> {}
     impl<S: State> State for SetPlayer<S> {
-        type System = S::System;
         type Player = Set<members::player>;
         type CreatedAt = S::CreatedAt;
+        type System = S::System;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type System = S::System;
         type Player = S::Player;
         type CreatedAt = Set<members::created_at>;
+        type System = S::System;
+    }
+    ///State transition - sets the `system` field to Set
+    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSystem<S> {}
+    impl<S: State> State for SetSystem<S> {
+        type Player = S::Player;
+        type CreatedAt = S::CreatedAt;
+        type System = Set<members::system>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `system` field
-        pub struct system(());
         ///Marker type for the `player` field
         pub struct player(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `system` field
+        pub struct system(());
     }
 }
 
@@ -139,10 +133,7 @@ impl<'a> MasterBuilder<'a, master_state::Empty> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `campaign` field (optional)
-    pub fn campaign(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn campaign(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -193,18 +184,12 @@ where
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `snapshotScope` field (optional)
-    pub fn snapshot_scope(
-        mut self,
-        value: impl Into<Option<MasterSnapshotScope<'a>>>,
-    ) -> Self {
+    pub fn snapshot_scope(mut self, value: impl Into<Option<MasterSnapshotScope<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `snapshotScope` field to an Option value (optional)
-    pub fn maybe_snapshot_scope(
-        mut self,
-        value: Option<MasterSnapshotScope<'a>>,
-    ) -> Self {
+    pub fn maybe_snapshot_scope(mut self, value: Option<MasterSnapshotScope<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -212,18 +197,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `spriteCid` field (optional)
-    pub fn sprite_cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sprite_cid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `spriteCid` field to an Option value (optional)
-    pub fn maybe_sprite_cid(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sprite_cid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -239,10 +218,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_stats(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -289,9 +265,9 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
-    S::System: master_state::IsSet,
     S::Player: master_state::IsSet,
     S::CreatedAt: master_state::IsSet,
+    S::System: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {
@@ -438,13 +414,7 @@ impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MasterGetRecordOutput<'a> {
@@ -501,9 +471,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Master<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "campaign",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("campaign"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -514,9 +482,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Master<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("system"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });

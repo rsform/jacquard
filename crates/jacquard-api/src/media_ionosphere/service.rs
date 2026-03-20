@@ -8,13 +8,7 @@
 /// Represents the service belonging to this PDS
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
@@ -45,14 +39,12 @@ pub struct Service<'a> {
     pub name: jacquard_common::CowStr<'a>,
     /// This is the language that the content is actually presented in. If multiple, choose to omit this.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub presentation_language: std::option::Option<
-        jacquard_common::types::string::Language,
-    >,
+    pub presentation_language: std::option::Option<jacquard_common::types::string::Language>,
 }
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,18 +130,7 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
     pub fn new() -> Self {
         ServiceBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -176,18 +157,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -203,10 +178,7 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(
-        mut self,
-        value: Option<Vec<crate::media_ionosphere::Genre<'a>>>,
-    ) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<crate::media_ionosphere::Genre<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -241,10 +213,7 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_icon(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -271,18 +240,12 @@ where
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -407,13 +370,7 @@ impl<'a> Service<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
@@ -470,9 +427,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -483,9 +438,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ionosphere",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ionosphere"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -500,13 +453,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 128usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -514,9 +469,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     }
 }
 
-fn lexicon_doc_media_ionosphere_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_media_ionosphere_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("media.ionosphere.service"),

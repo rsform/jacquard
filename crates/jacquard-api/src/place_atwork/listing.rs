@@ -8,20 +8,14 @@
 /// A job listing
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listing<'a> {
     /// URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apply_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub apply_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -36,9 +30,7 @@ pub struct Listing<'a> {
     /// Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<
-        Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
-    >,
+    pub locations: std::option::Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
     /// Client-declared timestamp when the job listing expires.
     pub not_after: jacquard_common::types::string::Datetime,
     /// Client-declared timestamp when the job listing becomes visible.
@@ -50,7 +42,7 @@ pub struct Listing<'a> {
 
 pub mod listing_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -59,8 +51,8 @@ pub mod listing_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type NotAfter;
-        type Title;
         type NotBefore;
+        type Title;
         type Description;
     }
     /// Empty state - all required fields are unset
@@ -68,8 +60,8 @@ pub mod listing_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type NotAfter = Unset;
-        type Title = Unset;
         type NotBefore = Unset;
+        type Title = Unset;
         type Description = Unset;
     }
     ///State transition - sets the `not_after` field to Set
@@ -77,17 +69,8 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetNotAfter<S> {}
     impl<S: State> State for SetNotAfter<S> {
         type NotAfter = Set<members::not_after>;
+        type NotBefore = S::NotBefore;
         type Title = S::Title;
-        type NotBefore = S::NotBefore;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type NotAfter = S::NotAfter;
-        type Title = Set<members::title>;
-        type NotBefore = S::NotBefore;
         type Description = S::Description;
     }
     ///State transition - sets the `not_before` field to Set
@@ -95,8 +78,17 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetNotBefore<S> {}
     impl<S: State> State for SetNotBefore<S> {
         type NotAfter = S::NotAfter;
-        type Title = S::Title;
         type NotBefore = Set<members::not_before>;
+        type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type NotAfter = S::NotAfter;
+        type NotBefore = S::NotBefore;
+        type Title = Set<members::title>;
         type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
@@ -104,8 +96,8 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type NotAfter = S::NotAfter;
-        type Title = S::Title;
         type NotBefore = S::NotBefore;
+        type Title = S::Title;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
@@ -113,10 +105,10 @@ pub mod listing_state {
     pub mod members {
         ///Marker type for the `not_after` field
         pub struct not_after(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `not_before` field
         pub struct not_before(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
     }
@@ -126,13 +118,11 @@ pub mod listing_state {
 pub struct ListingBuilder<'a, S: listing_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<
-            Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -162,7 +152,7 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `applyLink` field (optional)
     pub fn apply_link(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -170,7 +160,7 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `applyLink` field to an Option value (optional)
     pub fn maybe_apply_link(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -238,9 +228,7 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -316,8 +304,8 @@ impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
     S::NotAfter: listing_state::IsSet,
-    S::Title: listing_state::IsSet,
     S::NotBefore: listing_state::IsSet,
+    S::Title: listing_state::IsSet,
     S::Description: listing_state::IsSet,
 {
     /// Build the final struct
@@ -371,13 +359,7 @@ impl<'a> Listing<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingGetRecordOutput<'a> {
@@ -435,9 +417,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -452,13 +432,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 10000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -467,9 +449,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -479,9 +459,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     }
 }
 
-fn lexicon_doc_place_atwork_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_atwork_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.listing"),

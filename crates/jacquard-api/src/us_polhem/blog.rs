@@ -12,13 +12,7 @@ pub mod tag;
 /// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
@@ -28,7 +22,7 @@ pub struct AspectRatio<'a> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,9 +157,7 @@ where
     }
 }
 
-fn lexicon_doc_us_polhem_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_us_polhem_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("us.polhem.blog.defs"),
@@ -243,9 +235,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
             let value = &self.height;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -255,9 +245,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
             let value = &self.width;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
                     min: 1i64,
                     actual: *value,
                 });

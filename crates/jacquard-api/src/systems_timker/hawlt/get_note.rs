@@ -6,27 +6,19 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetNote<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
 }
 
 pub mod get_note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,9 +66,7 @@ pub struct GetNoteBuilder<'a, S: get_note_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -128,9 +118,7 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> GetNoteBuilder<'a, get_note_state::SetRkey<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
@@ -159,13 +147,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetNoteOutput<'a> {

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfUpdate<'a> {
@@ -35,9 +35,8 @@ impl jacquard_common::xrpc::XrpcResp for NotifyOfUpdateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfUpdate<'a> {
     const NSID: &'static str = "com.atproto.sync.notifyOfUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = NotifyOfUpdateResponse;
 }
 
@@ -46,9 +45,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfUpdate<'a> {
 pub struct NotifyOfUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfUpdateRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.notifyOfUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = NotifyOfUpdate<'de>;
     type Response = NotifyOfUpdateResponse;
 }

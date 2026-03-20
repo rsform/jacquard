@@ -8,13 +8,7 @@
 /// A declaration of the default site for an organization
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefaultSite<'a> {
@@ -27,7 +21,7 @@ pub struct DefaultSite<'a> {
 
 pub mod default_site_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod default_site_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Site;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Site = S::Site;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type CreatedAt = S::CreatedAt;
         type Site = Set<members::site>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Site = S::Site;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> DefaultSiteBuilder<'a, S>
 where
     S: default_site_state::State,
-    S::CreatedAt: default_site_state::IsSet,
     S::Site: default_site_state::IsSet,
+    S::CreatedAt: default_site_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefaultSite<'a> {
@@ -180,13 +174,7 @@ impl<'a> DefaultSite<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefaultSiteGetRecordOutput<'a> {
@@ -243,14 +231,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefaultSite<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_defaultSite() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_organization_defaultSite()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "app.gainforest.organization.defaultSite",
-        ),
+        id: ::jacquard_common::CowStr::new_static("app.gainforest.organization.defaultSite"),
         revision: None,
         description: None,
         defs: {

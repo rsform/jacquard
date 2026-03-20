@@ -140,7 +140,7 @@ impl OAuthResolver for MockClient {
         jacquard_oauth::resolver::ResolverError,
     > {
         let mut md = jacquard_oauth::types::OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from("https://issuer/");
+        md.issuer = jacquard::CowStr::from("https://issuer");
         md.authorization_endpoint = jacquard::CowStr::from("https://issuer/authorize");
         md.token_endpoint = jacquard::CowStr::from("https://issuer/token");
         md.require_pushed_authorization_requests = Some(true);
@@ -272,9 +272,8 @@ async fn oauth_end_to_end_mock_flow() {
         .callback(CallbackParams {
             code: jacquard::CowStr::from("code123"),
             state: Some(state.clone()),
-            // Callback compares exact string with metadata.issuer (which is a URL string
-            // including trailing slash). Use normalized form to match.
-            iss: Some(jacquard::CowStr::from("https://issuer/")),
+            // Callback compares exact string with metadata.issuer. Must match exactly.
+            iss: Some(jacquard::CowStr::from("https://issuer")),
         })
         .await
         .unwrap();

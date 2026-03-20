@@ -1,15 +1,15 @@
-use super::{CacheBuilder, ConcurrentCacheExt, EntryRef, Iter, base_cache::BaseCache};
+use super::{base_cache::BaseCache, CacheBuilder, ConcurrentCacheExt, EntryRef, Iter};
 use crate::{
-    Policy,
     common::{
         concurrent::{
-            Weigher, WriteOp,
             constants::{MAX_SYNC_REPEATS, WRITE_RETRY_INTERVAL_MICROS},
             housekeeper::{Housekeeper, InnerSync},
+            Weigher, WriteOp,
         },
         time::Duration,
         time::Instant,
     },
+    Policy,
 };
 
 use crossbeam_channel::{Sender, TrySendError};

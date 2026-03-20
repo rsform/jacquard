@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllRead<'a> {
@@ -113,13 +113,7 @@ impl jacquard_common::IntoStatic for UpdateAllReadStatus<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllReadOutput<'a> {
@@ -139,9 +133,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAllReadResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAllRead<'a> {
     const NSID: &'static str = "chat.bsky.convo.updateAllRead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateAllReadResponse;
 }
 
@@ -150,9 +143,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAllRead<'a> {
 pub struct UpdateAllReadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAllReadRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.updateAllRead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateAllRead<'de>;
     type Response = UpdateAllReadResponse;
 }

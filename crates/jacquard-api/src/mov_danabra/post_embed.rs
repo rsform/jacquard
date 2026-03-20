@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostEmbed<'a> {
@@ -26,7 +20,7 @@ pub struct PostEmbed<'a> {
 
 pub mod post_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,13 +141,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostEmbedOutput<'a> {
@@ -174,9 +162,8 @@ impl jacquard_common::xrpc::XrpcResp for PostEmbedResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PostEmbed<'a> {
     const NSID: &'static str = "mov.danabra.PostEmbed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PostEmbedResponse;
 }
 
@@ -185,9 +172,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PostEmbed<'a> {
 pub struct PostEmbedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PostEmbedRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.PostEmbed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = PostEmbed<'de>;
     type Response = PostEmbedResponse;
 }

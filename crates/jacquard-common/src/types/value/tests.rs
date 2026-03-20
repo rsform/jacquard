@@ -1399,3 +1399,117 @@ fn test_type_discriminator() {
 
     assert_eq!(raw_obj.type_discriminator(), Some("test.type"));
 }
+
+#[test]
+fn parse_string_nsid_with_camelcase_name() {
+    use super::parsing::parse_string;
+    use crate::types::string::AtprotoStr;
+
+    // NSIDs with camelCase names (uppercase in last segment) are unambiguously NSIDs.
+    let nsid = parse_string("com.atproto.repo.getRecord");
+    assert!(
+        matches!(nsid, AtprotoStr::Nsid(_)),
+        "NSID was misclassified: {:?}",
+        nsid
+    );
+
+    let nsid2 = parse_string("com.atproto.sync.subscribeRepos");
+    assert!(
+        matches!(nsid2, AtprotoStr::Nsid(_)),
+        "NSID was misclassified: {:?}",
+        nsid2
+    );
+
+    // "app.bsky.feed.post" starts with "app" (a known TLD) → reverse domain order → NSID.
+    let nsid3 = parse_string("app.bsky.feed.post");
+    assert!(
+        matches!(nsid3, AtprotoStr::Nsid(_)),
+        "NSID was misclassified: {:?}",
+        nsid3
+    );
+}
+
+#[test]
+fn parse_string_handle_classified_correctly() {
+    use super::parsing::parse_string;
+    use crate::types::string::AtprotoStr;
+
+    let handle = parse_string("example.bsky.social");
+    assert!(
+        matches!(handle, AtprotoStr::AtIdentifier(_)),
+        "handle was misclassified: {:?}",
+        handle
+    );
+
+    let handle2 = parse_string("jay.bsky");
+    assert!(
+        matches!(handle2, AtprotoStr::AtIdentifier(_)),
+        "two-segment handle misclassified: {:?}",
+        handle2
+    );
+}
+
+#[test]
+fn parse_string_https_uri() {
+    use super::parsing::parse_string;
+    use crate::types::string::AtprotoStr;
+    use crate::types::uri::UriValue;
+
+    let uri = parse_string("https://example.com/path");
+    assert!(
+        matches!(uri, AtprotoStr::Uri(UriValue::Https(_))),
+        "https URI was misclassified: {:?}",
+        uri
+    );
+}
+
+#[test]
+fn parse_string_wss_uri() {
+    use super::parsing::parse_string;
+    use crate::types::string::AtprotoStr;
+    use crate::types::uri::UriValue;
+
+    let uri = parse_string("wss://bsky.network/subscribe");
+    assert!(
+        matches!(uri, AtprotoStr::Uri(UriValue::Wss(_))),
+        "wss URI was misclassified: {:?}",
+        uri
+    );
+}
+
+#[test]
+fn parse_string_disambiguation_edge_cases() {
+    use super::parsing::parse_string;
+    use crate::types::string::AtprotoStr;
+
+    // Both first and last segments are TLDs — first-is-TLD wins → NSID.
+    let both_tld = parse_string("com.net.service");
+    assert!(
+        matches!(both_tld, AtprotoStr::Nsid(_)),
+        "both-TLD case: {:?}",
+        both_tld
+    );
+
+    // Neither segment is a known TLD — falls through to fallback.
+    // "foo.bar.baz" is valid as both a handle and an NSID; handle wins in fallback.
+    let neither_tld = parse_string("foo.bar.baz");
+    // Handle validation may reject this (handle TLD must be ≥2 alpha chars, which "baz" satisfies).
+    // If handle passes, it wins; if not, NSID fallback.
+    assert!(
+        matches!(
+            neither_tld,
+            AtprotoStr::AtIdentifier(_) | AtprotoStr::Nsid(_)
+        ),
+        "neither-TLD case should be handle or NSID: {:?}",
+        neither_tld
+    );
+
+    // Two-segment where both are TLDs (e.g., "example.social").
+    // First segment "example" is not a TLD, "social" is → handle.
+    let two_seg = parse_string("example.social");
+    assert!(
+        matches!(two_seg, AtprotoStr::AtIdentifier(_)),
+        "two-segment handle: {:?}",
+        two_seg
+    );
+}

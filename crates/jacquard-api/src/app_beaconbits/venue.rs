@@ -8,13 +8,7 @@
 /// A user-created venue definition
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Venue<'a> {
@@ -25,9 +19,8 @@ pub struct Venue<'a> {
     /// Structured address using community lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details: std::option::Option<
-        crate::community_lexicon::location::address::Address<'a>,
-    >,
+    pub address_details:
+        std::option::Option<crate::community_lexicon::location::address::Address<'a>>,
     /// Venue category (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -44,12 +37,12 @@ pub struct Venue<'a> {
     /// Link to underlying OpenStreetMap entity (osm://node/123)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub osm_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub osm_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod venue_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +94,7 @@ pub struct VenueBuilder<'a, S: venue_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -126,10 +119,7 @@ impl<'a> VenueBuilder<'a, venue_state::Empty> {
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `address` field (optional)
-    pub fn address(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn address(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -144,9 +134,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(
         mut self,
-        value: impl Into<
-            Option<crate::community_lexicon::location::address::Address<'a>>,
-        >,
+        value: impl Into<Option<crate::community_lexicon::location::address::Address<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -163,10 +151,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -238,7 +223,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `osmUri` field (optional)
     pub fn osm_uri(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -246,7 +231,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `osmUri` field to an Option value (optional)
     pub fn maybe_osm_uri(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
@@ -308,13 +293,7 @@ impl<'a> Venue<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VenueGetRecordOutput<'a> {
@@ -375,13 +354,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Venue<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "address",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "address",
+                            ),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -393,13 +374,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Venue<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "category",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "category",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -412,13 +395,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Venue<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -426,9 +411,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Venue<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_venue() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_beaconbits_venue() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.venue"),

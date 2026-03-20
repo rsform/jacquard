@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeAccountCredentials<'a> {
@@ -23,7 +17,7 @@ pub struct RevokeAccountCredentials<'a> {
 
 pub mod revoke_account_credentials_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -54,23 +48,16 @@ pub mod revoke_account_credentials_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct RevokeAccountCredentialsBuilder<
-    'a,
-    S: revoke_account_credentials_state::State,
-> {
+pub struct RevokeAccountCredentialsBuilder<'a, S: revoke_account_credentials_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> RevokeAccountCredentials<'a> {
     /// Create a new builder for this type
-    pub fn new() -> RevokeAccountCredentialsBuilder<
-        'a,
-        revoke_account_credentials_state::Empty,
-    > {
+    pub fn new() -> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::Empty> {
         RevokeAccountCredentialsBuilder::new()
     }
 }
@@ -95,10 +82,7 @@ where
     pub fn account(
         mut self,
         value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> RevokeAccountCredentialsBuilder<
-        'a,
-        revoke_account_credentials_state::SetAccount<S>,
-    > {
+    ) -> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::SetAccount<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         RevokeAccountCredentialsBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -147,9 +131,8 @@ impl jacquard_common::xrpc::XrpcResp for RevokeAccountCredentialsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<'a> {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RevokeAccountCredentialsResponse;
 }
 
@@ -158,9 +141,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<'a> {
 pub struct RevokeAccountCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.revokeAccountCredentials";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RevokeAccountCredentials<'de>;
     type Response = RevokeAccountCredentialsResponse;
 }

@@ -16,13 +16,12 @@ Typically rendered as `<strong>` in HTML.*/
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bold<'a> {}
-fn lexicon_doc_com_deckbelcher_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_deckbelcher_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.deckbelcher.richtext.facet"),
@@ -378,13 +377,7 @@ Start index is inclusive, end index is exclusive.
 Indices are zero-indexed, counting bytes of the UTF-8 encoded text.*/
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ByteSlice<'a> {
@@ -394,7 +387,7 @@ pub struct ByteSlice<'a> {
 
 pub mod byte_slice_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -402,37 +395,37 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteStart;
         type ByteEnd;
+        type ByteStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteStart = Unset;
         type ByteEnd = Unset;
-    }
-    ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
-        type ByteStart = Set<members::byte_start>;
-        type ByteEnd = S::ByteEnd;
+        type ByteStart = Unset;
     }
     ///State transition - sets the `byte_end` field to Set
     pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetByteEnd<S> {}
     impl<S: State> State for SetByteEnd<S> {
-        type ByteStart = S::ByteStart;
         type ByteEnd = Set<members::byte_end>;
+        type ByteStart = S::ByteStart;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteStart<S> {}
+    impl<S: State> State for SetByteStart<S> {
+        type ByteEnd = S::ByteEnd;
+        type ByteStart = Set<members::byte_start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_start` field
-        pub struct byte_start(());
         ///Marker type for the `byte_end` field
         pub struct byte_end(());
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
     }
 }
 
@@ -502,8 +495,8 @@ where
 impl<'a, S> ByteSliceBuilder<'a, S>
 where
     S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsSet,
     S::ByteEnd: byte_slice_state::IsSet,
+    S::ByteStart: byte_slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ByteSlice<'a> {
@@ -546,9 +539,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
             let value = &self.byte_end;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "byte_end",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("byte_end"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -558,9 +549,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
             let value = &self.byte_start;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "byte_start",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("byte_start"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -575,13 +564,7 @@ Links to a Magic: The Gathering card.
 The text is usually the card name.*/
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CardRef<'a> {
@@ -592,7 +575,7 @@ pub struct CardRef<'a> {
 
 pub mod card_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -625,9 +608,7 @@ pub mod card_ref_state {
 /// Builder for constructing an instance of this type
 pub struct CardRefBuilder<'a, S: card_ref_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_deckbelcher::CardRef<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<crate::com_deckbelcher::CardRef<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -723,7 +704,7 @@ Typically rendered as `<code>` in HTML.*/
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Code<'a> {}
@@ -755,7 +736,7 @@ Typically rendered as `<pre><code>` in HTML.*/
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CodeBlock<'a> {}
@@ -787,7 +768,7 @@ Typically rendered as `<em>` in HTML.*/
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Italic<'a> {}
@@ -812,23 +793,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
 The text URL may have been simplified or truncated, but the facet reference should be a complete URL.*/
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Link<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -861,9 +836,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::UriValue<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -893,7 +866,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         LinkBuilder {
@@ -952,13 +925,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
 Extends Bluesky's facet system to support DeckBelcher-specific features.*/
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
@@ -970,7 +937,7 @@ pub struct Facet<'a> {
 
 pub mod facet_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1110,13 +1077,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1160,13 +1121,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
 The text is usually a handle, including an `@` prefix, but the facet reference is a DID.*/
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Mention<'a> {
@@ -1176,7 +1131,7 @@ pub struct Mention<'a> {
 
 pub mod mention_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1209,9 +1164,7 @@ pub mod mention_state {
 /// Builder for constructing an instance of this type
 pub struct MentionBuilder<'a, S: mention_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1307,7 +1260,7 @@ The text usually includes a '#' prefix, but the facet reference should not.*/
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
@@ -1333,9 +1286,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tag",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tag"),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1350,13 +1301,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "tag",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("tag"),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

@@ -8,13 +8,7 @@
 /// A connection linking a source to a target, with optional type and note.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Connection<'a> {
@@ -42,7 +36,7 @@ pub struct Connection<'a> {
 
 pub mod connection_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,37 +44,37 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
         type Target;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type Target = S::Target;
+        type Source = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Source = S::Source;
         type Target = Set<members::target>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Target = S::Target;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -126,10 +120,7 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
         self
     }
     /// Set the `connectionType` field to an Option value (optional)
-    pub fn maybe_connection_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_connection_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -156,10 +147,7 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -230,8 +218,8 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S> ConnectionBuilder<'a, S>
 where
     S: connection_state::State,
-    S::Source: connection_state::IsSet,
     S::Target: connection_state::IsSet,
+    S::Source: connection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Connection<'a> {
@@ -280,13 +268,7 @@ impl<'a> Connection<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectionGetRecordOutput<'a> {
@@ -343,9 +325,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -355,9 +335,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
     }
 }
 
-fn lexicon_doc_network_cosmik_connection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_cosmik_connection() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.cosmik.connection"),

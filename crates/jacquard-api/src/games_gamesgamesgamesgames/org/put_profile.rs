@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutProfile<'a> {
@@ -32,9 +32,7 @@ pub struct PutProfile<'a> {
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -42,9 +40,7 @@ pub struct PutProfile<'a> {
     pub founded_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
+    pub media: std::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -53,9 +49,7 @@ pub struct PutProfile<'a> {
     pub status: std::option::Option<PutProfileStatus<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
+    pub websites: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -163,13 +157,7 @@ impl jacquard_common::IntoStatic for PutProfileStatus<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutProfileOutput<'a> {
@@ -191,9 +179,8 @@ impl jacquard_common::xrpc::XrpcResp for PutProfileResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutProfile<'a> {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.putProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutProfileResponse;
 }
 
@@ -202,9 +189,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutProfile<'a> {
 pub struct PutProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.org.putProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = PutProfile<'de>;
     type Response = PutProfileResponse;
 }

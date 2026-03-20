@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValidateSupporter<'a> {
@@ -26,7 +20,7 @@ pub struct ValidateSupporter<'a> {
 
 pub mod validate_supporter_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,49 +28,49 @@ pub mod validate_supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Supporter;
         type Signer;
+        type Supporter;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Supporter = Unset;
         type Signer = Unset;
+        type Supporter = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `supporter` field to Set
-    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSupporter<S> {}
-    impl<S: State> State for SetSupporter<S> {
-        type Supporter = Set<members::supporter>;
-        type Signer = S::Signer;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `signer` field to Set
     pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigner<S> {}
     impl<S: State> State for SetSigner<S> {
-        type Supporter = S::Supporter;
         type Signer = Set<members::signer>;
+        type Supporter = S::Supporter;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `supporter` field to Set
+    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSupporter<S> {}
+    impl<S: State> State for SetSupporter<S> {
+        type Signer = S::Signer;
+        type Supporter = Set<members::supporter>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Supporter = S::Supporter;
         type Signer = S::Signer;
+        type Supporter = S::Supporter;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `supporter` field
-        pub struct supporter(());
         ///Marker type for the `signer` field
         pub struct signer(());
+        ///Marker type for the `supporter` field
+        pub struct supporter(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -171,8 +165,8 @@ where
 impl<'a, S> ValidateSupporterBuilder<'a, S>
 where
     S: validate_supporter_state::State,
-    S::Supporter: validate_supporter_state::IsSet,
     S::Signer: validate_supporter_state::IsSet,
+    S::Supporter: validate_supporter_state::IsSet,
     S::Subject: validate_supporter_state::IsSet,
 {
     /// Build the final struct
@@ -187,22 +181,14 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValidateSupporterOutput<'a> {
     /// Hydrated profile of the supporter, if available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<
-        crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
-    >,
+    pub profile: std::option::Option<crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>>,
     /// Whether the supporter relationship exists and the required attestation is valid.
     pub valid: bool,
 }
@@ -217,7 +203,7 @@ pub struct ValidateSupporterOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

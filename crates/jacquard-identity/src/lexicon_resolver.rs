@@ -7,12 +7,14 @@
 use crate::resolver::{IdentityError, IdentityResolver};
 
 use jacquard_common::{
-    IntoStatic, from_json_value, deps::smol_str,
+    IntoStatic,
+    deps::fluent_uri::Uri,
+    deps::smol_str,
+    from_json_value,
     types::{aturi::AtUri, cid::Cid, did::Did, string::Nsid},
 };
 use jacquard_lexicon::lexicon::LexiconDoc;
 use smol_str::SmolStr;
-use url::Url;
 
 /// Resolve lexicon authority (NSID → authoritative DID)
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
@@ -318,20 +320,22 @@ impl crate::JacquardResolver {
         #[cfg(feature = "tracing")]
         tracing::debug!("resolving lexicon via XRPC: {}", nsid);
 
-        let mut url =
-            Url::parse("https://public.api.bsky.app").expect("hardcoded URL should be valid");
-
-        url.set_path("/xrpc/com.atproto.lexicon.resolveLexicon");
-
         let qs = serde_html_form::to_string(&ResolveLexicon::new().nsid(nsid.clone()).build())
             .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
-        url.set_query(Some(&qs));
+
+        let url_str = format!(
+            "https://public.api.bsky.app/xrpc/com.atproto.lexicon.resolveLexicon?{}",
+            qs
+        );
+        let url = Uri::parse(url_str)
+            .map(|u| u.to_owned())
+            .map_err(|(e, _)| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
 
         #[cfg(feature = "tracing")]
         tracing::debug!("fetching from URL: {}", url);
 
         let (buf, status) = self
-            .get_json_bytes(url)
+            .get_json_bytes(url.borrow())
             .await
             .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
 
@@ -499,7 +503,8 @@ impl crate::JacquardResolver {
                     #[cfg(feature = "cache")]
                     if let Ok(ref did) = result {
                         if let Some(caches) = &self.caches {
-                            let authority_key = jacquard_common::deps::smol_str::SmolStr::from(authority);
+                            let authority_key =
+                                jacquard_common::deps::smol_str::SmolStr::from(authority);
                             crate::cache_impl::insert(
                                 &caches.authority_to_did,
                                 authority_key,

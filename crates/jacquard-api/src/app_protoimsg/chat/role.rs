@@ -8,13 +8,7 @@
 /// Assign a moderator role to a user for a specific room.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Role<'a> {
@@ -33,7 +27,7 @@ pub struct Role<'a> {
 
 pub mod role_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,8 +37,8 @@ pub mod role_state {
     pub trait State: sealed::Sealed {
         type Room;
         type Subject;
-        type CreatedAt;
         type Role;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -52,8 +46,8 @@ pub mod role_state {
     impl State for Empty {
         type Room = Unset;
         type Subject = Unset;
-        type CreatedAt = Unset;
         type Role = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
@@ -61,8 +55,8 @@ pub mod role_state {
     impl<S: State> State for SetRoom<S> {
         type Room = Set<members::room>;
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
         type Role = S::Role;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
@@ -70,17 +64,8 @@ pub mod role_state {
     impl<S: State> State for SetSubject<S> {
         type Room = S::Room;
         type Subject = Set<members::subject>;
+        type Role = S::Role;
         type CreatedAt = S::CreatedAt;
-        type Role = S::Role;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Role = S::Role;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
@@ -88,8 +73,17 @@ pub mod role_state {
     impl<S: State> State for SetRole<S> {
         type Room = S::Room;
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
         type Role = Set<members::role>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Room = S::Room;
+        type Subject = S::Subject;
+        type Role = S::Role;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -98,10 +92,10 @@ pub mod role_state {
         pub struct room(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -216,8 +210,8 @@ where
     S: role_state::State,
     S::Room: role_state::IsSet,
     S::Subject: role_state::IsSet,
-    S::CreatedAt: role_state::IsSet,
     S::Role: role_state::IsSet,
+    S::CreatedAt: role_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Role<'a> {
@@ -351,13 +345,7 @@ impl jacquard_common::IntoStatic for RoleRole<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoleGetRecordOutput<'a> {
@@ -414,9 +402,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Role<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_role() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_role() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.role"),

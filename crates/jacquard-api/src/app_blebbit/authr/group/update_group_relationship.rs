@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupRelationship<'a> {
@@ -38,9 +38,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateGroupRelationshipResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroupRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroupRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateGroupRelationshipResponse;
 }
 
@@ -49,9 +48,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroupRelationship<'a> {
 pub struct UpdateGroupRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.updateGroupRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateGroupRelationship<'de>;
     type Response = UpdateGroupRelationshipResponse;
 }

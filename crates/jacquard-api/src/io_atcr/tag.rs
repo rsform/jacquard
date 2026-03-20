@@ -8,13 +8,7 @@
 /// A named tag pointing to a specific manifest digest
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
@@ -39,7 +33,7 @@ pub struct Tag<'a> {
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,37 +41,37 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Repository;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Repository = S::Repository;
+        type Tag = Unset;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type Tag = S::Tag;
         type Repository = Set<members::repository>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Repository = S::Repository;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -141,10 +135,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         self
     }
     /// Set the `manifestDigest` field to an Option value (optional)
-    pub fn maybe_manifest_digest(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_manifest_digest(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -210,8 +201,8 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Tag: tag_state::IsSet,
     S::Repository: tag_state::IsSet,
+    S::Tag: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
@@ -258,13 +249,7 @@ impl<'a> Tag<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagGetRecordOutput<'a> {
@@ -334,9 +319,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -347,9 +330,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tag",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tag"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

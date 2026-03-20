@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Pause;
 /// Response type for
@@ -29,9 +29,8 @@ impl jacquard_common::xrpc::XrpcResp for PauseResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Pause {
     const NSID: &'static str = "app.rocksky.spotify.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PauseResponse;
 }
 
@@ -40,9 +39,8 @@ impl jacquard_common::xrpc::XrpcRequest for Pause {
 pub struct PauseRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Pause;
     type Response = PauseResponse;
 }

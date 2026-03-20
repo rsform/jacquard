@@ -16,6 +16,7 @@ use crate::{
 use dashmap::DashMap;
 use jacquard_common::{
     CowStr, IntoStatic,
+    deps::fluent_uri::Uri,
     http_client::HttpClient,
     session::SessionStoreError,
     types::{did::Did, string::Datetime},
@@ -44,7 +45,7 @@ pub struct ClientSessionData<'s> {
     pub session_id: CowStr<'s>,
 
     // Base URL of the "resource server" (eg, PDS). Should include scheme, hostname, port; no path or auth info.
-    pub host_url: CowStr<'s>,
+    pub host_url: Uri<String>,
 
     // Base URL of the "auth server" (eg, PDS or entryway). Should include scheme, hostname, port; no path or auth info.
     pub authserver_url: CowStr<'s>,
@@ -81,7 +82,7 @@ impl IntoStatic for ClientSessionData<'_> {
             token_set: self.token_set.into_static(),
             account_did: self.account_did.into_static(),
             session_id: self.session_id.into_static(),
-            host_url: self.host_url.into_static(),
+            host_url: self.host_url.clone(),
         }
     }
 }

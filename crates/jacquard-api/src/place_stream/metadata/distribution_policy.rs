@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionPolicy<'a> {
@@ -28,14 +28,11 @@ pub struct DistributionPolicy<'a> {
     pub delete_after: std::option::Option<i64>,
 }
 
-fn lexicon_doc_place_stream_metadata_distributionPolicy() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_metadata_distributionPolicy()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "place.stream.metadata.distributionPolicy",
-        ),
+        id: ::jacquard_common::CowStr::new_static("place.stream.metadata.distributionPolicy"),
         revision: None,
         description: None,
         defs: {

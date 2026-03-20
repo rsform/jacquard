@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attachment<'a> {
@@ -27,7 +21,7 @@ pub struct Attachment<'a> {
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,14 +140,11 @@ where
     }
 }
 
-fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tools_smokesignal_blahg_content_post()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.smokesignal.blahg.content.post",
-        ),
+        id: ::jacquard_common::CowStr::new_static("tools.smokesignal.blahg.content.post"),
         revision: None,
         description: None,
         defs: {
@@ -338,21 +329,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
 /// A blagh post
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attachments: std::option::Option<
-        Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
-    >,
+    pub attachments:
+        std::option::Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>,
     /// The content of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -369,7 +353,7 @@ pub struct Post<'a> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -390,9 +374,7 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -423,9 +405,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `attachments` field (optional)
     pub fn attachments(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -433,9 +413,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `attachments` field to an Option value (optional)
     pub fn maybe_attachments(
         mut self,
-        value: Option<
-            Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
-        >,
+        value: Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -501,10 +479,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -564,13 +539,7 @@ impl<'a> Post<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
@@ -627,9 +596,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "langs",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("langs"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -639,9 +606,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -655,13 +620,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 200usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

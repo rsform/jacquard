@@ -40,7 +40,7 @@ use jacquard_api::com_atproto::{
     },
     server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
 };
-use jacquard_common::cowstr::ToCowStr;
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::XrpcResult;
 pub use jacquard_common::error::{ClientError, XrpcResult as ClientResult};
 use jacquard_common::http_client::HttpClient;
@@ -75,7 +75,6 @@ use std::option::Option;
 use std::sync::Arc;
 pub use token::FileAuthStore;
 use tokio::sync::RwLock;
-use url::Url;
 
 /// Identifies the active authentication mode for an agent/session.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -97,7 +96,7 @@ pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     fn session_info(&self)
     -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>>;
     /// Current base endpoint.
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>>;
+    fn endpoint(&self) -> impl Future<Output = Uri<String>>;
     /// Override per-session call options.
     fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()>;
     /// Refresh the session and return a fresh AuthorizationToken.
@@ -158,7 +157,7 @@ impl Default for BasicClient {
 #[derive(Debug, Clone)]
 pub struct UnauthenticatedSession<T> {
     resolver: Arc<T>,
-    endpoint: Arc<RwLock<Option<CowStr<'static>>>>,
+    endpoint: Arc<RwLock<Option<Uri<String>>>>,
     options: Arc<RwLock<CallOptions<'static>>>,
 }
 
@@ -219,13 +218,13 @@ where
     T: Sync + Send,
 {
     #[doc = " Get the base URI for the client."]
-    fn base_uri(&self) -> impl Future<Output = CowStr<'static>> + Send {
+    fn base_uri(&self) -> impl Future<Output = Uri<String>> + Send {
         async move {
-            self.endpoint
-                .read()
-                .await
-                .clone()
-                .unwrap_or(CowStr::new_static("https://public.api.bsky.app"))
+            self.endpoint.read().await.clone().unwrap_or_else(|| {
+                Uri::parse("https://public.api.bsky.app")
+                    .expect("hardcoded URI is valid")
+                    .to_owned()
+            })
         }
     }
 
@@ -257,7 +256,6 @@ where
     {
         async move {
             let base_uri = self.base_uri().await;
-            let base_uri = Url::parse(&base_uri).expect("base_uri should be valid url");
             self.resolver
                 .xrpc(base_uri)
                 .with_options(opts.clone())
@@ -292,7 +290,6 @@ where
     {
         async move {
             let base_uri = self.base_uri().await;
-            let base_uri = Url::parse(&base_uri).expect("base_uri should be valid url");
             self.resolver
                 .xrpc(base_uri)
                 .with_options(opts.clone())
@@ -302,10 +299,11 @@ where
     }
 
     #[doc = " Set the base URI for the client."]
-    fn set_base_uri(&self, url: Url) -> impl Future<Output = ()> + Send {
+    fn set_base_uri(&self, uri: Uri<String>) -> impl Future<Output = ()> + Send {
         async move {
+            let normalized = crate::xrpc::normalize_base_uri(uri);
             let mut guard = self.endpoint.write().await;
-            *guard = Some(url.to_cowstr().into_static());
+            *guard = Some(normalized);
         }
     }
 
@@ -336,7 +334,7 @@ where
         async { None } // no session
     }
 
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {
+    fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async { self.base_uri().await }
     }
 
@@ -453,7 +451,7 @@ impl MemoryCredentialSession {
         identifier: CowStr<'_>,
         password: CowStr<'_>,
         session_id: Option<CowStr<'_>>,
-        pds: Option<Url>,
+        pds: Option<Uri<String>>,
     ) -> ClientResult<(Self, AtpSession)> {
         let session = MemoryCredentialSession::unauthenticated();
         let auth = session
@@ -549,7 +547,7 @@ impl<A: AgentSession> Agent<A> {
     }
 
     /// Get current endpoint.
-    pub async fn endpoint(&self) -> CowStr<'static> {
+    pub async fn endpoint(&self) -> Uri<String> {
         self.inner.endpoint().await
     }
 
@@ -832,11 +830,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             _span.exit();
 
             let response: Response<GetRecordResponse> = {
-                use url::Url;
-
                 let http_request = xrpc::build_http_request(
-                    &Url::parse("https://slingshot.microcosm.blue")
-                        .expect("slingshot url is valid"),
+                    &Uri::parse("https://slingshot.microcosm.blue")
+                        .expect("slingshot url is valid")
+                        .to_owned(),
                     &request,
                     &self.opts().await,
                 )?;
@@ -1240,7 +1237,7 @@ where
                 .map(|key| (key.0, Some(key.1)))
         }
     }
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {
+    fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async move { CredentialSession::<S, T, W>::endpoint(self).await }
     }
     fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
@@ -1272,7 +1269,7 @@ where
             Some((did.into_static(), Some(sid.into_static())))
         }
     }
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {
+    fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async { self.endpoint().await }
     }
     fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
@@ -1301,7 +1298,7 @@ where
     ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
         async { None }
     }
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {
+    fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async { self.base_uri().await }
     }
     fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
@@ -1409,7 +1406,7 @@ where
 }
 
 impl<A: AgentSession> XrpcClient for Agent<A> {
-    async fn base_uri(&self) -> CowStr<'static> {
+    async fn base_uri(&self) -> Uri<String> {
         self.inner.base_uri().await
     }
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
@@ -1420,8 +1417,8 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
         self.inner.set_opts(opts).await
     }
 
-    async fn set_base_uri(&self, url: url::Url) {
-        self.inner.set_base_uri(url).await
+    async fn set_base_uri(&self, uri: Uri<String>) {
+        self.inner.set_base_uri(uri).await
     }
     fn send<R>(
         &self,
@@ -1554,7 +1551,7 @@ impl<A: AgentSession> AgentSession for Agent<A> {
         async { self.info().await }
     }
 
-    fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {
+    fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async { self.endpoint().await }
     }
 

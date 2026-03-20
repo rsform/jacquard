@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Address<'a> {
@@ -44,9 +44,8 @@ pub struct Address<'a> {
     pub street: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_community_lexicon_location_address()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("community.lexicon.location.address"),
@@ -222,9 +221,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "country",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("country"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -235,9 +232,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "country",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("country"),
                     min: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });

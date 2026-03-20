@@ -8,19 +8,13 @@
 /// Web Monetization wallet.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebMonetization<'a> {
     /// Wallet address.
     #[serde(borrow)]
-    pub address: jacquard_common::types::string::Uri<'a>,
+    pub address: jacquard_common::types::string::UriValue<'a>,
     /// Short, human-readable description of how this wallet is related to this account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -29,7 +23,7 @@ pub struct WebMonetization<'a> {
 
 pub mod web_monetization_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,7 +57,7 @@ pub mod web_monetization_state {
 pub struct WebMonetizationBuilder<'a, S: web_monetization_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -95,7 +89,7 @@ where
     /// Set the `address` field (required)
     pub fn address(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> WebMonetizationBuilder<'a, web_monetization_state::SetAddress<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         WebMonetizationBuilder {
@@ -108,10 +102,7 @@ where
 
 impl<'a, S: web_monetization_state::State> WebMonetizationBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -166,13 +157,7 @@ impl<'a> WebMonetization<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebMonetizationGetRecordOutput<'a> {
@@ -229,14 +214,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebMonetization<'a> {
     }
 }
 
-fn lexicon_doc_community_lexicon_payments_webMonetization() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_community_lexicon_payments_webMonetization()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "community.lexicon.payments.webMonetization",
-        ),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.payments.webMonetization"),
         revision: None,
         description: None,
         defs: {

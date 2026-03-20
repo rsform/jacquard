@@ -8,13 +8,7 @@
 /// Attestation signature proving a score was submitted through ATPlay SDK
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attestation<'a> {
@@ -31,7 +25,7 @@ pub struct Attestation<'a> {
 
 pub mod attestation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -191,9 +185,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_atplay_score_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_atplay_score_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.atplay.score.defs"),
@@ -300,9 +292,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });

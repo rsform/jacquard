@@ -1,13 +1,14 @@
+use crate::deps::fluent_uri::Uri;
 use crate::types::crypto::{CryptoError, PublicKey};
 use crate::types::string::{Did, Handle};
 use crate::types::value::Data;
 use crate::{CowStr, IntoStatic};
 use alloc::collections::BTreeMap;
+use alloc::string::String;
 use alloc::vec::Vec;
 use bon::Builder;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
-use url::Url;
 
 /// DID Document representation with borrowed data where possible.
 ///
@@ -125,18 +126,20 @@ impl<'a> DidDocument<'a> {
         })
     }
 
-    /// Extract the AtprotoPersonalDataServer service endpoint as a `Url`.
+    /// Extract the AtprotoPersonalDataServer service endpoint as a `fluent_uri::Uri<String>`.
     /// Accepts endpoint as string or object (string preferred).
-    pub fn pds_endpoint(&self) -> Option<Url> {
+    pub fn pds_endpoint(&self) -> Option<Uri<String>> {
         self.service.as_ref().and_then(|services| {
             services.iter().find_map(|s| {
                 if s.r#type.as_ref() == "AtprotoPersonalDataServer" {
                     match &s.service_endpoint {
-                        Some(Data::String(strv)) => Url::parse(strv.as_ref()).ok(),
+                        Some(Data::String(strv)) => {
+                            Uri::parse(strv.as_ref()).ok().map(|u| u.to_owned())
+                        }
                         Some(Data::Object(obj)) => {
                             // Some documents may include structured endpoints; try common fields
                             if let Some(Data::String(urlv)) = obj.0.get("url") {
-                                Url::parse(urlv.as_ref()).ok()
+                                Uri::parse(urlv.as_ref()).ok().map(|u| u.to_owned())
                             } else {
                                 None
                             }
@@ -285,7 +288,7 @@ mod tests {
         assert_eq!(doc.id.as_str(), "did:plc:yfvwmnlztr4dwkb7hwz55r2g");
         // pds endpoint
         let pds = doc.pds_endpoint().expect("pds endpoint");
-        assert_eq!(pds.as_str(), "https://atproto.systems/");
+        assert_eq!(pds.as_str(), "https://atproto.systems");
         // handle alias extraction
         let handles = doc.handles();
         assert!(handles.iter().any(|h| h.as_str() == "nonbinary.computer"));

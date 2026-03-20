@@ -8,13 +8,7 @@
 /// A profile for a user on the Margin network.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -43,7 +37,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,18 +152,12 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -177,18 +165,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `links` field (optional)
-    pub fn links(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn links(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
-    pub fn maybe_links(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_links(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -196,10 +178,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field (optional)
-    pub fn website(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn website(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -262,13 +241,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -325,9 +298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bio",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bio"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -349,9 +320,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "links",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("links"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -361,9 +330,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "website",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("website"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });

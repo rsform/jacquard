@@ -21,9 +21,9 @@ use jacquard_identity::resolver::IdentityError;
 #[cfg(feature = "api_bluesky")]
 use jacquard_identity::resolver::IdentityResolver;
 #[cfg(not(target_family = "wasm"))]
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 #[cfg(target_family = "wasm")]
-use regex_lite::{Regex, Captures};
+use regex_lite::{Captures, Regex};
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::LazyLock;
@@ -661,15 +661,17 @@ fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'s
 #[cfg(feature = "api_bluesky")]
 pub fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUri<'static>> {
     // Parse URL
-    let url_parsed = url::Url::parse(url).ok()?;
+    use jacquard_common::deps::fluent_uri::Uri;
+
+    let url_parsed = Uri::parse(url).ok()?;
 
     // Check if domain is in allowed list
-    let domain = url_parsed.domain()?;
+    let domain = url_parsed.authority()?.host();
     if !embed_domains.contains(&domain) {
         return None;
     }
 
-    let path = url_parsed.path();
+    let path = url_parsed.path().as_str();
     let segments: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
 
     let at_uri_str = match segments.as_slice() {
@@ -762,14 +764,14 @@ impl RichTextBuilder<Resolved> {
             use crate::api::app_bsky::richtext::facet::{
                 ByteSlice, FacetFeaturesItem, Link, Mention, Tag,
             };
-            use crate::types::uri::Uri;
+            use crate::types::uri::UriValue;
 
             let (range, feature) = match candidate {
                 FacetCandidate::MarkdownLink { display_range, url } => {
                     // MarkdownLink stores URL directly, use display_range for index
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
-                        uri: Uri::new_owned(&url)?,
+                        uri: UriValue::new_owned(&url)?,
                         extra_data: None,
                     }));
                     (display_range, feature)
@@ -810,7 +812,7 @@ impl RichTextBuilder<Resolved> {
                     }
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
-                        uri: Uri::new_owned(&url)?,
+                        uri: UriValue::new_owned(&url)?,
                         extra_data: None,
                     }));
                     (range, feature)
@@ -913,7 +915,7 @@ impl RichTextBuilder<Unresolved> {
                     // MarkdownLink stores URL directly, use display_range for index
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
-                        uri: crate::types::uri::Uri::new_owned(&url)?,
+                        uri: crate::types::uri::UriValue::new_owned(&url)?,
                         extra_data: None,
                     }));
                     (display_range, feature)
@@ -963,7 +965,7 @@ impl RichTextBuilder<Unresolved> {
                     }
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
-                        uri: crate::types::uri::Uri::new_owned(&url)?,
+                        uri: crate::types::uri::UriValue::new_owned(&url)?,
                         extra_data: None,
                     }));
                     (range, feature)

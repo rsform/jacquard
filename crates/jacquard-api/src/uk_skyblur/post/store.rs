@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Store<'a> {
@@ -31,7 +25,7 @@ pub struct Store<'a> {
 
 pub mod store_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -119,18 +113,12 @@ impl<'a> StoreBuilder<'a, store_state::Empty> {
 
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `additional` field (optional)
-    pub fn additional(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn additional(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `additional` field to an Option value (optional)
-    pub fn maybe_additional(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_additional(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -230,13 +218,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StoreOutput<'a> {
@@ -258,9 +240,8 @@ impl jacquard_common::xrpc::XrpcResp for StoreResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Store<'a> {
     const NSID: &'static str = "uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StoreResponse;
 }
 
@@ -269,9 +250,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Store<'a> {
 pub struct StoreRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StoreRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Store<'de>;
     type Response = StoreResponse;
 }

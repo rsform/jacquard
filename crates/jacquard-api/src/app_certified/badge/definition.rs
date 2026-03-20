@@ -8,13 +8,7 @@
 /// Defines a badge that can be awarded via badge award records to users, projects, or activity claims.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
@@ -41,7 +35,7 @@ pub struct Definition<'a> {
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,67 +43,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Icon;
-        type BadgeType;
         type Title;
         type CreatedAt;
+        type BadgeType;
+        type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Icon = Unset;
-        type BadgeType = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Icon = Set<members::icon>;
-        type BadgeType = S::BadgeType;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type Icon = S::Icon;
-        type BadgeType = Set<members::badge_type>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type BadgeType = Unset;
+        type Icon = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Icon = S::Icon;
-        type BadgeType = S::BadgeType;
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
+        type BadgeType = S::BadgeType;
+        type Icon = S::Icon;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Icon = S::Icon;
-        type BadgeType = S::BadgeType;
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type BadgeType = S::BadgeType;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type BadgeType = Set<members::badge_type>;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type BadgeType = S::BadgeType;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `icon` field
-        pub struct icon(());
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
     }
 }
 
@@ -204,18 +198,12 @@ where
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -262,10 +250,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Icon: definition_state::IsSet,
-    S::BadgeType: definition_state::IsSet,
     S::Title: definition_state::IsSet,
     S::CreatedAt: definition_state::IsSet,
+    S::BadgeType: definition_state::IsSet,
+    S::Icon: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -314,13 +302,7 @@ impl<'a> Definition<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
@@ -390,9 +372,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "badge_type",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("badge_type"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -402,9 +382,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -418,13 +396,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -433,9 +413,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -445,9 +423,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_badge_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_certified_badge_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.badge.definition"),

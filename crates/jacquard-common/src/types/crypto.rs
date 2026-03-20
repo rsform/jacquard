@@ -243,7 +243,6 @@ pub fn multikey(code: u64, key: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use multibase;
 
     #[test]
     fn decode_ed25519() {

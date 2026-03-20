@@ -168,7 +168,10 @@ impl RepoError {
     }
 
     /// Create an invalid CID conversion error
-    pub fn invalid_cid_conversion(source: impl Error + Send + Sync + 'static, context: &str) -> Self {
+    pub fn invalid_cid_conversion(
+        source: impl Error + Send + Sync + 'static,
+        context: &str,
+    ) -> Self {
         Self::new(RepoErrorKind::InvalidCidConversion, Some(Box::new(source)))
             .with_context(context.to_string())
             .with_help("CID conversion failed - check that the source data is a valid CIDv1 string or bytes. Common causes: malformed base32 encoding, incorrect multicodec prefix, or invalid multihash.")

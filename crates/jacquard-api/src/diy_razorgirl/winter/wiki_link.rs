@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WikiLink<'a> {
@@ -40,7 +34,7 @@ pub struct WikiLink<'a> {
 
 pub mod wiki_link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -48,65 +42,65 @@ pub mod wiki_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Target;
         type LinkType;
+        type CreatedAt;
         type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Target = Unset;
         type LinkType = Unset;
+        type CreatedAt = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Target = S::Target;
-        type LinkType = S::LinkType;
-        type Source = S::Source;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
         type Target = Set<members::target>;
         type LinkType = S::LinkType;
+        type CreatedAt = S::CreatedAt;
         type Source = S::Source;
     }
     ///State transition - sets the `link_type` field to Set
     pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLinkType<S> {}
     impl<S: State> State for SetLinkType<S> {
-        type CreatedAt = S::CreatedAt;
         type Target = S::Target;
         type LinkType = Set<members::link_type>;
+        type CreatedAt = S::CreatedAt;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Target = S::Target;
+        type LinkType = S::LinkType;
+        type CreatedAt = Set<members::created_at>;
         type Source = S::Source;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type CreatedAt = S::CreatedAt;
         type Target = S::Target;
         type LinkType = S::LinkType;
+        type CreatedAt = S::CreatedAt;
         type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `source` field
         pub struct source(());
     }
@@ -147,10 +141,7 @@ impl<'a> WikiLinkBuilder<'a, wiki_link_state::Empty> {
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `context` field (optional)
-    pub fn context(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn context(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -220,18 +211,12 @@ where
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `sourceAnchor` field (optional)
-    pub fn source_anchor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source_anchor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sourceAnchor` field to an Option value (optional)
-    pub fn maybe_source_anchor(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_source_anchor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -258,18 +243,12 @@ where
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `targetAnchor` field (optional)
-    pub fn target_anchor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn target_anchor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `targetAnchor` field to an Option value (optional)
-    pub fn maybe_target_anchor(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_target_anchor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -278,9 +257,9 @@ impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
 impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
-    S::CreatedAt: wiki_link_state::IsSet,
     S::Target: wiki_link_state::IsSet,
     S::LinkType: wiki_link_state::IsSet,
+    S::CreatedAt: wiki_link_state::IsSet,
     S::Source: wiki_link_state::IsSet,
 {
     /// Build the final struct
@@ -455,13 +434,7 @@ impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WikiLinkGetRecordOutput<'a> {
@@ -518,9 +491,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "context",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("context"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -530,9 +501,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("diy.razorgirl.winter.wikiLink"),

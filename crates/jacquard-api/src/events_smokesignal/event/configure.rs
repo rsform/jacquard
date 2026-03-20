@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Configure<'a> {
@@ -29,12 +23,12 @@ pub struct Configure<'a> {
     /// URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rsvp_redirect_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub rsvp_redirect_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod configure_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,7 +65,7 @@ pub struct ConfigureBuilder<'a, S: configure_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -143,7 +137,7 @@ impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `rsvpRedirectUrl` field (optional)
     pub fn rsvp_redirect_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -151,7 +145,7 @@ impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `rsvpRedirectUrl` field to an Option value (optional)
     pub fn maybe_rsvp_redirect_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -200,7 +194,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigureOutput<'a> {}
@@ -214,7 +208,7 @@ pub struct ConfigureOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -271,9 +265,8 @@ impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
     const NSID: &'static str = "events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ConfigureResponse;
 }
 
@@ -282,9 +275,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
 pub struct ConfigureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
     const PATH: &'static str = "/xrpc/events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Configure<'de>;
     type Response = ConfigureResponse;
 }

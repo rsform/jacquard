@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteUpload<'a> {
@@ -30,7 +24,7 @@ pub struct CompleteUpload<'a> {
 
 pub mod complete_upload_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,51 +32,51 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parts;
-        type Digest;
         type UploadId;
+        type Digest;
+        type Parts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parts = Unset;
-        type Digest = Unset;
         type UploadId = Unset;
-    }
-    ///State transition - sets the `parts` field to Set
-    pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParts<S> {}
-    impl<S: State> State for SetParts<S> {
-        type Parts = Set<members::parts>;
-        type Digest = S::Digest;
-        type UploadId = S::UploadId;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Parts = S::Parts;
-        type Digest = Set<members::digest>;
-        type UploadId = S::UploadId;
+        type Digest = Unset;
+        type Parts = Unset;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
-        type Parts = S::Parts;
-        type Digest = S::Digest;
         type UploadId = Set<members::upload_id>;
+        type Digest = S::Digest;
+        type Parts = S::Parts;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type UploadId = S::UploadId;
+        type Digest = Set<members::digest>;
+        type Parts = S::Parts;
+    }
+    ///State transition - sets the `parts` field to Set
+    pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParts<S> {}
+    impl<S: State> State for SetParts<S> {
+        type UploadId = S::UploadId;
+        type Digest = S::Digest;
+        type Parts = Set<members::parts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parts` field
-        pub struct parts(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `parts` field
+        pub struct parts(());
     }
 }
 
@@ -175,9 +169,9 @@ where
 impl<'a, S> CompleteUploadBuilder<'a, S>
 where
     S: complete_upload_state::State,
-    S::Parts: complete_upload_state::IsSet,
-    S::Digest: complete_upload_state::IsSet,
     S::UploadId: complete_upload_state::IsSet,
+    S::Digest: complete_upload_state::IsSet,
+    S::Parts: complete_upload_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompleteUpload<'a> {
@@ -214,7 +208,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteUploadOutput<'a> {
@@ -236,7 +230,7 @@ pub struct CompleteUploadOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -299,9 +293,8 @@ impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CompleteUploadResponse;
 }
 
@@ -310,9 +303,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
 pub struct CompleteUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CompleteUpload<'de>;
     type Response = CompleteUploadResponse;
 }
@@ -320,13 +312,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
 /// Information about a completed upload part
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PartInfo<'a> {
@@ -339,7 +325,7 @@ pub struct PartInfo<'a> {
 
 pub mod part_info_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -347,37 +333,37 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PartNumber;
         type Etag;
+        type PartNumber;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PartNumber = Unset;
         type Etag = Unset;
-    }
-    ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type PartNumber = Set<members::part_number>;
-        type Etag = S::Etag;
+        type PartNumber = Unset;
     }
     ///State transition - sets the `etag` field to Set
     pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEtag<S> {}
     impl<S: State> State for SetEtag<S> {
-        type PartNumber = S::PartNumber;
         type Etag = Set<members::etag>;
+        type PartNumber = S::PartNumber;
+    }
+    ///State transition - sets the `part_number` field to Set
+    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
+    impl<S: State> State for SetPartNumber<S> {
+        type Etag = S::Etag;
+        type PartNumber = Set<members::part_number>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `part_number` field
-        pub struct part_number(());
         ///Marker type for the `etag` field
         pub struct etag(());
+        ///Marker type for the `part_number` field
+        pub struct part_number(());
     }
 }
 
@@ -450,8 +436,8 @@ where
 impl<'a, S> PartInfoBuilder<'a, S>
 where
     S: part_info_state::State,
-    S::PartNumber: part_info_state::IsSet,
     S::Etag: part_info_state::IsSet,
+    S::PartNumber: part_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PartInfo<'a> {
@@ -477,9 +463,7 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.hold.completeUpload"),
@@ -582,59 +566,57 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("partInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Information about a completed upload part",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("partNumber"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("etag")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "etag",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "ETag returned when the part was uploaded",
-                                    ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("etag"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("etag"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "ETag returned when the part was uploaded",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(256usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(256usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partNumber",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "partNumber",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: Some(1i64),
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -659,9 +641,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "etag",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("etag"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -671,9 +651,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
             let value = &self.part_number;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "part_number",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("part_number"),
                     min: 1i64,
                     actual: *value,
                 });

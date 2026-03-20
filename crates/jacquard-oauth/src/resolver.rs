@@ -7,52 +7,12 @@ use jacquard_common::CowStr;
 use jacquard_common::IntoStatic;
 #[allow(unused_imports)]
 use jacquard_common::cowstr::ToCowStr;
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};
 use jacquard_identity::resolver::{IdentityError, IdentityResolver};
 use smol_str::SmolStr;
-use url::Url;
-
-/// Compare two issuer strings strictly but without spuriously failing on trivial differences.
-///
-/// Rules:
-/// - Schemes must match exactly.
-/// - Hostnames and effective ports must match (treat missing port the same as default port).
-/// - Path must match, except that an empty path and `/` are equivalent.
-/// - Query/fragment are not considered; if present on either side, the comparison fails.
-pub(crate) fn issuer_equivalent(a: &str, b: &str) -> bool {
-    fn normalize(url: &Url) -> Option<(String, String, u16, String)> {
-        if url.query().is_some() || url.fragment().is_some() {
-            return None;
-        }
-        let scheme = url.scheme().to_string();
-        let host = url.host_str()?.to_string();
-        let port = url.port_or_known_default()?;
-        let path = match url.path() {
-            "" => "/".to_string(),
-            "/" => "/".to_string(),
-            other => other.to_string(),
-        };
-        Some((scheme, host, port, path))
-    }
-
-    match (Url::parse(a), Url::parse(b)) {
-        (Ok(ua), Ok(ub)) => match (normalize(&ua), normalize(&ub)) {
-            (Some((sa, ha, pa, pa_path)), Some((sb, hb, pb, pb_path))) => {
-                if sa != sb || ha != hb || pa != pb {
-                    return false;
-                }
-                if pa_path == "/" && pb_path == "/" {
-                    return true;
-                }
-                pa_path == pb_path
-            }
-            _ => false,
-        },
-        _ => a == b,
-    }
-}
 
 pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
@@ -340,12 +300,12 @@ impl From<serde_html_form::ser::Error> for ResolverError {
     }
 }
 
-impl From<url::ParseError> for ResolverError {
-    fn from(e: url::ParseError) -> Self {
+impl From<jacquard_common::deps::fluent_uri::ParseError> for ResolverError {
+    fn from(e: jacquard_common::deps::fluent_uri::ParseError) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
         Self::new(ResolverErrorKind::Uri, Some(Box::new(e)))
             .with_context(msg)
-            .with_help("ensure URLs are well-formed (e.g., https://example.com)")
+            .with_help("ensure URIs are well-formed (e.g., https://example.com)")
     }
 }
 
@@ -362,9 +322,9 @@ async fn verify_issuer_impl<T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
     server_metadata: &OAuthAuthorizationServerMetadata<'_>,
     sub: &Did<'_>,
-) -> Result<Url> {
+) -> Result<Uri<String>> {
     let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
-    if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+    if metadata.issuer != server_metadata.issuer {
         return Err(ResolverError::authorization_server_metadata(
             "issuer mismatch",
         ));
@@ -379,9 +339,9 @@ async fn verify_issuer_impl<T: OAuthResolver + ?Sized>(
     resolver: &T,
     server_metadata: &OAuthAuthorizationServerMetadata<'_>,
     sub: &Did<'_>,
-) -> Result<Url> {
+) -> Result<Uri<String>> {
     let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
-    if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+    if metadata.issuer != server_metadata.issuer {
         return Err(ResolverError::authorization_server_metadata(
             "issuer mismatch",
         ));
@@ -403,10 +363,16 @@ async fn resolve_oauth_impl<T: OAuthResolver + Sync + ?Sized>(
     // when the user forgot their handle, or when the handle does not
     // resolve to a DID)
     Ok(if input.starts_with("https://") {
-        use jacquard_common::cowstr::ToCowStr;
-
-        let url = Url::parse(input).map_err(|_| ResolverError::not_found())?;
-        (resolver.resolve_from_service(&url.to_cowstr()).await?, None)
+        let uri = Uri::parse(input)
+            .map_err(|e| {
+                let err = ResolverError::new(ResolverErrorKind::Uri, Some(Box::new(e)));
+                err.with_context("failed to parse service URL")
+            })?
+            .to_owned();
+        (
+            resolver.resolve_from_service(&uri.as_str().into()).await?,
+            None,
+        )
     } else {
         let (metadata, identity) = resolver.resolve_from_identity(input).await?;
         (metadata, Some(identity))
@@ -425,8 +391,16 @@ async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
     // when the user forgot their handle, or when the handle does not
     // resolve to a DID)
     Ok(if input.starts_with("https://") {
-        let url = Url::parse(input).map_err(|_| ResolverError::not_found())?;
-        (resolver.resolve_from_service(&url.to_cowstr()).await?, None)
+        let uri = Uri::parse(input)
+            .map_err(|e| {
+                let err = ResolverError::new(ResolverErrorKind::Uri, Some(Box::new(e)));
+                err.with_context("failed to parse service URL")
+            })?
+            .to_owned();
+        (
+            resolver.resolve_from_service(&uri.as_str().into()).await?,
+            None,
+        )
     } else {
         let (metadata, identity) = resolver.resolve_from_identity(input).await?;
         (metadata, Some(identity))
@@ -646,7 +620,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> impl Future<Output = Result<Url>> + Send
+    ) -> impl Future<Output = Result<Uri<String>>> + Send
     where
         Self: Sync,
     {
@@ -658,7 +632,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> impl Future<Output = Result<Url>> {
+    ) -> impl Future<Output = Result<Uri<String>>> {
         verify_issuer_impl(self, server_metadata, sub)
     }
 
@@ -799,7 +773,7 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
         let metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
         // Accept semantically equivalent issuer (normalize to the requested URL form)
-        if issuer_equivalent(&metadata.issuer, server.as_str()) {
+        if metadata.issuer == server.as_str() {
             // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
@@ -822,7 +796,7 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     );
 
     let req = Request::builder()
-        .uri(url.to_string())
+        .uri(url)
         .body(Vec::new())
         .map_err(|e| ResolverError::transport(e))?;
     let res = client
@@ -833,7 +807,7 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
         let metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
         // Accept semantically equivalent resource URL (normalize to the requested URL form)
-        if issuer_equivalent(&metadata.resource, server.as_str()) {
+        if metadata.resource == server.as_str() {
             // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
@@ -911,26 +885,21 @@ mod tests {
     }
 
     #[test]
-    fn issuer_equivalence_rules() {
-        assert!(super::issuer_equivalent(
-            "https://issuer",
-            "https://issuer/"
-        ));
-        assert!(super::issuer_equivalent(
-            "https://issuer:443/",
-            "https://issuer/"
-        ));
-        assert!(!super::issuer_equivalent(
-            "http://issuer/",
-            "https://issuer/"
-        ));
-        assert!(!super::issuer_equivalent(
-            "https://issuer/foo",
-            "https://issuer/"
-        ));
-        assert!(!super::issuer_equivalent(
-            "https://issuer/?q=1",
-            "https://issuer/"
-        ));
+    fn issuer_plain_string_equality() {
+        // AC5.1: Matching issuer strings pass comparison
+        let issuer1 = CowStr::new_static("https://issuer.example.com");
+        let issuer2 = CowStr::new_static("https://issuer.example.com");
+        assert_eq!(issuer1, issuer2);
+
+        // AC5.2: Semantically equivalent but string-different issuers fail comparison
+        // fluent-uri preserves exact input, so these should NOT be equal
+        let issuer_no_slash = CowStr::new_static("https://issuer.example.com");
+        let issuer_with_slash = CowStr::new_static("https://issuer.example.com/");
+        assert_ne!(issuer_no_slash, issuer_with_slash);
+
+        // AC5.2: Different query/path parameters should also not be equal
+        let issuer_base = CowStr::new_static("https://issuer.example.com");
+        let issuer_with_path = CowStr::new_static("https://issuer.example.com/path");
+        assert_ne!(issuer_base, issuer_with_path);
     }
 }

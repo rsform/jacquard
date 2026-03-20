@@ -8,13 +8,7 @@
 /// A single wearing review of a fragrance
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
@@ -58,9 +52,7 @@ pub struct Review<'a> {
     pub stage1_temp: std::option::Option<i64>,
     /// Timestamp when Stage 2 was completed (for accurate temperature)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage2_completed_at: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    pub stage2_completed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stage2_temp: std::option::Option<i64>,
@@ -84,7 +76,7 @@ pub struct Review<'a> {
 
 pub mod review_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,37 +84,37 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fragrance;
         type CreatedAt;
+        type Fragrance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fragrance = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `fragrance` field to Set
-    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFragrance<S> {}
-    impl<S: State> State for SetFragrance<S> {
-        type Fragrance = Set<members::fragrance>;
-        type CreatedAt = S::CreatedAt;
+        type Fragrance = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Fragrance = S::Fragrance;
         type CreatedAt = Set<members::created_at>;
+        type Fragrance = S::Fragrance;
+    }
+    ///State transition - sets the `fragrance` field to Set
+    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFragrance<S> {}
+    impl<S: State> State for SetFragrance<S> {
+        type CreatedAt = S::CreatedAt;
+        type Fragrance = Set<members::fragrance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fragrance` field
-        pub struct fragrance(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `fragrance` field
+        pub struct fragrance(());
     }
 }
 
@@ -167,26 +159,8 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
         ReviewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -421,10 +395,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn text(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
@@ -477,8 +448,8 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Fragrance: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
+    S::Fragrance: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -555,13 +526,7 @@ impl<'a> Review<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
@@ -617,9 +582,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.complexity {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("complexity"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -628,9 +591,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.complexity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("complexity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -661,9 +622,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.end_rating {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("end_rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -672,9 +631,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.end_rating {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("end_rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -683,9 +640,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.longevity {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("longevity"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -694,9 +649,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.longevity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("longevity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -793,9 +746,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.sillage {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("sillage"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -804,9 +755,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.sillage {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("sillage"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -816,9 +765,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -832,22 +779,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
                     )
                     .count();
                 if count > 255usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 255usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 255usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.uv_index {
             if *value > 11i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uv_index"),
                     max: 11i64,
                     actual: *value,
                 });
@@ -856,9 +803,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.uv_index {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uv_index"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -868,9 +813,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
 }
 
-fn lexicon_doc_social_drydown_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_drydown_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.drydown.review"),

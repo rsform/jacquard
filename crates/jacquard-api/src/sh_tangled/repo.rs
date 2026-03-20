@@ -36,13 +36,7 @@ pub mod tree;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
@@ -63,7 +57,7 @@ pub struct Repo<'a> {
     /// source of the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub source: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// CI runner to send jobs to and receive results from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -75,12 +69,12 @@ pub struct Repo<'a> {
     /// Any URI related to the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,51 +82,51 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Knot;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
+        type Knot;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Knot = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type Knot = Set<members::knot>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Knot = S::Knot;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
+        type Knot = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Knot = S::Knot;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Knot = Set<members::knot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `knot` field
-        pub struct knot(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `knot` field
+        pub struct knot(());
     }
 }
 
@@ -145,10 +139,10 @@ pub struct RepoBuilder<'a, S: repo_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -165,17 +159,7 @@ impl<'a> RepoBuilder<'a, repo_state::Empty> {
     pub fn new() -> Self {
         RepoBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -202,18 +186,12 @@ where
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -280,7 +258,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -288,7 +266,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
@@ -297,10 +275,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `spindle` field (optional)
-    pub fn spindle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn spindle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -313,18 +288,12 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `topics` field (optional)
-    pub fn topics(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn topics(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `topics` field to an Option value (optional)
-    pub fn maybe_topics(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_topics(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -334,7 +303,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -342,7 +311,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
@@ -352,9 +321,9 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
-    S::Knot: repo_state::IsSet,
-    S::CreatedAt: repo_state::IsSet,
     S::Name: repo_state::IsSet,
+    S::CreatedAt: repo_state::IsSet,
+    S::Knot: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {
@@ -409,13 +378,7 @@ impl<'a> Repo<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoGetRecordOutput<'a> {
@@ -476,13 +439,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count > 140usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 140usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 140usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -494,13 +459,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        min: 1usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            min: 1usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -508,9 +475,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "topics",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("topics"),
                     max: 50usize,
                     actual: value.len(),
                 });

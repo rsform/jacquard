@@ -7,35 +7,26 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     /// Nested ordered list items. Mutually exclusive with unorderedListChildren; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub children: std::option::Option<
-        Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>,
-    >,
+    pub children: std::option::Option<Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>>,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
     /// A nested unordered list. Mutually exclusive with children; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub unordered_list_children: std::option::Option<
-        crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>,
-    >,
+    pub unordered_list_children:
+        std::option::Option<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>,
 }
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -69,13 +60,9 @@ pub mod list_item_state {
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>>,
         ::core::option::Option<ListItemContent<'a>>,
-        ::core::option::Option<
-            crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>,
-        >,
+        ::core::option::Option<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -102,9 +89,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -142,9 +127,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `unorderedListChildren` field (optional)
     pub fn unordered_list_children(
         mut self,
-        value: impl Into<
-            Option<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>,
-        >,
+        value: impl Into<Option<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -192,13 +175,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -211,9 +188,8 @@ pub enum ListItemContent<'a> {
     Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
 }
 
-fn lexicon_doc_pub_leaflet_blocks_orderedList() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_leaflet_blocks_orderedList() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.orderedList"),
@@ -283,47 +259,53 @@ fn lexicon_doc_pub_leaflet_blocks_orderedList() -> ::jacquard_lexicon::lexicon::
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("children")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "children",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "startIndex",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("children"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("children"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#listItem",
+                                                ),
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "startIndex",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
+                                    ::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -349,13 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrderedList<'a> {
@@ -368,7 +344,7 @@ pub struct OrderedList<'a> {
 
 pub mod ordered_list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -402,9 +378,7 @@ pub mod ordered_list_state {
 pub struct OrderedListBuilder<'a, S: ordered_list_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>>,
         ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,

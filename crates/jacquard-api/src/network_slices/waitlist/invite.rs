@@ -8,13 +8,7 @@
 /// An invite granting a DID access, created by the slice owner
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Invite<'a> {
@@ -33,7 +27,7 @@ pub struct Invite<'a> {
 
 pub mod invite_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,50 +36,50 @@ pub mod invite_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Slice;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Slice = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
         type Slice = Set<members::slice>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slice = S::Slice;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `slice` field
         pub struct slice(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -199,8 +193,8 @@ impl<'a, S> InviteBuilder<'a, S>
 where
     S: invite_state::State,
     S::Slice: invite_state::IsSet,
-    S::CreatedAt: invite_state::IsSet,
     S::Did: invite_state::IsSet,
+    S::CreatedAt: invite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Invite<'a> {
@@ -245,13 +239,7 @@ impl<'a> Invite<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteGetRecordOutput<'a> {
@@ -308,9 +296,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_waitlist_invite() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_slices_waitlist_invite() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.waitlist.invite"),

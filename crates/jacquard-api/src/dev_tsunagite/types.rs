@@ -8,21 +8,13 @@
 /// A named value with a numeric index for sorting.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Indexable<'a> {
     /// The internal ID for the value, limited to the RecordKey character set.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// The numeric index used for sorting.
     pub index: i64,
     /// The human-readable name of the value for displaying in UIs.
@@ -32,7 +24,7 @@ pub struct Indexable<'a> {
 
 pub mod indexable_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,49 +32,49 @@ pub mod indexable_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Name;
+        type Id;
         type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Name = Unset;
+        type Id = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Name = S::Name;
-        type Index = S::Index;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
         type Index = S::Index;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Id = S::Id;
         type Name = S::Name;
+        type Id = S::Id;
         type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `index` field
         pub struct index(());
     }
@@ -93,9 +85,7 @@ pub struct IndexableBuilder<'a, S: indexable_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -130,9 +120,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> IndexableBuilder<'a, indexable_state::SetId<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -185,8 +173,8 @@ where
 impl<'a, S> IndexableBuilder<'a, S>
 where
     S: indexable_state::State,
-    S::Id: indexable_state::IsSet,
     S::Name: indexable_state::IsSet,
+    S::Id: indexable_state::IsSet,
     S::Index: indexable_state::IsSet,
 {
     /// Build the final struct
@@ -215,9 +203,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_types() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_tsunagite_types() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.types"),
@@ -295,66 +281,62 @@ fn lexicon_doc_dev_tsunagite_types() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("typedRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A typed record reference that does not require a CID hash.",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The AT URI of the record this object references.",
-                                    ),
+                        )),
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The AT URI of the record this object references.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The type of the record this object references.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The type of the record this object references.",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -379,9 +361,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -392,9 +372,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -414,7 +392,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TypedRef<'a> {
@@ -426,9 +404,7 @@ pub struct TypedRef<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#type: std::option::Option<
-        jacquard_common::types::string::RecordKey<
-            jacquard_common::types::string::Rkey<'a>,
-        >,
+        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     >,
 }
 

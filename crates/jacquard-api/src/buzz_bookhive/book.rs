@@ -8,13 +8,7 @@
 /// A book in the user's library
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
@@ -56,7 +50,7 @@ pub struct Book<'a> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -65,8 +59,8 @@ pub mod book_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type HiveId;
         type CreatedAt;
+        type HiveId;
         type Authors;
     }
     /// Empty state - all required fields are unset
@@ -74,8 +68,8 @@ pub mod book_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type HiveId = Unset;
         type CreatedAt = Unset;
+        type HiveId = Unset;
         type Authors = Unset;
     }
     ///State transition - sets the `title` field to Set
@@ -83,17 +77,8 @@ pub mod book_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
         type HiveId = S::HiveId;
-        type CreatedAt = S::CreatedAt;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiveId<S> {}
-    impl<S: State> State for SetHiveId<S> {
-        type Title = S::Title;
-        type HiveId = Set<members::hive_id>;
-        type CreatedAt = S::CreatedAt;
         type Authors = S::Authors;
     }
     ///State transition - sets the `created_at` field to Set
@@ -101,8 +86,17 @@ pub mod book_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type HiveId = S::HiveId;
         type CreatedAt = Set<members::created_at>;
+        type HiveId = S::HiveId;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type HiveId = Set<members::hive_id>;
         type Authors = S::Authors;
     }
     ///State transition - sets the `authors` field to Set
@@ -110,8 +104,8 @@ pub mod book_state {
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
         type Title = S::Title;
-        type HiveId = S::HiveId;
         type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
         type Authors = Set<members::authors>;
     }
     /// Marker types for field names
@@ -119,10 +113,10 @@ pub mod book_state {
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
     }
@@ -160,17 +154,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
         BookBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -225,10 +209,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         self
     }
     /// Set the `cover` field to an Option value (optional)
-    pub fn maybe_cover(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_cover(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -293,10 +274,7 @@ where
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn review(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -375,8 +353,8 @@ impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
     S::Title: book_state::IsSet,
-    S::HiveId: book_state::IsSet,
     S::CreatedAt: book_state::IsSet,
+    S::HiveId: book_state::IsSet,
     S::Authors: book_state::IsSet,
 {
     /// Build the final struct
@@ -539,13 +517,7 @@ impl jacquard_common::IntoStatic for BookStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookGetRecordOutput<'a> {
@@ -603,9 +575,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("authors"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -616,9 +586,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("authors"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -632,22 +600,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
                     )
                     .count();
                 if count > 15000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "review",
-                        ),
-                        max: 15000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "review",
+                            ),
+                            max: 15000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.stars {
             if *value > 10i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("stars"),
                     max: 10i64,
                     actual: *value,
                 });
@@ -656,9 +624,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
         if let Some(ref value) = self.stars {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("stars"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -669,9 +635,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -682,9 +646,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });

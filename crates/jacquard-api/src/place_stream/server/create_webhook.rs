@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateWebhook<'a> {
@@ -49,12 +43,12 @@ pub struct CreateWebhook<'a> {
     pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The webhook URL where events will be sent.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod create_webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -62,37 +56,37 @@ pub mod create_webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Events;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Events = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Events = S::Events;
+        type Url = Unset;
     }
     ///State transition - sets the `events` field to Set
     pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvents<S> {}
     impl<S: State> State for SetEvents<S> {
-        type Url = S::Url;
         type Events = Set<members::events>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Events = S::Events;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `events` field
         pub struct events(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -108,7 +102,7 @@ pub struct CreateWebhookBuilder<'a, S: create_webhook_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -125,17 +119,7 @@ impl<'a> CreateWebhookBuilder<'a, create_webhook_state::Empty> {
     pub fn new() -> Self {
         CreateWebhookBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -156,18 +140,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -202,10 +180,7 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
         self
     }
     /// Set the `muteWords` field to an Option value (optional)
-    pub fn maybe_mute_words(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_mute_words(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -213,10 +188,7 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -229,10 +201,7 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `prefix` field (optional)
-    pub fn prefix(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn prefix(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -264,10 +233,7 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `suffix` field (optional)
-    pub fn suffix(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn suffix(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -286,7 +252,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> CreateWebhookBuilder<'a, create_webhook_state::SetUrl<S>> {
         self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
         CreateWebhookBuilder {
@@ -300,8 +266,8 @@ where
 impl<'a, S> CreateWebhookBuilder<'a, S>
 where
     S: create_webhook_state::State,
-    S::Url: create_webhook_state::IsSet,
     S::Events: create_webhook_state::IsSet,
+    S::Url: create_webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateWebhook<'a> {
@@ -343,13 +309,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateWebhookOutput<'a> {
@@ -367,7 +327,7 @@ pub struct CreateWebhookOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -424,9 +384,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
     const NSID: &'static str = "place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateWebhookResponse;
 }
 
@@ -435,9 +394,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
 pub struct CreateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateWebhook<'de>;
     type Response = CreateWebhookResponse;
 }

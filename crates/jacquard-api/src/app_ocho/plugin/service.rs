@@ -8,13 +8,7 @@
 /// The definitions for the plugin.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
@@ -28,7 +22,7 @@ pub struct Service<'a> {
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,10 +82,7 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `db` field (optional)
-    pub fn db(
-        mut self,
-        value: impl Into<Option<crate::app_ocho::plugin::Db<'a>>>,
-    ) -> Self {
+    pub fn db(mut self, value: impl Into<Option<crate::app_ocho::plugin::Db<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -165,13 +156,7 @@ impl<'a> Service<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
@@ -228,9 +213,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     }
 }
 
-fn lexicon_doc_app_ocho_plugin_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_ocho_plugin_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.ocho.plugin.service"),

@@ -8,13 +8,7 @@
 /// A test record type for geometries
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestRecord<'a> {
@@ -26,7 +20,7 @@ pub struct TestRecord<'a> {
 
 pub mod test_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,26 +173,14 @@ impl<'a> TestRecord<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TestRecordGeometry<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestRecordGetRecordOutput<'a> {
@@ -256,9 +238,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestRecord<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -268,14 +248,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestRecord<'a> {
     }
 }
 
-fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_custorium_temp_jsonfg_testRecord()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "org.custorium.temp.jsonfg.testRecord",
-        ),
+        id: ::jacquard_common::CowStr::new_static("org.custorium.temp.jsonfg.testRecord"),
         revision: None,
         description: None,
         defs: {

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTemplate<'a> {
@@ -46,13 +46,7 @@ pub struct UpdateTemplate<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTemplateOutput<'a> {
@@ -71,7 +65,7 @@ pub struct UpdateTemplateOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -107,9 +101,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateTemplateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.updateTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateTemplateResponse;
 }
 
@@ -118,9 +111,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<'a> {
 pub struct UpdateTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateTemplateRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.updateTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateTemplate<'de>;
     type Response = UpdateTemplateResponse;
 }

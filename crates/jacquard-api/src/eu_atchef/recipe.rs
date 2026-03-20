@@ -8,13 +8,7 @@
 /// A cooking recipe with ingredients, instructions, and metadata
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe<'a> {
@@ -53,7 +47,7 @@ pub struct Recipe<'a> {
 
 pub mod recipe_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -61,51 +55,51 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Content;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Name = S::Name;
         type Content = Set<members::content>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -139,18 +133,7 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
     pub fn new() -> Self {
         RecipeBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -209,18 +192,12 @@ where
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -236,10 +213,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_image(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -325,9 +299,9 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Name: recipe_state::IsSet,
     S::Content: recipe_state::IsSet,
     S::CreatedAt: recipe_state::IsSet,
+    S::Name: recipe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recipe<'a> {
@@ -384,13 +358,7 @@ impl<'a> Recipe<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecipeGetRecordOutput<'a> {
@@ -448,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 15000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 15000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -465,22 +431,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "content",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.cook_time {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cook_time",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("cook_time"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -490,9 +456,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -506,13 +470,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 200usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -521,9 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -538,22 +502,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.portions {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "portions",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("portions"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -562,9 +526,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
         if let Some(ref value) = self.prep_time {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "prep_time",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("prep_time"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -573,9 +535,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
         if let Some(ref value) = self.time {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "time",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("time"),
                     min: 1i64,
                     actual: *value,
                 });

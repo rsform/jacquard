@@ -8,13 +8,7 @@
 /// User's current presence status. Lives in their repo, updated by their client. IMPORTANT: visibleTo is intentionally excluded — it is a privacy preference and must remain server-side only. Writing it to the PDS would publicly expose who the user is hiding from.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Presence<'a> {
@@ -31,7 +25,7 @@ pub struct Presence<'a> {
 
 pub mod presence_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -104,18 +98,12 @@ impl<'a> PresenceBuilder<'a, presence_state::Empty> {
 
 impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
     /// Set the `awayMessage` field (optional)
-    pub fn away_message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn away_message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `awayMessage` field to an Option value (optional)
-    pub fn maybe_away_message(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_away_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -310,13 +298,7 @@ impl jacquard_common::IntoStatic for PresenceStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PresenceGetRecordOutput<'a> {
@@ -385,9 +367,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Presence<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_presence() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_presence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.presence"),

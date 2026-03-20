@@ -57,6 +57,7 @@ zstd = ["dep:zstd"]
 trait-variant.workspace = true
 bon = { workspace = true, optional = true }
 base64.workspace = true
+phf.workspace = true
 bytes = { workspace = true, features = ["serde"] }
 chrono.workspace = true
 cid.workspace = true
@@ -74,7 +75,7 @@ smol_str.workspace = true
 thiserror.workspace = true
 rustversion.workspace = true
 unicode-segmentation.workspace = true
-url.workspace = true
+fluent-uri.workspace = true
 http.workspace = true
 serde_bytes.workspace = true
 spin = { version = "0.10", default-features = false, features = ["lazy"] }

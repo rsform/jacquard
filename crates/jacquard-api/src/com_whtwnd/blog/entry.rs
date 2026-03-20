@@ -8,13 +8,7 @@
 /// A declaration of a post.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
@@ -48,7 +42,7 @@ pub struct Entry<'a> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,17 +101,7 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     pub fn new() -> Self {
         EntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -195,10 +179,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `ogp` field (optional)
-    pub fn ogp(
-        mut self,
-        value: impl Into<Option<crate::com_whtwnd::blog::Ogp<'a>>>,
-    ) -> Self {
+    pub fn ogp(mut self, value: impl Into<Option<crate::com_whtwnd::blog::Ogp<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -211,10 +192,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
-    pub fn subtitle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn subtitle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -227,10 +205,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -243,10 +218,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -259,18 +231,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -334,13 +300,7 @@ impl<'a> Entry<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
@@ -398,9 +358,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -410,9 +368,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subtitle",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subtitle"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -422,9 +378,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -434,9 +388,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-fn lexicon_doc_com_whtwnd_blog_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_whtwnd_blog_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.whtwnd.blog.entry"),

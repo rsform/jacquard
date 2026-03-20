@@ -8,13 +8,7 @@
 /// Agent thought record.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Thought<'a> {
@@ -27,7 +21,7 @@ pub struct Thought<'a> {
     /// URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub subject_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Job type identifier the agent is thinking about.
     #[serde(borrow)]
     pub work_type: jacquard_common::CowStr<'a>,
@@ -35,7 +29,7 @@ pub struct Thought<'a> {
 
 pub mod thought_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,7 +77,7 @@ pub struct ThoughtBuilder<'a, S: thought_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -128,10 +122,7 @@ where
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -146,7 +137,7 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
     pub fn subject_uri(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -154,7 +145,7 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `subjectUri` field to an Option value (optional)
     pub fn maybe_subject_uri(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -229,13 +220,7 @@ impl<'a> Thought<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThoughtGetRecordOutput<'a> {
@@ -292,9 +277,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
     }
 }
 
-fn lexicon_doc_top_launchpadx_agent_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_top_launchpadx_agent_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("top.launchpadx.agent.thought"),

@@ -80,12 +80,14 @@ impl<'s> Data<'s> {
                 }
                 AtprotoStr::AtUri(_) => DataModelType::String(LexiconStringType::AtUri),
                 AtprotoStr::Uri(uri) => match uri {
-                    Uri::Did(_) => DataModelType::String(LexiconStringType::Uri(UriType::Did)),
-                    Uri::At(_) => DataModelType::String(LexiconStringType::Uri(UriType::At)),
-                    Uri::Https(_) => DataModelType::String(LexiconStringType::Uri(UriType::Https)),
-                    Uri::Wss(_) => DataModelType::String(LexiconStringType::Uri(UriType::Wss)),
-                    Uri::Cid(_) => DataModelType::String(LexiconStringType::Uri(UriType::Cid)),
-                    Uri::Any(_) => DataModelType::String(LexiconStringType::Uri(UriType::Any)),
+                    UriValue::Did(_) => DataModelType::String(LexiconStringType::Uri(UriType::Did)),
+                    UriValue::At(_) => DataModelType::String(LexiconStringType::Uri(UriType::At)),
+                    UriValue::Https(_) => {
+                        DataModelType::String(LexiconStringType::Uri(UriType::Https))
+                    }
+                    UriValue::Wss(_) => DataModelType::String(LexiconStringType::Uri(UriType::Wss)),
+                    UriValue::Cid(_) => DataModelType::String(LexiconStringType::Uri(UriType::Cid)),
+                    UriValue::Any(_) => DataModelType::String(LexiconStringType::Uri(UriType::Any)),
                 },
                 AtprotoStr::Cid(_) => DataModelType::String(LexiconStringType::Cid),
                 AtprotoStr::RecordKey(_) => DataModelType::String(LexiconStringType::RecordKey),

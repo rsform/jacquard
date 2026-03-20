@@ -8,13 +8,7 @@
 /// Crew member in a hold's embedded PDS. Grants access permissions to push blobs to the hold. Stored in the hold's embedded PDS (one record per member).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Crew<'a> {
@@ -37,7 +31,7 @@ pub struct Crew<'a> {
 
 pub mod crew_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -45,67 +39,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Member;
-        type Role;
         type AddedAt;
+        type Role;
         type Permissions;
+        type Member;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Member = Unset;
-        type Role = Unset;
         type AddedAt = Unset;
+        type Role = Unset;
         type Permissions = Unset;
-    }
-    ///State transition - sets the `member` field to Set
-    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMember<S> {}
-    impl<S: State> State for SetMember<S> {
-        type Member = Set<members::member>;
-        type Role = S::Role;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Member = S::Member;
-        type Role = Set<members::role>;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
+        type Member = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Member = S::Member;
-        type Role = S::Role;
         type AddedAt = Set<members::added_at>;
+        type Role = S::Role;
         type Permissions = S::Permissions;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type AddedAt = S::AddedAt;
+        type Role = Set<members::role>;
+        type Permissions = S::Permissions;
+        type Member = S::Member;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
-        type Member = S::Member;
-        type Role = S::Role;
         type AddedAt = S::AddedAt;
+        type Role = S::Role;
         type Permissions = Set<members::permissions>;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `member` field to Set
+    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMember<S> {}
+    impl<S: State> State for SetMember<S> {
+        type AddedAt = S::AddedAt;
+        type Role = S::Role;
+        type Permissions = S::Permissions;
+        type Member = Set<members::member>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `member` field
-        pub struct member(());
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `role` field
+        pub struct role(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `member` field
+        pub struct member(());
     }
 }
 
@@ -218,10 +212,7 @@ where
 
 impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
     /// Set the `tier` field (optional)
-    pub fn tier(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn tier(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -235,10 +226,10 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Member: crew_state::IsSet,
-    S::Role: crew_state::IsSet,
     S::AddedAt: crew_state::IsSet,
+    S::Role: crew_state::IsSet,
     S::Permissions: crew_state::IsSet,
+    S::Member: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -384,13 +375,7 @@ impl jacquard_common::IntoStatic for CrewRole<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CrewGetRecordOutput<'a> {
@@ -448,9 +433,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("role"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -460,9 +443,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tier",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tier"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Steps<'a> {
@@ -23,7 +17,7 @@ pub struct Steps<'a> {
 
 pub mod steps_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -31,37 +25,37 @@ pub mod steps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
         type CreatedAt;
+        type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type Steps = Set<members::steps>;
-        type CreatedAt = S::CreatedAt;
+        type Steps = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Steps = S::Steps;
         type CreatedAt = Set<members::created_at>;
+        type Steps = S::Steps;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSteps<S> {}
+    impl<S: State> State for SetSteps<S> {
+        type CreatedAt = S::CreatedAt;
+        type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
     }
 }
 
@@ -118,10 +112,7 @@ where
     S::Steps: steps_state::IsUnset,
 {
     /// Set the `steps` field (required)
-    pub fn steps(
-        mut self,
-        value: impl Into<i64>,
-    ) -> StepsBuilder<'a, steps_state::SetSteps<S>> {
+    pub fn steps(mut self, value: impl Into<i64>) -> StepsBuilder<'a, steps_state::SetSteps<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StepsBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -134,8 +125,8 @@ where
 impl<'a, S> StepsBuilder<'a, S>
 where
     S: steps_state::State,
-    S::Steps: steps_state::IsSet,
     S::CreatedAt: steps_state::IsSet,
+    S::Steps: steps_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Steps<'a> {
@@ -176,13 +167,7 @@ impl<'a> Steps<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StepsGetRecordOutput<'a> {
@@ -239,9 +224,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Steps<'a> {
     }
 }
 
-fn lexicon_doc_dev_baileytownsend_health_steps() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_baileytownsend_health_steps() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.baileytownsend.health.steps"),

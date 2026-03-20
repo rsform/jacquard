@@ -7,7 +7,7 @@ pre-commit-all:
 
 # Check that jacquard-common compiles for wasm32
 check-wasm:
-    cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket, reqwest-client
+    cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket,reqwest-client
 
 # Run 'cargo run' on the project
 run *ARGS:

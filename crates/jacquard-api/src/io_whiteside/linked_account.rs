@@ -8,13 +8,7 @@
 /// A linked account record containing external account information
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkedAccount<'a> {
@@ -23,7 +17,7 @@ pub struct LinkedAccount<'a> {
     pub icon: jacquard_common::CowStr<'a>,
     /// URL to the linked account
     #[serde(borrow)]
-    pub link: jacquard_common::types::string::Uri<'a>,
+    pub link: jacquard_common::types::string::UriValue<'a>,
     /// Display name of the linked account
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -34,7 +28,7 @@ pub struct LinkedAccount<'a> {
 
 pub mod linked_account_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,50 +37,50 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Link;
-        type Icon;
         type Name;
+        type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Link = Unset;
-        type Icon = Unset;
         type Name = Unset;
+        type Icon = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
         type Link = Set<members::link>;
+        type Name = S::Name;
         type Icon = S::Icon;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Link = S::Link;
-        type Icon = Set<members::icon>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Link = S::Link;
-        type Icon = S::Icon;
         type Name = Set<members::name>;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Link = S::Link;
+        type Name = S::Name;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `link` field
         pub struct link(());
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
     }
 }
 
@@ -95,7 +89,7 @@ pub struct LinkedAccountBuilder<'a, S: linked_account_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
     ),
@@ -147,7 +141,7 @@ where
     /// Set the `link` field (required)
     pub fn link(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetLink<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         LinkedAccountBuilder {
@@ -194,8 +188,8 @@ impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
     S::Link: linked_account_state::IsSet,
-    S::Icon: linked_account_state::IsSet,
     S::Name: linked_account_state::IsSet,
+    S::Icon: linked_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinkedAccount<'a> {
@@ -240,13 +234,7 @@ impl<'a> LinkedAccount<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkedAccountGetRecordOutput<'a> {
@@ -303,9 +291,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
     }
 }
 
-fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.whiteside.linkedAccount"),

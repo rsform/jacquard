@@ -8,22 +8,14 @@
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sequence<'a> {
     /// Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub bsky_post_ref: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Attribution for composers, arrangers, etc
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -55,7 +47,7 @@ pub struct Sequence<'a> {
     /// Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Version number for the byte array encoding of the events field.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub version: std::option::Option<i64>,
@@ -63,7 +55,7 @@ pub struct Sequence<'a> {
 
 pub mod sequence_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,7 +98,7 @@ pub struct SequenceBuilder<'a, S: sequence_state::State> {
         ::core::option::Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -125,17 +117,7 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
         SequenceBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -214,10 +196,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -268,18 +247,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -308,7 +281,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
@@ -316,7 +289,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value;
         self
@@ -398,13 +371,7 @@ impl<'a> Sequence<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SequenceGetRecordOutput<'a> {
@@ -461,9 +428,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 60usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "credits",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("credits"),
                     max: 60usize,
                     actual: value.len(),
                 });
@@ -472,9 +437,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
         if let Some(ref value) = self.id {
             if *value > 65535i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 65535i64,
                     actual: *value,
                 });
@@ -484,9 +447,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1280usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 1280usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -500,13 +461,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
                     )
                     .count();
                 if count > 640usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 640usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 640usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

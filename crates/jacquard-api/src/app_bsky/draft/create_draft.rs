@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDraft<'a> {
@@ -23,7 +17,7 @@ pub struct CreateDraft<'a> {
 
 pub mod create_draft_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -133,7 +127,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDraftOutput<'a> {
@@ -152,7 +146,7 @@ pub struct CreateDraftOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -189,9 +183,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateDraftResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
     const NSID: &'static str = "app.bsky.draft.createDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateDraftResponse;
 }
 
@@ -200,9 +193,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
 pub struct CreateDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateDraftRequest {
     const PATH: &'static str = "/xrpc/app.bsky.draft.createDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateDraft<'de>;
     type Response = CreateDraftResponse;
 }

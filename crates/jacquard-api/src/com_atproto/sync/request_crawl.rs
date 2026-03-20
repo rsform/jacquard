@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrawl<'a> {
@@ -33,7 +33,7 @@ pub struct RequestCrawl<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -69,9 +69,8 @@ impl jacquard_common::xrpc::XrpcResp for RequestCrawlResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrawl<'a> {
     const NSID: &'static str = "com.atproto.sync.requestCrawl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RequestCrawlResponse;
 }
 
@@ -80,9 +79,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrawl<'a> {
 pub struct RequestCrawlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrawlRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.requestCrawl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RequestCrawl<'de>;
     type Response = RequestCrawlResponse;
 }

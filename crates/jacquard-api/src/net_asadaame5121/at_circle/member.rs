@@ -8,13 +8,7 @@
 /// Membership in an at-circle (Sidecar Record)
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Member<'a> {
@@ -28,18 +22,18 @@ pub struct Member<'a> {
     /// RSS feed URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rss: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub rss: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Title of the participant's site
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     /// URL of the participant's site
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod member_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,9 +112,9 @@ pub struct MemberBuilder<'a, S: member_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::net_asadaame5121::at_circle::RingRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -164,10 +158,7 @@ where
 
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -201,7 +192,7 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `rss` field (optional)
     pub fn rss(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -209,7 +200,7 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `rss` field to an Option value (optional)
     pub fn maybe_rss(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -243,7 +234,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> MemberBuilder<'a, member_state::SetUrl<S>> {
         self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         MemberBuilder {
@@ -309,13 +300,7 @@ impl<'a> Member<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MemberGetRecordOutput<'a> {
@@ -372,9 +357,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -388,13 +371,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "note",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "note",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -402,9 +387,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rss",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rss"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -415,9 +398,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -432,13 +413,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -447,9 +430,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -459,9 +440,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_member() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_net_asadaame5121_at_circle_member()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.asadaame5121.at-circle.member"),

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailability<'a> {
@@ -27,7 +21,7 @@ pub struct CheckHandleAvailability<'a> {
 
 pub mod check_handle_availability_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -58,10 +52,7 @@ pub mod check_handle_availability_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct CheckHandleAvailabilityBuilder<
-    'a,
-    S: check_handle_availability_state::State,
-> {
+pub struct CheckHandleAvailabilityBuilder<'a, S: check_handle_availability_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -73,10 +64,7 @@ pub struct CheckHandleAvailabilityBuilder<
 
 impl<'a> CheckHandleAvailability<'a> {
     /// Create a new builder for this type
-    pub fn new() -> CheckHandleAvailabilityBuilder<
-        'a,
-        check_handle_availability_state::Empty,
-    > {
+    pub fn new() -> CheckHandleAvailabilityBuilder<'a, check_handle_availability_state::Empty> {
         CheckHandleAvailabilityBuilder::new()
     }
 }
@@ -92,10 +80,7 @@ impl<'a> CheckHandleAvailabilityBuilder<'a, check_handle_availability_state::Emp
     }
 }
 
-impl<
-    'a,
-    S: check_handle_availability_state::State,
-> CheckHandleAvailabilityBuilder<'a, S> {
+impl<'a, S: check_handle_availability_state::State> CheckHandleAvailabilityBuilder<'a, S> {
     /// Set the `birthDate` field (optional)
     pub fn birth_date(
         mut self,
@@ -114,15 +99,9 @@ impl<
     }
 }
 
-impl<
-    'a,
-    S: check_handle_availability_state::State,
-> CheckHandleAvailabilityBuilder<'a, S> {
+impl<'a, S: check_handle_availability_state::State> CheckHandleAvailabilityBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn email(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -142,10 +121,7 @@ where
     pub fn handle(
         mut self,
         value: impl Into<jacquard_common::types::string::Handle<'a>>,
-    ) -> CheckHandleAvailabilityBuilder<
-        'a,
-        check_handle_availability_state::SetHandle<S>,
-    > {
+    ) -> CheckHandleAvailabilityBuilder<'a, check_handle_availability_state::SetHandle<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         CheckHandleAvailabilityBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -172,13 +148,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailabilityOutput<'a> {
@@ -191,21 +161,13 @@ pub struct CheckHandleAvailabilityOutput<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CheckHandleAvailabilityOutputResult<'a> {
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
-    ResultAvailable(
-        Box<crate::com_atproto::temp::check_handle_availability::ResultAvailable<'a>>,
-    ),
+    ResultAvailable(Box<crate::com_atproto::temp::check_handle_availability::ResultAvailable<'a>>),
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultUnavailable")]
     ResultUnavailable(
         Box<crate::com_atproto::temp::check_handle_availability::ResultUnavailable<'a>>,
@@ -222,7 +184,7 @@ pub enum CheckHandleAvailabilityOutputResult<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -283,18 +245,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultAvailable<'a> {}
-fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_atproto_temp_checkHandleAvailability()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "com.atproto.temp.checkHandleAvailability",
-        ),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.temp.checkHandleAvailability"),
         revision: None,
         description: None,
         defs: {
@@ -390,23 +349,21 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "resultAvailable",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("resultAvailable"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Indicates the provided handle is available.",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map
+                        )),
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
@@ -532,26 +489,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
 /// Indicates the provided handle is unavailable and gives suggestions of available handles.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultUnavailable<'a> {
     /// List of suggested handles based on the provided inputs.
     #[serde(borrow)]
-    pub suggestions: Vec<
-        crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
-    >,
+    pub suggestions: Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>,
 }
 
 pub mod result_unavailable_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -618,9 +567,7 @@ where
     /// Set the `suggestions` field (required)
     pub fn suggestions(
         mut self,
-        value: impl Into<
-            Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>,
-        >,
+        value: impl Into<Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>>,
     ) -> ResultUnavailableBuilder<'a, result_unavailable_state::SetSuggestions<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ResultUnavailableBuilder {
@@ -677,13 +624,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
@@ -696,7 +637,7 @@ pub struct Suggestion<'a> {
 
 pub mod suggestion_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -704,37 +645,37 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Method;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Method = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Method = S::Method;
+        type Handle = Unset;
     }
     ///State transition - sets the `method` field to Set
     pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMethod<S> {}
     impl<S: State> State for SetMethod<S> {
-        type Handle = S::Handle;
         type Method = Set<members::method>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Method = S::Method;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `method` field
         pub struct method(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -807,8 +748,8 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
-    S::Handle: suggestion_state::IsSet,
     S::Method: suggestion_state::IsSet,
+    S::Handle: suggestion_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {

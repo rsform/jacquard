@@ -8,13 +8,7 @@
 /// A quiz containing one or more rounds of questions
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Quiz<'a> {
@@ -33,9 +27,7 @@ pub struct Quiz<'a> {
     /// If this is an edit or revision of a previous quiz, link that previous version here.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub revision_of: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub revision_of: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Ordered list of rounds in this quiz
     #[serde(borrow)]
     pub rounds: Vec<crate::pub_quizzy::quiz::Round<'a>>,
@@ -48,7 +40,7 @@ pub struct Quiz<'a> {
 
 pub mod quiz_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,18 +148,12 @@ impl<'a> QuizBuilder<'a, quiz_state::Empty> {
 
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -353,13 +339,7 @@ impl<'a> Quiz<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizGetRecordOutput<'a> {
@@ -416,9 +396,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -432,13 +410,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 3000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -447,9 +427,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locales",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("locales"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -460,9 +438,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locales",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("locales"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -473,9 +449,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rounds",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rounds"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -486,9 +460,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rounds",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rounds"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -808,13 +780,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
 /// Reference to a question with its point value
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuestionRef<'a> {
@@ -831,7 +797,7 @@ pub struct QuestionRef<'a> {
 
 pub mod question_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -892,10 +858,7 @@ impl<'a> QuestionRefBuilder<'a, question_ref_state::Empty> {
 
 impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -986,9 +949,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 16usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1002,22 +963,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
                     )
                     .count();
                 if count > 160usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 160usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 160usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.points {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "points",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("points"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1030,13 +991,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
 /// A round within a quiz
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Round<'a> {
@@ -1051,7 +1006,7 @@ pub struct Round<'a> {
 
 pub mod round_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1130,10 +1085,7 @@ where
 
 impl<'a, S: round_state::State> RoundBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -1191,9 +1143,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "questions",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("questions"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -1204,9 +1154,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "questions",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("questions"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -1216,9 +1164,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1232,13 +1178,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

@@ -85,13 +85,9 @@ impl jacquard_common::IntoStatic for CollabScope<'_> {
     type Output = CollabScope<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            CollabScope::ShWeaverCollabDefsNotebook => {
-                CollabScope::ShWeaverCollabDefsNotebook
-            }
+            CollabScope::ShWeaverCollabDefsNotebook => CollabScope::ShWeaverCollabDefsNotebook,
             CollabScope::ShWeaverCollabDefsEntry => CollabScope::ShWeaverCollabDefsEntry,
-            CollabScope::ShWeaverCollabDefsChapter => {
-                CollabScope::ShWeaverCollabDefsChapter
-            }
+            CollabScope::ShWeaverCollabDefsChapter => CollabScope::ShWeaverCollabDefsChapter,
             CollabScope::Other(v) => CollabScope::Other(v.into_static()),
         }
     }
@@ -100,13 +96,7 @@ impl jacquard_common::IntoStatic for CollabScope<'_> {
 /// Invitation to collaborate on a resource (notebook, entry, chapter, etc.). Creates half of a two-way agreement.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Invite<'a> {
@@ -132,7 +122,7 @@ pub struct Invite<'a> {
 
 pub mod invite_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -279,10 +269,7 @@ where
 
 impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -385,13 +372,7 @@ impl<'a> Invite<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteGetRecordOutput<'a> {
@@ -448,9 +429,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -464,13 +443,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "message",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -478,9 +459,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_invite() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_collab_invite() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.collab.invite"),
@@ -490,22 +469,22 @@ fn lexicon_doc_sh_weaver_collab_invite() -> ::jacquard_lexicon::lexicon::Lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("collabScope"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The scope/type of collaboration.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: None,
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),

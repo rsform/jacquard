@@ -388,7 +388,7 @@ fn refine_string_by_type<'s>(s: CowStr<'s>, string_type: LexiconStringType) -> D
         LexiconStringType::RecordKey => Rkey::new_owned(s.clone())
             .map(|rkey| Data::String(AtprotoStr::RecordKey(RecordKey::from(rkey))))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
-        LexiconStringType::Uri(_) => Uri::new_owned(s.clone())
+        LexiconStringType::Uri(_) => UriValue::new_owned(s.clone())
             .map(|uri| Data::String(AtprotoStr::Uri(uri)))
             .unwrap_or_else(|_| Data::String(AtprotoStr::String(s.clone()))),
         LexiconStringType::String => Data::String(parse_string(&s).into_static()),

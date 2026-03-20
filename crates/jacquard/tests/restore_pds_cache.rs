@@ -7,12 +7,12 @@ use jacquard::client::{AtpSession, FileAuthStore};
 use jacquard::identity::resolver::{DidDocResponse, IdentityResolver, ResolverOptions};
 use jacquard::types::did::Did;
 use jacquard::types::string::Handle;
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::session::SessionStore;
 use std::fs;
 use std::path::PathBuf;
 use tokio::sync::RwLock;
-use url::Url;
 
 #[derive(Clone, Default)]
 struct MockResolver {
@@ -99,7 +99,12 @@ async fn restore_uses_cached_pds_when_present() {
     assert!(SessionStore::get(store.as_ref(), &key).await.is_some());
     // Persist PDS endpoint cache to avoid DID resolution on restore
     store
-        .set_atp_pds(&key, &Url::parse("https://pds-cached").unwrap())
+        .set_atp_pds(
+            &key,
+            &Uri::parse("https://pds-cached")
+                .expect("valid uri")
+                .to_owned(),
+        )
         .unwrap();
     assert_eq!(
         store
@@ -108,7 +113,7 @@ async fn restore_uses_cached_pds_when_present() {
             .flatten()
             .expect("pds cached")
             .as_str(),
-        "https://pds-cached/"
+        "https://pds-cached"
     );
 
     let session = CredentialSession::new(store.clone(), resolver.clone());
@@ -117,7 +122,7 @@ async fn restore_uses_cached_pds_when_present() {
         .restore(Did::new_static("did:plc:alice").unwrap(), "session".into())
         .await
         .expect("restore ok");
-    assert_eq!(session.endpoint().await.as_str(), "https://pds-cached/");
+    assert_eq!(session.endpoint().await.as_str(), "https://pds-cached");
 
     // Cleanup
     let _ = fs::remove_file(&path);

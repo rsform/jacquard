@@ -8,13 +8,7 @@
 /// Granular communication consent flags.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommunicationPreferences<'a> {
@@ -24,7 +18,7 @@ pub struct CommunicationPreferences<'a> {
 
 pub mod communication_preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,10 +49,7 @@ pub mod communication_preferences_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct CommunicationPreferencesBuilder<
-    'a,
-    S: communication_preferences_state::State,
-> {
+pub struct CommunicationPreferencesBuilder<'a, S: communication_preferences_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (::core::option::Option<bool>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -66,10 +57,7 @@ pub struct CommunicationPreferencesBuilder<
 
 impl<'a> CommunicationPreferences<'a> {
     /// Create a new builder for this type
-    pub fn new() -> CommunicationPreferencesBuilder<
-        'a,
-        communication_preferences_state::Empty,
-    > {
+    pub fn new() -> CommunicationPreferencesBuilder<'a, communication_preferences_state::Empty> {
         CommunicationPreferencesBuilder::new()
     }
 }
@@ -94,10 +82,7 @@ where
     pub fn marketing(
         mut self,
         value: impl Into<bool>,
-    ) -> CommunicationPreferencesBuilder<
-        'a,
-        communication_preferences_state::SetMarketing<S>,
-    > {
+    ) -> CommunicationPreferencesBuilder<'a, communication_preferences_state::SetMarketing<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         CommunicationPreferencesBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -134,9 +119,7 @@ where
     }
 }
 
-fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.tophhie.profile"),
@@ -145,37 +128,33 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "communicationPreferences",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("communicationPreferences"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Granular communication consent flags.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "marketing",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -274,45 +253,51 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("pdsPreferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Granular PDS preference consent flags.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("showOnHomepage"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accessibilityScoring")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilityScoring",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "showOnHomepage",
                             ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "accessibilityScoring",
+                            ),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "accessibilityScoring",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "showOnHomepage",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -338,21 +323,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     /// User's opt-in/out preferences for communications.
     #[serde(borrow)]
-    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<
-        'a,
-    >,
+    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<'a>,
     /// ISO 8601 timestamp when this profile record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// User's opt-in/out preferences for PDS features.
@@ -365,7 +342,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,49 +350,49 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommunicationPreferences;
         type PdsPreferences;
+        type CommunicationPreferences;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommunicationPreferences = Unset;
         type PdsPreferences = Unset;
+        type CommunicationPreferences = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `communication_preferences` field to Set
-    pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
-    impl<S: State> State for SetCommunicationPreferences<S> {
-        type CommunicationPreferences = Set<members::communication_preferences>;
-        type PdsPreferences = S::PdsPreferences;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `pds_preferences` field to Set
     pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
     impl<S: State> State for SetPdsPreferences<S> {
-        type CommunicationPreferences = S::CommunicationPreferences;
         type PdsPreferences = Set<members::pds_preferences>;
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `communication_preferences` field to Set
+    pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
+    impl<S: State> State for SetCommunicationPreferences<S> {
+        type PdsPreferences = S::PdsPreferences;
+        type CommunicationPreferences = Set<members::communication_preferences>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CommunicationPreferences = S::CommunicationPreferences;
         type PdsPreferences = S::PdsPreferences;
+        type CommunicationPreferences = S::CommunicationPreferences;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `communication_preferences` field
-        pub struct communication_preferences(());
         ///Marker type for the `pds_preferences` field
         pub struct pds_preferences(());
+        ///Marker type for the `communication_preferences` field
+        pub struct communication_preferences(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -425,9 +402,7 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            crate::social_tophhie::profile::CommunicationPreferences<'a>,
-        >,
+        ::core::option::Option<crate::social_tophhie::profile::CommunicationPreferences<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::social_tophhie::profile::PdsPreferences<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -532,8 +507,8 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::CommunicationPreferences: profile_state::IsSet,
     S::PdsPreferences: profile_state::IsSet,
+    S::CommunicationPreferences: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
@@ -579,13 +554,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -645,13 +614,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
 /// Granular PDS preference consent flags.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PdsPreferences<'a> {
@@ -663,7 +626,7 @@ pub struct PdsPreferences<'a> {
 
 pub mod pds_preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

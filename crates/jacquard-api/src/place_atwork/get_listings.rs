@@ -8,13 +8,7 @@
 /// A job listing record with metadata for strong references
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingRecord<'a> {
@@ -32,7 +26,7 @@ pub struct ListingRecord<'a> {
 
 pub mod listing_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,10 +145,7 @@ impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
         self
     }
     /// Set the `value` field to an Option value (optional)
-    pub fn maybe_value(
-        mut self,
-        value: Option<crate::place_atwork::listing::Listing<'a>>,
-    ) -> Self {
+    pub fn maybe_value(mut self, value: Option<crate::place_atwork::listing::Listing<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -192,9 +183,7 @@ where
     }
 }
 
-fn lexicon_doc_place_atwork_getListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_atwork_getListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.getListings"),
@@ -365,13 +354,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
 }
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListings<'a> {
@@ -385,7 +368,7 @@ pub struct GetListings<'a> {
 
 pub mod get_listings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -432,10 +415,7 @@ impl<'a> GetListingsBuilder<'a, get_listings_state::Empty> {
 
 impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
     /// Set the `identity` field (optional)
-    pub fn identity(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn identity(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -474,13 +454,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListingsOutput<'a> {

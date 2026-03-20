@@ -327,12 +327,10 @@ pub fn extract_variant_ref(variant: &syn::Variant, base_nsid: &str) -> syn::Resu
             let variant_name = variant.ident.to_string().to_lower_camel_case();
             Ok(format!("{}#{}", base_nsid, variant_name))
         }
-        syn::Fields::Unnamed(fields) if fields.unnamed.len() == 1 => {
-            Err(syn::Error::new_spanned(
-                variant,
-                "union variants with non-primitive types must use #[nsid] or #[serde(rename)] attribute to specify the ref",
-            ))
-        }
+        syn::Fields::Unnamed(fields) if fields.unnamed.len() == 1 => Err(syn::Error::new_spanned(
+            variant,
+            "union variants with non-primitive types must use #[nsid] or #[serde(rename)] attribute to specify the ref",
+        )),
         _ => Err(syn::Error::new_spanned(
             variant,
             "union variants must be unit variants or have single unnamed field",

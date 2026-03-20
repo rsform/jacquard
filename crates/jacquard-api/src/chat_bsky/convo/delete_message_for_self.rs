@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMessageForSelf<'a> {
@@ -26,13 +26,7 @@ pub struct DeleteMessageForSelf<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMessageForSelfOutput<'a> {
@@ -53,9 +47,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteMessageForSelfResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<'a> {
     const NSID: &'static str = "chat.bsky.convo.deleteMessageForSelf";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteMessageForSelfResponse;
 }
 
@@ -64,9 +57,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<'a> {
 pub struct DeleteMessageForSelfRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMessageForSelfRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.deleteMessageForSelf";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteMessageForSelf<'de>;
     type Response = DeleteMessageForSelfResponse;
 }

@@ -259,14 +259,18 @@ fn test_sanitize_preserves_facets() {
     let builder = RichText::parse(text);
 
     // Should still detect both mention and link
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .any(|fc| matches!(fc, FacetCandidate::Mention { .. })));
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .any(|fc| matches!(fc, FacetCandidate::Link { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .any(|fc| matches!(fc, FacetCandidate::Mention { .. }))
+    );
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .any(|fc| matches!(fc, FacetCandidate::Link { .. }))
+    );
 }
 
 #[test]
@@ -343,10 +347,12 @@ fn test_tag_too_long() {
     let builder = RichText::parse(text);
 
     // Should NOT detect the tag
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .all(|fc| !matches!(fc, FacetCandidate::Tag { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .all(|fc| !matches!(fc, FacetCandidate::Tag { .. }))
+    );
 }
 
 #[test]
@@ -389,10 +395,12 @@ fn test_markdown_link_unclosed() {
 
     // Should not detect markdown link, text unchanged
     assert_eq!(builder.text, text);
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .all(|fc| !matches!(fc, FacetCandidate::MarkdownLink { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .all(|fc| !matches!(fc, FacetCandidate::MarkdownLink { .. }))
+    );
 }
 
 #[test]
@@ -470,10 +478,12 @@ fn test_extremely_long_url() {
     let builder = RichText::parse(text);
 
     // Should detect the URL without panicking
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .any(|fc| matches!(fc, FacetCandidate::Link { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .any(|fc| matches!(fc, FacetCandidate::Link { .. }))
+    );
 }
 
 #[test]
@@ -543,10 +553,7 @@ fn test_build_with_invalid_range() {
         .mention(&did, 0..100)
         .build();
 
-    assert!(matches!(
-        result,
-        Err(RichTextError::InvalidRange { .. })
-    ));
+    assert!(matches!(result, Err(RichTextError::InvalidRange { .. })));
 }
 
 #[test]
@@ -566,10 +573,12 @@ fn test_tag_empty_after_hash() {
     let builder = RichText::parse(text);
 
     // Should not detect empty tag
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .all(|fc| !matches!(fc, FacetCandidate::Tag { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .all(|fc| !matches!(fc, FacetCandidate::Tag { .. }))
+    );
 }
 
 // === Unicode Byte Boundary Tests ===
@@ -603,10 +612,12 @@ fn test_emoji_grapheme_clusters() {
     let builder = RichText::parse(text);
 
     // Should still detect the mention after the emoji
-    assert!(builder
-        .facet_candidates
-        .iter()
-        .any(|fc| matches!(fc, FacetCandidate::Mention { .. })));
+    assert!(
+        builder
+            .facet_candidates
+            .iter()
+            .any(|fc| matches!(fc, FacetCandidate::Mention { .. }))
+    );
 
     // Verify all ranges are valid against the sanitized text
     for fc in &builder.facet_candidates {

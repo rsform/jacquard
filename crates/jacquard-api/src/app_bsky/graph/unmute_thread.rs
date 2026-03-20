@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteThread<'a> {
@@ -23,7 +17,7 @@ pub struct UnmuteThread<'a> {
 
 pub mod unmute_thread_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,9 +50,7 @@ pub mod unmute_thread_state {
 /// Builder for constructing an instance of this type
 pub struct UnmuteThreadBuilder<'a, S: unmute_thread_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -138,9 +130,8 @@ impl jacquard_common::xrpc::XrpcResp for UnmuteThreadResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteThread<'a> {
     const NSID: &'static str = "app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UnmuteThreadResponse;
 }
 
@@ -149,9 +140,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteThread<'a> {
 pub struct UnmuteThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UnmuteThread<'de>;
     type Response = UnmuteThreadResponse;
 }

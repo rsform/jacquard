@@ -19,7 +19,7 @@ pub mod stamp;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookRequirement<'a> {
@@ -123,9 +123,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("authors"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -140,13 +138,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "authors",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "authors",
+                            ),
+                            max: 200usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -155,9 +155,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -172,13 +170,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 200usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

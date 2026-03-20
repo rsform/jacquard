@@ -13,9 +13,8 @@ pub use chrono;
 /// Re-export of the [`smol_str`](https://docs.rs/smol_str/) crate for optimized small strings.
 pub use smol_str;
 
-/// Re-export of the [`url`](https://docs.rs/url/) crate for URI/URL parsing.
-/// Note: This will be replaced with `fluent_uri` in a future phase.
-pub use url;
+/// Re-export of the [`fluent_uri`](https://docs.rs/fluent-uri/) crate for RFC 3986 compliant URI parsing and manipulation.
+pub use fluent_uri;
 
 /// Re-exports of crates used in code generation contexts.
 ///

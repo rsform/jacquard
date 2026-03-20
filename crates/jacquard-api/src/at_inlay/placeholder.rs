@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Placeholder<'a> {
@@ -25,7 +19,7 @@ pub struct Placeholder<'a> {
 
 pub mod placeholder_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,37 +27,37 @@ pub mod placeholder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Children;
         type Fallback;
+        type Children;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Children = Unset;
         type Fallback = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-        type Fallback = S::Fallback;
+        type Children = Unset;
     }
     ///State transition - sets the `fallback` field to Set
     pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFallback<S> {}
     impl<S: State> State for SetFallback<S> {
-        type Children = S::Children;
         type Fallback = Set<members::fallback>;
+        type Children = S::Children;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Fallback = S::Fallback;
+        type Children = Set<members::children>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
         ///Marker type for the `fallback` field
         pub struct fallback(());
+        ///Marker type for the `children` field
+        pub struct children(());
     }
 }
 
@@ -136,8 +130,8 @@ where
 impl<'a, S> PlaceholderBuilder<'a, S>
 where
     S: placeholder_state::State,
-    S::Children: placeholder_state::IsSet,
     S::Fallback: placeholder_state::IsSet,
+    S::Children: placeholder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Placeholder<'a> {
@@ -165,13 +159,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceholderOutput<'a> {
@@ -192,9 +180,8 @@ impl jacquard_common::xrpc::XrpcResp for PlaceholderResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Placeholder<'a> {
     const NSID: &'static str = "at.inlay.Placeholder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PlaceholderResponse;
 }
 
@@ -203,9 +190,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Placeholder<'a> {
 pub struct PlaceholderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceholderRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Placeholder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Placeholder<'de>;
     type Response = PlaceholderResponse;
 }

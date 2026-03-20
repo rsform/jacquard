@@ -1,6 +1,6 @@
 use super::LexiconSource;
-use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_common::IntoStatic;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{Result, miette};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

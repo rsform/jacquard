@@ -872,7 +872,7 @@ mod tests {
     use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
     use bytes::Bytes;
     use http::{Response as HttpResponse, StatusCode};
-    use jacquard_common::{http_client::HttpClient, types::string::Did};
+    use jacquard_common::{deps::fluent_uri::Uri, http_client::HttpClient, types::string::Did};
     use jacquard_identity::resolver::IdentityResolver;
     use std::sync::Arc;
     use tokio::sync::Mutex;
@@ -988,7 +988,7 @@ mod tests {
         let session = ClientSessionData {
             account_did: Did::new_static("did:plc:alice").unwrap(),
             session_id: CowStr::from("state"),
-            host_url: CowStr::new_static("https://pds"),
+            host_url: Uri::parse("https://pds").expect("valid").to_owned(),
             authserver_url: CowStr::new_static("https://issuer"),
             authserver_token_endpoint: CowStr::from("https://issuer/token"),
             authserver_revocation_endpoint: None,

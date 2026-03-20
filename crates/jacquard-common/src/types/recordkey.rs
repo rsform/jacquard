@@ -1,19 +1,19 @@
 use crate::types::Literal;
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
-#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
-use regex::Regex;
-#[cfg(target_arch = "wasm32")]
-use regex_lite::Regex;
-#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
-use regex_automata::meta::Regex;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::{SmolStr, ToSmolStr};
 use alloc::string::{String, ToString};
 use core::fmt;
 use core::marker::PhantomData;
 use core::ops::Deref;
 use core::str::FromStr;
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
+use regex::Regex;
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
+use regex_automata::meta::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::{SmolStr, ToSmolStr};
 
 use super::Lazy;
 

@@ -27,7 +27,6 @@ pub struct CodegenArgs {
     /// Output directory for generated Rust code
     #[arg(short = 'o', long)]
     pub output: PathBuf,
-
     // TODO: root_module causes issues when set to anything other than "crate", needs rework
     // /// Root module name (default: "crate")
     // #[arg(short = 'r', long, default_value = "crate")]

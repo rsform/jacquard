@@ -268,13 +268,7 @@ impl jacquard_common::IntoStatic for ActivityType<'_> {
 /// A split within an activity, like a mile split or kilometer split.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Split<'a> {
@@ -289,7 +283,7 @@ pub struct Split<'a> {
 
 pub mod split_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -297,51 +291,51 @@ pub mod split_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Duration;
-        type Order;
         type Distance;
+        type Order;
+        type Duration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Duration = Unset;
-        type Order = Unset;
         type Distance = Unset;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Duration = Set<members::duration>;
-        type Order = S::Order;
-        type Distance = S::Distance;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Duration = S::Duration;
-        type Order = Set<members::order>;
-        type Distance = S::Distance;
+        type Order = Unset;
+        type Duration = Unset;
     }
     ///State transition - sets the `distance` field to Set
     pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDistance<S> {}
     impl<S: State> State for SetDistance<S> {
-        type Duration = S::Duration;
-        type Order = S::Order;
         type Distance = Set<members::distance>;
+        type Order = S::Order;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Distance = S::Distance;
+        type Order = Set<members::order>;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Distance = S::Distance;
+        type Order = S::Order;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `order` field
-        pub struct order(());
         ///Marker type for the `distance` field
         pub struct distance(());
+        ///Marker type for the `order` field
+        pub struct order(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
     }
 }
 
@@ -418,10 +412,7 @@ where
     S::Order: split_state::IsUnset,
 {
     /// Set the `order` field (required)
-    pub fn order(
-        mut self,
-        value: impl Into<i64>,
-    ) -> SplitBuilder<'a, split_state::SetOrder<S>> {
+    pub fn order(mut self, value: impl Into<i64>) -> SplitBuilder<'a, split_state::SetOrder<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SplitBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -434,9 +425,9 @@ where
 impl<'a, S> SplitBuilder<'a, S>
 where
     S: split_state::State,
-    S::Duration: split_state::IsSet,
-    S::Order: split_state::IsSet,
     S::Distance: split_state::IsSet,
+    S::Order: split_state::IsSet,
+    S::Duration: split_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Split<'a> {
@@ -464,9 +455,7 @@ where
     }
 }
 
-fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pace.feed.defs"),

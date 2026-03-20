@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutTarget<'a> {
@@ -23,15 +17,13 @@ pub struct PutTarget<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rkey: std::option::Option<
-        jacquard_common::types::string::RecordKey<
-            jacquard_common::types::string::Rkey<'a>,
-        >,
+        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     >,
 }
 
 pub mod put_target_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -67,9 +59,7 @@ pub struct PutTargetBuilder<'a, S: put_target_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<crate::place_stream::multistream::target::Target<'a>>,
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -118,9 +108,7 @@ impl<'a, S: put_target_state::State> PutTargetBuilder<'a, S> {
         mut self,
         value: impl Into<
             Option<
-                jacquard_common::types::string::RecordKey<
-                    jacquard_common::types::string::Rkey<'a>,
-                >,
+                jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
             >,
         >,
     ) -> Self {
@@ -131,9 +119,7 @@ impl<'a, S: put_target_state::State> PutTargetBuilder<'a, S> {
     pub fn maybe_rkey(
         mut self,
         value: Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
@@ -172,13 +158,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutTargetOutput<'a> {
@@ -197,7 +177,7 @@ pub struct PutTargetOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -234,9 +214,8 @@ impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutTarget<'a> {
     const NSID: &'static str = "place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutTargetResponse;
 }
 
@@ -245,9 +224,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutTarget<'a> {
 pub struct PutTargetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = PutTarget<'de>;
     type Response = PutTargetResponse;
 }

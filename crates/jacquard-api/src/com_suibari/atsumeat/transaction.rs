@@ -8,13 +8,7 @@
 /// Definition of a transaction
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction<'a> {
@@ -33,27 +27,27 @@ pub struct Transaction<'a> {
     /// URI of the partner's profile, used for Constellation backlinking during the offer stage.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_partner: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub ref_partner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_transaction: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub ref_transaction: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The current status of the transaction.
     #[serde(borrow)]
     pub status: TransactionStatus<'a>,
     /// URIs of the stickers received in this exchange (if completed).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_in: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub sticker_in: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     /// URIs of the stickers given in this exchange.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_out: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub sticker_out: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
 }
 
 pub mod transaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -61,37 +55,37 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Status;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -103,11 +97,11 @@ pub struct TransactionBuilder<'a, S: transaction_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<TransactionStatus<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -124,17 +118,7 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
     pub fn new() -> Self {
         TransactionBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -174,10 +158,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -198,10 +179,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
         self
     }
     /// Set the `partner` field to an Option value (optional)
-    pub fn maybe_partner(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_partner(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -211,7 +189,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refPartner` field (optional)
     pub fn ref_partner(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -219,7 +197,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refPartner` field to an Option value (optional)
     pub fn maybe_ref_partner(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -230,7 +208,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refTransaction` field (optional)
     pub fn ref_transaction(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -238,7 +216,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refTransaction` field to an Option value (optional)
     pub fn maybe_ref_transaction(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
@@ -268,7 +246,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerIn` field (optional)
     pub fn sticker_in(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
+        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
@@ -276,7 +254,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerIn` field to an Option value (optional)
     pub fn maybe_sticker_in(
         mut self,
-        value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
@@ -287,7 +265,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerOut` field (optional)
     pub fn sticker_out(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
+        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -295,7 +273,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerOut` field to an Option value (optional)
     pub fn maybe_sticker_out(
         mut self,
-        value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
@@ -305,8 +283,8 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::CreatedAt: transaction_state::IsSet,
     S::Status: transaction_state::IsSet,
+    S::CreatedAt: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
@@ -455,13 +433,7 @@ impl jacquard_common::IntoStatic for TransactionStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionGetRecordOutput<'a> {
@@ -518,9 +490,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 6400usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
                     max: 6400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -534,13 +504,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
                     )
                     .count();
                 if count > 640usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 640usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "message",
+                            ),
+                            max: 640usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -549,9 +521,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("status"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -561,9 +531,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_suibari_atsumeat_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.suibari.atsumeat.transaction"),

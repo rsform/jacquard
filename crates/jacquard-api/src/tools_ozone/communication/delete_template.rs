@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTemplate<'a> {
@@ -34,9 +34,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteTemplateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteTemplateResponse;
 }
 
@@ -45,9 +44,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<'a> {
 pub struct DeleteTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteTemplateRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.deleteTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteTemplate<'de>;
     type Response = DeleteTemplateResponse;
 }

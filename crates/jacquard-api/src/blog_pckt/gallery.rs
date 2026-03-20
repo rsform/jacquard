@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Gallery<'a> {
@@ -36,7 +30,7 @@ pub struct Gallery<'a> {
 
 pub mod gallery_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,10 +92,7 @@ impl<'a> GalleryBuilder<'a, gallery_state::Empty> {
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -133,10 +124,7 @@ where
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `layout` field (optional)
-    pub fn layout(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn layout(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -149,10 +137,7 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -211,13 +196,7 @@ impl<'a> Gallery<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GalleryGetRecordOutput<'a> {
@@ -274,9 +253,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "caption",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("caption"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -290,13 +267,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "caption",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "caption",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -305,9 +284,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -318,9 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -330,9 +305,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "layout",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("layout"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -342,9 +315,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });

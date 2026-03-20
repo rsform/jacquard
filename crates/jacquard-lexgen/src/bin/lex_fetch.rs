@@ -76,14 +76,19 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn update_cargo_features(codegen: &CodeGenerator, cargo_toml_path: &PathBuf, codegen_dir: &PathBuf) -> Result<()> {
+fn update_cargo_features(
+    codegen: &CodeGenerator,
+    cargo_toml_path: &PathBuf,
+    codegen_dir: &PathBuf,
+) -> Result<()> {
     // Read existing Cargo.toml
     let content = std::fs::read_to_string(cargo_toml_path).into_diagnostic()?;
 
     // Find the "# --- generated ---" marker
     const MARKER: &str = "# --- generated ---";
 
-    let (before, _after) = content.split_once(MARKER)
+    let (before, _after) = content
+        .split_once(MARKER)
         .ok_or_else(|| miette::miette!("Cargo.toml missing '{}' marker", MARKER))?;
 
     // Generate new features, passing lib.rs path to detect existing modules

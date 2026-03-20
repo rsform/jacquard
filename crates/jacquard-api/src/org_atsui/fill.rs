@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fill<'a> {
@@ -23,7 +17,7 @@ pub struct Fill<'a> {
 
 pub mod fill_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,9 +50,7 @@ pub mod fill_state {
 /// Builder for constructing an instance of this type
 pub struct FillBuilder<'a, S: fill_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::value::Data<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,13 +120,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FillOutput<'a> {
@@ -155,9 +141,8 @@ impl jacquard_common::xrpc::XrpcResp for FillResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Fill<'a> {
     const NSID: &'static str = "org.atsui.Fill";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = FillResponse;
 }
 
@@ -166,9 +151,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Fill<'a> {
 pub struct FillRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FillRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Fill";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Fill<'de>;
     type Response = FillResponse;
 }

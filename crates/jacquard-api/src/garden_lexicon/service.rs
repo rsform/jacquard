@@ -8,13 +8,7 @@
 /// Declares XRPC methods available on a DID document service. The rkey is the service fragment ID without the # prefix (e.g., 'atproto_pds' for '#atproto_pds').
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
@@ -32,14 +26,12 @@ pub struct Service<'a> {
     /// URL templates for constructing web URLs from AT-URIs or record data. Useful for linking to web views of records.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub url_templates: std::option::Option<
-        Vec<crate::garden_lexicon::service::UrlTemplate<'a>>,
-    >,
+    pub url_templates: std::option::Option<Vec<crate::garden_lexicon::service::UrlTemplate<'a>>>,
 }
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,18 +93,12 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -223,13 +209,7 @@ impl<'a> Service<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
@@ -286,9 +266,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -311,9 +289,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     }
 }
 
-fn lexicon_doc_garden_lexicon_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_lexicon_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.lexicon.service"),
@@ -594,13 +570,7 @@ fn lexicon_doc_garden_lexicon_service() -> ::jacquard_lexicon::lexicon::LexiconD
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Method<'a> {
@@ -618,7 +588,7 @@ pub struct Method<'a> {
 
 pub mod method_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -687,10 +657,7 @@ impl<'a, S: method_state::State> MethodBuilder<'a, S> {
         self
     }
     /// Set the `authMethods` field to an Option value (optional)
-    pub fn maybe_auth_methods(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_auth_methods(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -785,7 +752,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Method<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UrlTemplate<'a> {
@@ -819,9 +786,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -832,9 +797,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contributor<'a> {
@@ -32,7 +26,7 @@ pub struct Contributor<'a> {
 
 pub mod contributor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,10 +114,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
         self
     }
     /// Set the `contributionWeight` field to an Option value (optional)
-    pub fn maybe_contribution_weight(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_contribution_weight(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -181,13 +172,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -200,28 +185,18 @@ pub enum ContributorContributionDetails<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContributorContributorIdentity<'a> {
     #[serde(rename = "org.hypercerts.claim.activity#contributorIdentity")]
-    ContributorIdentity(
-        Box<crate::org_hypercerts::claim::activity::ContributorIdentity<'a>>,
-    ),
+    ContributorIdentity(Box<crate::org_hypercerts::claim::activity::ContributorIdentity<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
 
-fn lexicon_doc_org_hypercerts_claim_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_claim_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.claim.activity"),
@@ -302,92 +277,80 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "contributorIdentity",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("contributorIdentity"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Contributor information as a string (DID or identifier).",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("identity")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The contributor identity string (DID or identifier).",
-                                    ),
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("identity"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("identity"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The contributor identity string (DID or identifier).",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(100usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(100usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "contributorRole",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("contributorRole"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Contribution details as a string.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("role")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "role",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The contribution role or details.",
-                                    ),
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("role"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("role"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The contribution role or details.",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(1000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(100usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(100usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -725,7 +688,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorIdentity<'a> {
@@ -752,9 +715,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "identity",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("identity"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -769,13 +730,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identity",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "identity",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -793,7 +756,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorRole<'a> {
@@ -820,9 +783,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorRole<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("role"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -837,13 +798,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorRole<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "role",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "role",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -854,30 +817,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorRole<'a> {
 /// A hypercert record tracking impact work.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
     /// An array of contributor objects, each containing contributor information, weight, and contribution details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributors: std::option::Option<
-        Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>,
-    >,
+    pub contributors:
+        std::option::Option<Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>>,
     /// Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
-        crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
-    >,
+    pub description:
+        std::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
     /// When the work ended
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -888,9 +843,7 @@ pub struct Activity<'a> {
     /// An array of strong references to the location where activity was performed. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub locations: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     /// A strong reference to the rights that this hypercert has. The record referenced must conform with the lexicon org.hypercerts.claim.rights.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -901,9 +854,8 @@ pub struct Activity<'a> {
     /// Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub short_description_facets:
+        std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// When the work began
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -918,7 +870,7 @@ pub struct Activity<'a> {
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -926,51 +878,51 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
         type ShortDescription;
+        type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
         type ShortDescription = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type ShortDescription = S::ShortDescription;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type ShortDescription = S::ShortDescription;
+        type CreatedAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShortDescription<S> {}
     impl<S: State> State for SetShortDescription<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type ShortDescription = Set<members::short_description>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ShortDescription = S::ShortDescription;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type ShortDescription = S::ShortDescription;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -978,13 +930,9 @@ pub mod activity_state {
 pub struct ActivityBuilder<'a, S: activity_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
-        >,
+        ::core::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<ActivityImage<'a>>,
         ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
@@ -1011,18 +959,7 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
         ActivityBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1033,9 +970,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `contributors` field (optional)
     pub fn contributors(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -1073,9 +1008,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<
-            Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
-        >,
+        value: impl Into<Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1126,9 +1059,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -1240,10 +1171,7 @@ where
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `workScope` field (optional)
-    pub fn work_scope(
-        mut self,
-        value: impl Into<Option<ActivityWorkScope<'a>>>,
-    ) -> Self {
+    pub fn work_scope(mut self, value: impl Into<Option<ActivityWorkScope<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
@@ -1257,9 +1185,9 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::Title: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
     S::ShortDescription: activity_state::IsSet,
+    S::CreatedAt: activity_state::IsSet,
+    S::Title: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -1320,13 +1248,7 @@ impl<'a> Activity<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1339,13 +1261,7 @@ pub enum ActivityImage<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1358,13 +1274,7 @@ pub enum ActivityWorkScope<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
@@ -1433,9 +1343,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locations",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("locations"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -1463,13 +1371,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "short_description",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "short_description",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1478,9 +1388,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1500,7 +1408,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkScopeString<'a> {
@@ -1527,9 +1435,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeString<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scope",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("scope"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1544,13 +1450,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeString<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scope",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "scope",
+                            ),
+                            max: 100usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

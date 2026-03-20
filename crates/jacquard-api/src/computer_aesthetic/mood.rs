@@ -8,13 +8,7 @@
 /// A mood entry from Aesthetic Computer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Mood<'a> {
@@ -30,7 +24,7 @@ pub struct Mood<'a> {
 
 pub mod mood_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,13 +214,7 @@ impl<'a> Mood<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MoodGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mood",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("mood"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -296,9 +282,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
     }
 }
 
-fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.mood"),

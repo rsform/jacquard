@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterPush<'a> {
@@ -32,7 +26,7 @@ pub struct RegisterPush<'a> {
 
 pub mod register_push_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,67 +34,67 @@ pub mod register_push_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type AppId;
         type ServiceDid;
         type Token;
         type Platform;
-        type AppId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type AppId = Unset;
         type ServiceDid = Unset;
         type Token = Unset;
         type Platform = Unset;
-        type AppId = Unset;
-    }
-    ///State transition - sets the `service_did` field to Set
-    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
-    impl<S: State> State for SetServiceDid<S> {
-        type ServiceDid = Set<members::service_did>;
-        type Token = S::Token;
-        type Platform = S::Platform;
-        type AppId = S::AppId;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type ServiceDid = S::ServiceDid;
-        type Token = Set<members::token>;
-        type Platform = S::Platform;
-        type AppId = S::AppId;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type ServiceDid = S::ServiceDid;
-        type Token = S::Token;
-        type Platform = Set<members::platform>;
-        type AppId = S::AppId;
     }
     ///State transition - sets the `app_id` field to Set
     pub struct SetAppId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppId<S> {}
     impl<S: State> State for SetAppId<S> {
+        type AppId = Set<members::app_id>;
         type ServiceDid = S::ServiceDid;
         type Token = S::Token;
         type Platform = S::Platform;
-        type AppId = Set<members::app_id>;
+    }
+    ///State transition - sets the `service_did` field to Set
+    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
+    impl<S: State> State for SetServiceDid<S> {
+        type AppId = S::AppId;
+        type ServiceDid = Set<members::service_did>;
+        type Token = S::Token;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type AppId = S::AppId;
+        type ServiceDid = S::ServiceDid;
+        type Token = Set<members::token>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type AppId = S::AppId;
+        type ServiceDid = S::ServiceDid;
+        type Token = S::Token;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `app_id` field
+        pub struct app_id(());
         ///Marker type for the `service_did` field
         pub struct service_did(());
         ///Marker type for the `token` field
         pub struct token(());
         ///Marker type for the `platform` field
         pub struct platform(());
-        ///Marker type for the `app_id` field
-        pub struct app_id(());
     }
 }
 
@@ -227,10 +221,10 @@ where
 impl<'a, S> RegisterPushBuilder<'a, S>
 where
     S: register_push_state::State,
+    S::AppId: register_push_state::IsSet,
     S::ServiceDid: register_push_state::IsSet,
     S::Token: register_push_state::IsSet,
     S::Platform: register_push_state::IsSet,
-    S::AppId: register_push_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RegisterPush<'a> {
@@ -350,9 +344,7 @@ impl jacquard_common::IntoStatic for RegisterPushPlatform<'_> {
             RegisterPushPlatform::Ios => RegisterPushPlatform::Ios,
             RegisterPushPlatform::Android => RegisterPushPlatform::Android,
             RegisterPushPlatform::Web => RegisterPushPlatform::Web,
-            RegisterPushPlatform::Other(v) => {
-                RegisterPushPlatform::Other(v.into_static())
-            }
+            RegisterPushPlatform::Other(v) => RegisterPushPlatform::Other(v.into_static()),
         }
     }
 }
@@ -369,9 +361,8 @@ impl jacquard_common::xrpc::XrpcResp for RegisterPushResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RegisterPush<'a> {
     const NSID: &'static str = "app.bsky.notification.registerPush";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RegisterPushResponse;
 }
 
@@ -380,9 +371,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RegisterPush<'a> {
 pub struct RegisterPushRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterPushRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.registerPush";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RegisterPush<'de>;
     type Response = RegisterPushResponse;
 }

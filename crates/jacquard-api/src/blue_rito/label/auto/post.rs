@@ -8,13 +8,7 @@
 /// Setting Post based auto labeling.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -38,7 +32,7 @@ pub struct Post<'a> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,85 +40,85 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
-        type DurationInHours;
-        type Condition;
         type AppliedTo;
         type CreatedAt;
+        type Condition;
+        type Label;
+        type DurationInHours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
-        type DurationInHours = Unset;
-        type Condition = Unset;
         type AppliedTo = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Label = Set<members::label>;
-        type DurationInHours = S::DurationInHours;
-        type Condition = S::Condition;
-        type AppliedTo = S::AppliedTo;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `duration_in_hours` field to Set
-    pub struct SetDurationInHours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDurationInHours<S> {}
-    impl<S: State> State for SetDurationInHours<S> {
-        type Label = S::Label;
-        type DurationInHours = Set<members::duration_in_hours>;
-        type Condition = S::Condition;
-        type AppliedTo = S::AppliedTo;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `condition` field to Set
-    pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCondition<S> {}
-    impl<S: State> State for SetCondition<S> {
-        type Label = S::Label;
-        type DurationInHours = S::DurationInHours;
-        type Condition = Set<members::condition>;
-        type AppliedTo = S::AppliedTo;
-        type CreatedAt = S::CreatedAt;
+        type Condition = Unset;
+        type Label = Unset;
+        type DurationInHours = Unset;
     }
     ///State transition - sets the `applied_to` field to Set
     pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
     impl<S: State> State for SetAppliedTo<S> {
-        type Label = S::Label;
-        type DurationInHours = S::DurationInHours;
-        type Condition = S::Condition;
         type AppliedTo = Set<members::applied_to>;
         type CreatedAt = S::CreatedAt;
+        type Condition = S::Condition;
+        type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Label = S::Label;
-        type DurationInHours = S::DurationInHours;
-        type Condition = S::Condition;
         type AppliedTo = S::AppliedTo;
         type CreatedAt = Set<members::created_at>;
+        type Condition = S::Condition;
+        type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+    }
+    ///State transition - sets the `condition` field to Set
+    pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCondition<S> {}
+    impl<S: State> State for SetCondition<S> {
+        type AppliedTo = S::AppliedTo;
+        type CreatedAt = S::CreatedAt;
+        type Condition = Set<members::condition>;
+        type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type AppliedTo = S::AppliedTo;
+        type CreatedAt = S::CreatedAt;
+        type Condition = S::Condition;
+        type Label = Set<members::label>;
+        type DurationInHours = S::DurationInHours;
+    }
+    ///State transition - sets the `duration_in_hours` field to Set
+    pub struct SetDurationInHours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDurationInHours<S> {}
+    impl<S: State> State for SetDurationInHours<S> {
+        type AppliedTo = S::AppliedTo;
+        type CreatedAt = S::CreatedAt;
+        type Condition = S::Condition;
+        type Label = S::Label;
+        type DurationInHours = Set<members::duration_in_hours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
-        ///Marker type for the `duration_in_hours` field
-        pub struct duration_in_hours(());
-        ///Marker type for the `condition` field
-        pub struct condition(());
         ///Marker type for the `applied_to` field
         pub struct applied_to(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `condition` field
+        pub struct condition(());
+        ///Marker type for the `label` field
+        pub struct label(());
+        ///Marker type for the `duration_in_hours` field
+        pub struct duration_in_hours(());
     }
 }
 
@@ -162,10 +156,7 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `action` field (optional)
-    pub fn action(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn action(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -274,11 +265,11 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Label: post_state::IsSet,
-    S::DurationInHours: post_state::IsSet,
-    S::Condition: post_state::IsSet,
     S::AppliedTo: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Condition: post_state::IsSet,
+    S::Label: post_state::IsSet,
+    S::DurationInHours: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -327,13 +318,7 @@ impl<'a> Post<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
@@ -390,9 +375,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
 }
 
-fn lexicon_doc_blue_rito_label_auto_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_rito_label_auto_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.rito.label.auto.post"),

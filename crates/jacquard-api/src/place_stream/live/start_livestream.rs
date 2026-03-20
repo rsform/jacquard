@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestream<'a> {
@@ -29,7 +23,7 @@ pub struct StartLivestream<'a> {
 
 pub mod start_livestream_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +31,37 @@ pub mod start_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Livestream;
         type Streamer;
+        type Livestream;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Livestream = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `livestream` field to Set
-    pub struct SetLivestream<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLivestream<S> {}
-    impl<S: State> State for SetLivestream<S> {
-        type Livestream = Set<members::livestream>;
-        type Streamer = S::Streamer;
+        type Livestream = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type Livestream = S::Livestream;
         type Streamer = Set<members::streamer>;
+        type Livestream = S::Livestream;
+    }
+    ///State transition - sets the `livestream` field to Set
+    pub struct SetLivestream<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLivestream<S> {}
+    impl<S: State> State for SetLivestream<S> {
+        type Streamer = S::Streamer;
+        type Livestream = Set<members::livestream>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `livestream` field
-        pub struct livestream(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `livestream` field
+        pub struct livestream(());
     }
 }
 
@@ -154,8 +148,8 @@ where
 impl<'a, S> StartLivestreamBuilder<'a, S>
 where
     S: start_livestream_state::State,
-    S::Livestream: start_livestream_state::IsSet,
     S::Streamer: start_livestream_state::IsSet,
+    S::Livestream: start_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StartLivestream<'a> {
@@ -185,13 +179,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestreamOutput<'a> {
@@ -200,7 +188,7 @@ pub struct StartLivestreamOutput<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     /// The URI of the livestream record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 /// Response type for
@@ -215,9 +203,8 @@ impl jacquard_common::xrpc::XrpcResp for StartLivestreamResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
     const NSID: &'static str = "place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartLivestreamResponse;
 }
 
@@ -226,9 +213,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
 pub struct StartLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = StartLivestream<'de>;
     type Response = StartLivestreamResponse;
 }

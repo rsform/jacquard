@@ -8,13 +8,7 @@
 /// User profile record
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -70,12 +64,12 @@ pub struct Profile<'a> {
     /// External website URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,67 +77,67 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Tags;
-        type Did;
         type CreatedAt;
+        type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Tags = Unset;
-        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Tags = S::Tags;
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
+        type Did = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type Handle = S::Handle;
         type Tags = Set<members::tags>;
+        type CreatedAt = S::CreatedAt;
         type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
         type Handle = S::Handle;
-        type Tags = S::Tags;
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Handle = S::Handle;
         type Tags = S::Tags;
-        type Did = S::Did;
         type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `tags` field
         pub struct tags(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -166,7 +160,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -184,22 +178,8 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -208,18 +188,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
-    pub fn accent_color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn accent_color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
-    pub fn maybe_accent_color(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_accent_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -329,18 +303,12 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -431,10 +399,7 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
@@ -468,7 +433,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
@@ -476,7 +441,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.15 = value;
         self
@@ -486,10 +451,10 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::Handle: profile_state::IsSet,
     S::Tags: profile_state::IsSet,
-    S::Did: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
+    S::Did: profile_state::IsSet,
+    S::Handle: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -558,13 +523,7 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -633,9 +592,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bio",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bio"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -646,9 +603,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "did",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("did"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -671,9 +626,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 253usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "handle",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("handle"),
                     max: 253usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -683,9 +636,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "showcase",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("showcase"),
                     max: 4usize,
                     actual: value.len(),
                 });
@@ -696,9 +647,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -708,9 +657,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "theme",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("theme"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -720,9 +667,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "website",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("website"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -732,9 +677,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_social_showcase_profile_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_showcase_profile_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.showcase.profile.profile"),

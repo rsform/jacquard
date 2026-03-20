@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEvents<'a> {
@@ -123,22 +123,14 @@ impl jacquard_common::IntoStatic for QueryEventsSortDirection<'_> {
         match self {
             QueryEventsSortDirection::Asc => QueryEventsSortDirection::Asc,
             QueryEventsSortDirection::Desc => QueryEventsSortDirection::Desc,
-            QueryEventsSortDirection::Other(v) => {
-                QueryEventsSortDirection::Other(v.into_static())
-            }
+            QueryEventsSortDirection::Other(v) => QueryEventsSortDirection::Other(v.into_static()),
         }
     }
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
@@ -162,9 +154,8 @@ impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
     const NSID: &'static str = "tools.ozone.safelink.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = QueryEventsResponse;
 }
 
@@ -173,9 +164,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
 pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = QueryEvents<'de>;
     type Response = QueryEventsResponse;
 }

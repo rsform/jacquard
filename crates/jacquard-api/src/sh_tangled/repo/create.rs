@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
@@ -43,9 +43,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
     const NSID: &'static str = "sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateResponse;
 }
 
@@ -54,9 +53,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Create<'de>;
     type Response = CreateResponse;
 }

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Heading<'a> {
@@ -23,7 +17,7 @@ pub struct Heading<'a> {
 
 pub mod heading_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,9 +50,7 @@ pub mod heading_state {
 /// Builder for constructing an instance of this type
 pub struct HeadingBuilder<'a, S: heading_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::value::Data<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,13 +120,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HeadingOutput<'a> {
@@ -155,9 +141,8 @@ impl jacquard_common::xrpc::XrpcResp for HeadingResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Heading<'a> {
     const NSID: &'static str = "org.atsui.Heading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = HeadingResponse;
 }
 
@@ -166,9 +151,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Heading<'a> {
 pub struct HeadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HeadingRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Heading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Heading<'de>;
     type Response = HeadingResponse;
 }

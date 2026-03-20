@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Interactions<'a> {
@@ -33,9 +33,8 @@ pub struct Interactions<'a> {
     pub services: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_lexicon_exultant_zebra_tile()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.lexicon.exultant-zebra.tile"),
@@ -456,13 +455,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interactions<'a> {
 /// A tile with a name and associated resource or bundle.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tile<'a> {
@@ -488,9 +481,8 @@ pub struct Tile<'a> {
     /// Declaration of the XRPC methods, collections, and services this tile interacts with.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub interactions: std::option::Option<
-        crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>,
-    >,
+    pub interactions:
+        std::option::Option<crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>>,
     /// Optional loading screen image for the tile.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -501,14 +493,12 @@ pub struct Tile<'a> {
     /// Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub params: std::option::Option<
-        Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>,
-    >,
+    pub params: std::option::Option<Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>>,
 }
 
 pub mod tile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -516,37 +506,37 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Name;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
+        type Content = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Content = S::Content;
         type Name = Set<members::name>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Name = S::Name;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -559,14 +549,10 @@ pub struct TileBuilder<'a, S: tile_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<
-            crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>,
-        >,
+        ::core::option::Option<crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -583,17 +569,7 @@ impl<'a> TileBuilder<'a, tile_state::Empty> {
     pub fn new() -> Self {
         TileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -601,10 +577,7 @@ impl<'a> TileBuilder<'a, tile_state::Empty> {
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<TileAspectRatio<'a>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<TileAspectRatio<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -636,18 +609,12 @@ where
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -682,10 +649,7 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_icon(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -695,9 +659,7 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `interactions` field (optional)
     pub fn interactions(
         mut self,
-        value: impl Into<
-            Option<crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>>,
-        >,
+        value: impl Into<Option<crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -754,9 +716,7 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `params` field (optional)
     pub fn params(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>>,
-        >,
+        value: impl Into<Option<Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -774,8 +734,8 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S> TileBuilder<'a, S>
 where
     S: tile_state::State,
-    S::Content: tile_state::IsSet,
     S::Name: tile_state::IsSet,
+    S::Content: tile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tile<'a> {
@@ -934,13 +894,7 @@ impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -953,13 +907,7 @@ pub enum TileContent<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TileGetRecordOutput<'a> {
@@ -1016,9 +964,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1038,7 +984,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Param<'a> {
@@ -1172,9 +1118,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1185,9 +1129,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });

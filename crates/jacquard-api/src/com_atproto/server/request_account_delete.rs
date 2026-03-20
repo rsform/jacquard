@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct RequestAccountDelete;
 /// Response type for
@@ -29,9 +29,8 @@ impl jacquard_common::xrpc::XrpcResp for RequestAccountDeleteResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestAccountDelete {
     const NSID: &'static str = "com.atproto.server.requestAccountDelete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RequestAccountDeleteResponse;
 }
 
@@ -40,9 +39,8 @@ impl jacquard_common::xrpc::XrpcRequest for RequestAccountDelete {
 pub struct RequestAccountDeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestAccountDeleteRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestAccountDelete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RequestAccountDelete;
     type Response = RequestAccountDeleteResponse;
 }

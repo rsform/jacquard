@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
@@ -35,7 +29,7 @@ pub struct Comment<'a> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -44,50 +38,50 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Issue;
-        type Body;
         type CreatedAt;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Issue = Unset;
-        type Body = Unset;
         type CreatedAt = Unset;
+        type Body = Unset;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssue<S> {}
     impl<S: State> State for SetIssue<S> {
         type Issue = Set<members::issue>;
+        type CreatedAt = S::CreatedAt;
         type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Issue = S::Issue;
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Issue = S::Issue;
-        type Body = S::Body;
         type CreatedAt = Set<members::created_at>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Issue = S::Issue;
+        type CreatedAt = S::CreatedAt;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `issue` field
         pub struct issue(());
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
@@ -241,8 +235,8 @@ impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
     S::Issue: comment_state::IsSet,
-    S::Body: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Body: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -291,13 +285,7 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -354,9 +342,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.issue.comment"),

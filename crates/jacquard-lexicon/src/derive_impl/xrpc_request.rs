@@ -2,7 +2,7 @@
 
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::{parse2, Attribute, DeriveInput, Ident, LitStr};
+use syn::{Attribute, DeriveInput, Ident, LitStr, parse2};
 
 /// Implementation for the XrpcRequest derive macro
 pub fn impl_derive_xrpc_request(input: TokenStream) -> TokenStream {

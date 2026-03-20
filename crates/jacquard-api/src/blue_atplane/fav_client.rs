@@ -8,13 +8,7 @@
 /// A declaration of a favorite client.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavClient<'a> {
@@ -25,7 +19,7 @@ pub struct FavClient<'a> {
 
 pub mod fav_client_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,13 +135,7 @@ impl<'a> FavClient<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavClientGetRecordOutput<'a> {
@@ -205,9 +193,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FavClient<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "fav_client",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("fav_client"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -217,9 +203,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FavClient<'a> {
     }
 }
 
-fn lexicon_doc_blue_atplane_favClient() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_atplane_favClient() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.atplane.favClient"),
@@ -229,49 +213,53 @@ fn lexicon_doc_blue_atplane_favClient() -> ::jacquard_lexicon::lexicon::LexiconD
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(
+                    ::jacquard_lexicon::lexicon::LexRecord {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A declaration of a favorite client.",
-                        ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("favClient")
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "favClient",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Set to your favorite client.",
-                                        ),
+                        )),
+                        key: Some(::jacquard_common::CowStr::new_static("literal:self")),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
+                            ::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: Some(vec![
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "favClient",
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(32usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
+                                ]),
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "favClient",
+                                        ),
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: Some(
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "Set to your favorite client.",
+                                                    ),
+                                                ),
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: Some(32usize),
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                    );
+                                    map
+                                },
+                            },
+                        ),
+                    },
+                ),
             );
             map
         },

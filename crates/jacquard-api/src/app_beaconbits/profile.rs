@@ -8,13 +8,7 @@
 /// User preferences and settings for BeaconBits
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -57,7 +51,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,18 +111,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     pub fn new() -> Self {
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -195,10 +178,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         self
     }
     /// Set the `defaultVisibility` field to an Option value (optional)
-    pub fn maybe_default_visibility(
-        mut self,
-        value: Option<ProfileDefaultVisibility<'a>>,
-    ) -> Self {
+    pub fn maybe_default_visibility(mut self, value: Option<ProfileDefaultVisibility<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -206,18 +186,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `distanceUnit` field (optional)
-    pub fn distance_unit(
-        mut self,
-        value: impl Into<Option<ProfileDistanceUnit<'a>>>,
-    ) -> Self {
+    pub fn distance_unit(mut self, value: impl Into<Option<ProfileDistanceUnit<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `distanceUnit` field to an Option value (optional)
-    pub fn maybe_distance_unit(
-        mut self,
-        value: Option<ProfileDistanceUnit<'a>>,
-    ) -> Self {
+    pub fn maybe_distance_unit(mut self, value: Option<ProfileDistanceUnit<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -251,18 +225,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `markerColor` field (optional)
-    pub fn marker_color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn marker_color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `markerColor` field to an Option value (optional)
-    pub fn maybe_marker_color(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_marker_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -652,9 +620,7 @@ impl jacquard_common::IntoStatic for ProfileDefaultVisibility<'_> {
             ProfileDefaultVisibility::Followers => ProfileDefaultVisibility::Followers,
             ProfileDefaultVisibility::Mutuals => ProfileDefaultVisibility::Mutuals,
             ProfileDefaultVisibility::Hidden => ProfileDefaultVisibility::Hidden,
-            ProfileDefaultVisibility::Other(v) => {
-                ProfileDefaultVisibility::Other(v.into_static())
-            }
+            ProfileDefaultVisibility::Other(v) => ProfileDefaultVisibility::Other(v.into_static()),
         }
     }
 }
@@ -874,13 +840,7 @@ impl jacquard_common::IntoStatic for ProfileLanguage<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -941,13 +901,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "allow_tags",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "allow_tags",
+                            ),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -959,13 +921,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "default_delayed_reveal",
-                        ),
-                        max: 16usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "default_delayed_reveal",
+                            ),
+                            max: 16usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -977,13 +941,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "default_visibility",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "default_visibility",
+                            ),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -995,13 +961,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "distance_unit",
-                        ),
-                        max: 16usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "distance_unit",
+                            ),
+                            max: 16usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1013,13 +981,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "language",
-                        ),
-                        max: 16usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "language",
+                            ),
+                            max: 16usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1031,13 +1001,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 7usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "marker_color",
-                        ),
-                        max: 7usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "marker_color",
+                            ),
+                            max: 7usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1045,9 +1017,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_beaconbits_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.profile"),

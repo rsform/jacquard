@@ -8,13 +8,7 @@
 /// A proposed answer to a question
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Answer<'a> {
@@ -30,7 +24,7 @@ pub struct Answer<'a> {
 
 pub mod answer_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,51 +32,51 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Question;
         type Content;
         type CreatedAt;
+        type Question;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Question = Unset;
         type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
+        type Question = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Question = S::Question;
         type Content = Set<members::content>;
         type CreatedAt = S::CreatedAt;
+        type Question = S::Question;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
         type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Question = S::Question;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Question = Set<members::question>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `question` field
+        pub struct question(());
     }
 }
 
@@ -195,9 +189,9 @@ where
 impl<'a, S> AnswerBuilder<'a, S>
 where
     S: answer_state::State,
-    S::Question: answer_state::IsSet,
     S::Content: answer_state::IsSet,
     S::CreatedAt: answer_state::IsSet,
+    S::Question: answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Answer<'a> {
@@ -242,13 +236,7 @@ impl<'a> Answer<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AnswerGetRecordOutput<'a> {
@@ -305,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Answer<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("languages"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -317,9 +303,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Answer<'a> {
     }
 }
 
-fn lexicon_doc_fyi_questionable_answer() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fyi_questionable_answer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.questionable.answer"),

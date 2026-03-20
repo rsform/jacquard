@@ -1,7 +1,7 @@
 use crate::error::{CodegenError, Result};
 use crate::lexicon::{LexUserType, LexiconDoc};
 use crate::ref_utils::RefPath;
-use jacquard_common::{into_static::IntoStatic, deps::smol_str::SmolStr};
+use jacquard_common::{deps::smol_str::SmolStr, into_static::IntoStatic};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
@@ -134,12 +134,26 @@ fn parse_object_deep(
         .get("required")
         .map(|v| serde_json::from_value(v.clone()))
         .transpose()
-        .map_err(|e| make_parse_error(file_path, &format!("{}.required", base_path), e.to_string(), content))?;
+        .map_err(|e| {
+            make_parse_error(
+                file_path,
+                &format!("{}.required", base_path),
+                e.to_string(),
+                content,
+            )
+        })?;
     let nullable: Option<Vec<SmolStr>> = obj
         .get("nullable")
         .map(|v| serde_json::from_value(v.clone()))
         .transpose()
-        .map_err(|e| make_parse_error(file_path, &format!("{}.nullable", base_path), e.to_string(), content))?;
+        .map_err(|e| {
+            make_parse_error(
+                file_path,
+                &format!("{}.nullable", base_path),
+                e.to_string(),
+                content,
+            )
+        })?;
 
     Ok(LexObject {
         description,
@@ -177,7 +191,12 @@ fn parse_def_deep(
 
                 // Parse the rest of the record
                 let obj = value.as_object().ok_or_else(|| {
-                    make_parse_error(file_path, &base_path, "expected object".to_string(), content)
+                    make_parse_error(
+                        file_path,
+                        &base_path,
+                        "expected object".to_string(),
+                        content,
+                    )
                 })?;
 
                 let description = obj
@@ -198,7 +217,9 @@ fn parse_def_deep(
                 // Fallback to normal parsing if no record field
                 serde_path_to_error::deserialize(value)
                     .map(|v: LexUserType| v.into_static())
-                    .map_err(|e| make_parse_error(file_path, &base_path, e.inner().to_string(), content))
+                    .map_err(|e| {
+                        make_parse_error(file_path, &base_path, e.inner().to_string(), content)
+                    })
             }
         }
         // For other types (query, procedure, etc.), use the simpler approach for now
@@ -228,15 +249,14 @@ fn parse_lexicon_with_context(
     path: &Path,
 ) -> std::result::Result<LexiconDoc<'static>, CodegenError> {
     // Phase 1: Parse the top-level structure with defs as raw Values
-    let raw_doc: RawLexiconDoc = serde_json::from_str(content).map_err(|e| {
-        CodegenError::ParseError {
+    let raw_doc: RawLexiconDoc =
+        serde_json::from_str(content).map_err(|e| CodegenError::ParseError {
             path: path.to_path_buf(),
             json_path: None,
             message: e.to_string(),
             src: Some(content.to_string()),
             span: None,
-        }
-    })?;
+        })?;
 
     // Phase 2: Parse each def with deep path tracking
     let mut parsed_defs = BTreeMap::new();

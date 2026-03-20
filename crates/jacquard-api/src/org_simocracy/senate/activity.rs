@@ -8,13 +8,7 @@
 /// Senate simulation activity log entry.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
@@ -29,9 +23,7 @@ pub struct Activity<'a> {
     /// Link to org.hypercerts.claim.evaluation record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub evaluation: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub evaluation: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// The proposal text being evaluated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -48,7 +40,7 @@ pub struct Activity<'a> {
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,51 +48,51 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ActivityType;
         type CreatedAt;
         type CommitteeSims;
-        type ActivityType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ActivityType = Unset;
         type CreatedAt = Unset;
         type CommitteeSims = Unset;
-        type ActivityType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type CommitteeSims = S::CommitteeSims;
-        type ActivityType = S::ActivityType;
-    }
-    ///State transition - sets the `committee_sims` field to Set
-    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
-    impl<S: State> State for SetCommitteeSims<S> {
-        type CreatedAt = S::CreatedAt;
-        type CommitteeSims = Set<members::committee_sims>;
-        type ActivityType = S::ActivityType;
     }
     ///State transition - sets the `activity_type` field to Set
     pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivityType<S> {}
     impl<S: State> State for SetActivityType<S> {
+        type ActivityType = Set<members::activity_type>;
         type CreatedAt = S::CreatedAt;
         type CommitteeSims = S::CommitteeSims;
-        type ActivityType = Set<members::activity_type>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ActivityType = S::ActivityType;
+        type CreatedAt = Set<members::created_at>;
+        type CommitteeSims = S::CommitteeSims;
+    }
+    ///State transition - sets the `committee_sims` field to Set
+    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
+    impl<S: State> State for SetCommitteeSims<S> {
+        type ActivityType = S::ActivityType;
+        type CreatedAt = S::CreatedAt;
+        type CommitteeSims = Set<members::committee_sims>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `activity_type` field
+        pub struct activity_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `committee_sims` field
         pub struct committee_sims(());
-        ///Marker type for the `activity_type` field
-        pub struct activity_type(());
     }
 }
 
@@ -215,18 +207,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `proposalText` field (optional)
-    pub fn proposal_text(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn proposal_text(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `proposalText` field to an Option value (optional)
-    pub fn maybe_proposal_text(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_proposal_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -234,18 +220,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `resultSummary` field (optional)
-    pub fn result_summary(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn result_summary(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `resultSummary` field to an Option value (optional)
-    pub fn maybe_result_summary(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_result_summary(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -267,9 +247,9 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
+    S::ActivityType: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
     S::CommitteeSims: activity_state::IsSet,
-    S::ActivityType: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -404,18 +384,10 @@ impl jacquard_common::IntoStatic for ActivityActivityType<'_> {
     type Output = ActivityActivityType<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ActivityActivityType::CommitteeEvaluation => {
-                ActivityActivityType::CommitteeEvaluation
-            }
-            ActivityActivityType::SimulationStarted => {
-                ActivityActivityType::SimulationStarted
-            }
-            ActivityActivityType::SimulationCompleted => {
-                ActivityActivityType::SimulationCompleted
-            }
-            ActivityActivityType::Other(v) => {
-                ActivityActivityType::Other(v.into_static())
-            }
+            ActivityActivityType::CommitteeEvaluation => ActivityActivityType::CommitteeEvaluation,
+            ActivityActivityType::SimulationStarted => ActivityActivityType::SimulationStarted,
+            ActivityActivityType::SimulationCompleted => ActivityActivityType::SimulationCompleted,
+            ActivityActivityType::Other(v) => ActivityActivityType::Other(v.into_static()),
         }
     }
 }
@@ -516,13 +488,7 @@ impl jacquard_common::IntoStatic for ActivityStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
@@ -616,9 +582,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     }
 }
 
-fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.senate.activity"),

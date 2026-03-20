@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fsq<'a> {
@@ -34,9 +34,8 @@ pub struct Fsq<'a> {
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("community.lexicon.location.fsq"),

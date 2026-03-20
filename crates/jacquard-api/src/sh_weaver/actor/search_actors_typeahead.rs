@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeahead<'a> {
@@ -25,7 +19,7 @@ pub struct SearchActorsTypeahead<'a> {
 
 pub mod search_actors_typeahead_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -67,10 +61,7 @@ pub struct SearchActorsTypeaheadBuilder<'a, S: search_actors_typeahead_state::St
 
 impl<'a> SearchActorsTypeahead<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SearchActorsTypeaheadBuilder<
-        'a,
-        search_actors_typeahead_state::Empty,
-    > {
+    pub fn new() -> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::Empty> {
         SearchActorsTypeaheadBuilder::new()
     }
 }
@@ -134,13 +125,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeaheadOutput<'a> {

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InitiateUpload<'a> {
@@ -32,7 +32,7 @@ pub struct InitiateUpload<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InitiateUploadOutput<'a> {
@@ -51,7 +51,7 @@ pub struct InitiateUploadOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -87,9 +87,8 @@ impl jacquard_common::xrpc::XrpcResp for InitiateUploadResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for InitiateUpload<'a> {
     const NSID: &'static str = "io.atcr.hold.initiateUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = InitiateUploadResponse;
 }
 
@@ -98,9 +97,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for InitiateUpload<'a> {
 pub struct InitiateUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for InitiateUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.initiateUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = InitiateUpload<'de>;
     type Response = InitiateUploadResponse;
 }

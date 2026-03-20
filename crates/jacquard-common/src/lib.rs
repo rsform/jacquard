@@ -9,7 +9,7 @@
 //! use jacquard_common::http_client::HttpClient;
 //! // ...
 //! let http = reqwest::Client::new();
-//! let base = url::Url::parse("https://public.api.bsky.app")?;
+//! let base = jacquard_common::deps::fluent_uri::Uri::parse("https://public.api.bsky.app")?.to_owned();
 //! let resp = http.xrpc(base).send(&request).await?;
 //! ```
 //! The other, `XrpcClient`, is stateful, and can be implemented on anything with a bit of internal state to store the base URI (the URL of the PDS being contacted) and the default options. It's the one you're most likely to interact with doing normal atproto API client stuff. The Agent struct in the initial example implements that trait, as does the session struct it wraps, and the `.send()` method used is that trait method.
@@ -230,6 +230,8 @@ pub mod macros;
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
 pub mod session;
+/// Compile-time TLD lookup for disambiguating handles from NSIDs.
+pub(crate) mod tld;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
 // XRPC protocol types and traits
@@ -290,9 +292,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::deps::smol_str::SmolStr;
     use crate::deps::bytes;
     use crate::deps::chrono;
+    use crate::deps::smol_str::SmolStr;
 
     #[test]
     fn deps_smol_str() {

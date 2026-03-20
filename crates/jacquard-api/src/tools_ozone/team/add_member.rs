@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddMember<'a> {
@@ -25,7 +19,7 @@ pub struct AddMember<'a> {
 
 pub mod add_member_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -263,13 +257,7 @@ impl jacquard_common::IntoStatic for AddMemberRole<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddMemberOutput<'a> {
@@ -288,7 +276,7 @@ pub struct AddMemberOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -325,9 +313,8 @@ impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for AddMember<'a> {
     const NSID: &'static str = "tools.ozone.team.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddMemberResponse;
 }
 
@@ -336,9 +323,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddMember<'a> {
 pub struct AddMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.team.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = AddMember<'de>;
     type Response = AddMemberResponse;
 }

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendEmail<'a> {
@@ -34,7 +28,7 @@ pub struct SendEmail<'a> {
 
 pub mod send_email_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,49 +36,49 @@ pub mod send_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type RecipientDid;
+        type Content;
         type SenderDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type RecipientDid = Unset;
+        type Content = Unset;
         type SenderDid = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type RecipientDid = S::RecipientDid;
-        type SenderDid = S::SenderDid;
     }
     ///State transition - sets the `recipient_did` field to Set
     pub struct SetRecipientDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecipientDid<S> {}
     impl<S: State> State for SetRecipientDid<S> {
-        type Content = S::Content;
         type RecipientDid = Set<members::recipient_did>;
+        type Content = S::Content;
+        type SenderDid = S::SenderDid;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type RecipientDid = S::RecipientDid;
+        type Content = Set<members::content>;
         type SenderDid = S::SenderDid;
     }
     ///State transition - sets the `sender_did` field to Set
     pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSenderDid<S> {}
     impl<S: State> State for SetSenderDid<S> {
-        type Content = S::Content;
         type RecipientDid = S::RecipientDid;
+        type Content = S::Content;
         type SenderDid = Set<members::sender_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `recipient_did` field
         pub struct recipient_did(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `sender_did` field
         pub struct sender_did(());
     }
@@ -123,10 +117,7 @@ impl<'a> SendEmailBuilder<'a, send_email_state::Empty> {
 
 impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -196,10 +187,7 @@ where
 
 impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -213,8 +201,8 @@ impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
 impl<'a, S> SendEmailBuilder<'a, S>
 where
     S: send_email_state::State,
-    S::Content: send_email_state::IsSet,
     S::RecipientDid: send_email_state::IsSet,
+    S::Content: send_email_state::IsSet,
     S::SenderDid: send_email_state::IsSet,
 {
     /// Build the final struct
@@ -249,13 +237,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendEmailOutput<'a> {
@@ -274,9 +256,8 @@ impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
     const NSID: &'static str = "com.atproto.admin.sendEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SendEmailResponse;
 }
 
@@ -285,9 +266,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
 pub struct SendEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.sendEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = SendEmail<'de>;
     type Response = SendEmailResponse;
 }

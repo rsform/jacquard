@@ -1,7 +1,7 @@
 use super::LexiconSource;
 use crate::fetch::sources::parse_from_index_or_lexicon_file;
-use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_common::IntoStatic;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{IntoDiagnostic, Result};
 use std::collections::HashMap;
 use std::path::PathBuf;

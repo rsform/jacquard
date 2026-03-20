@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
@@ -23,7 +17,7 @@ pub struct GetProfile<'a> {
 
 pub mod get_profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -67,10 +61,7 @@ impl<'a> GetProfileBuilder<'a, get_profile_state::Empty> {
 
 impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn handle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -102,7 +93,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
@@ -120,25 +111,15 @@ pub struct GetProfileOutput<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetProfileOutputProfile<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#actorProfileDetailView")]
-    ActorProfileDetailView(
-        Box<crate::games_gamesgamesgamesgames::ActorProfileDetailView<'a>>,
-    ),
+    ActorProfileDetailView(Box<crate::games_gamesgamesgamesgames::ActorProfileDetailView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#orgProfileDetailView")]
-    OrgProfileDetailView(
-        Box<crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>>,
-    ),
+    OrgProfileDetailView(Box<crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

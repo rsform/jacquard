@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AbortUpload<'a> {
@@ -32,7 +32,7 @@ pub struct AbortUpload<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AbortUploadOutput<'a> {
@@ -51,7 +51,7 @@ pub struct AbortUploadOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -96,9 +96,8 @@ impl jacquard_common::xrpc::XrpcResp for AbortUploadResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for AbortUpload<'a> {
     const NSID: &'static str = "io.atcr.hold.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AbortUploadResponse;
 }
 
@@ -107,9 +106,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AbortUpload<'a> {
 pub struct AbortUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AbortUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = AbortUpload<'de>;
     type Response = AbortUploadResponse;
 }

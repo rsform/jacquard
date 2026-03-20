@@ -8,11 +8,11 @@
 
 use clap::Parser;
 use jacquard::api::com_atproto::sync::subscribe_repos::{SubscribeRepos, SubscribeReposMessage};
+use jacquard_common::deps::fluent_uri::{ParseError, Uri};
 use jacquard_common::xrpc::{SubscriptionClient, TungsteniteSubscriptionClient};
 use miette::IntoDiagnostic;
 use n0_future::StreamExt;
 use smol_str::ToSmolStr;
-use url::Url;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -29,16 +29,15 @@ struct Args {
     cursor: Option<i64>,
 }
 
-fn normalize_url(input: &str) -> Result<Url, url::ParseError> {
-    // Strip any existing scheme
+fn normalize_uri(input: &str) -> Result<Uri<String>, ParseError> {
     let without_scheme = input
         .trim_start_matches("https://")
         .trim_start_matches("http://")
         .trim_start_matches("wss://")
         .trim_start_matches("ws://");
 
-    // Prepend wss://
-    Url::parse(&format!("wss://{}", without_scheme))
+    let full = format!("wss://{}", without_scheme);
+    Uri::parse(full).map_err(|(e, _)| e)
 }
 
 fn print_message(msg: &SubscribeReposMessage) {
@@ -94,7 +93,7 @@ fn print_message(msg: &SubscribeReposMessage) {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    let base_url = normalize_url(&args.pds_url).into_diagnostic()?;
+    let base_url = normalize_uri(&args.pds_url).into_diagnostic()?;
     println!("Connecting to {}", base_url);
 
     // Create subscription client

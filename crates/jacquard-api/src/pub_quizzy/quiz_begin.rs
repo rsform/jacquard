@@ -8,13 +8,7 @@
 /// Marks the start of a quiz session
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizBegin<'a> {
@@ -32,7 +26,7 @@ pub struct QuizBegin<'a> {
 
 pub mod quiz_begin_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,8 +36,8 @@ pub mod quiz_begin_state {
     pub trait State: sealed::Sealed {
         type Quiz;
         type League;
-        type StartedAt;
         type EndsAt;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -51,8 +45,8 @@ pub mod quiz_begin_state {
     impl State for Empty {
         type Quiz = Unset;
         type League = Unset;
-        type StartedAt = Unset;
         type EndsAt = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `quiz` field to Set
     pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
@@ -60,8 +54,8 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetQuiz<S> {
         type Quiz = Set<members::quiz>;
         type League = S::League;
-        type StartedAt = S::StartedAt;
         type EndsAt = S::EndsAt;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `league` field to Set
     pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
@@ -69,17 +63,8 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetLeague<S> {
         type Quiz = S::Quiz;
         type League = Set<members::league>;
+        type EndsAt = S::EndsAt;
         type StartedAt = S::StartedAt;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Quiz = S::Quiz;
-        type League = S::League;
-        type StartedAt = Set<members::started_at>;
-        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -87,8 +72,17 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetEndsAt<S> {
         type Quiz = S::Quiz;
         type League = S::League;
-        type StartedAt = S::StartedAt;
         type EndsAt = Set<members::ends_at>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Quiz = S::Quiz;
+        type League = S::League;
+        type EndsAt = S::EndsAt;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -97,10 +91,10 @@ pub mod quiz_begin_state {
         pub struct quiz(());
         ///Marker type for the `league` field
         pub struct league(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -215,8 +209,8 @@ where
     S: quiz_begin_state::State,
     S::Quiz: quiz_begin_state::IsSet,
     S::League: quiz_begin_state::IsSet,
-    S::StartedAt: quiz_begin_state::IsSet,
     S::EndsAt: quiz_begin_state::IsSet,
+    S::StartedAt: quiz_begin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizBegin<'a> {
@@ -261,13 +255,7 @@ impl<'a> QuizBegin<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizBeginGetRecordOutput<'a> {
@@ -324,9 +312,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizBegin<'a> {
     }
 }
 
-fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.quizBegin"),

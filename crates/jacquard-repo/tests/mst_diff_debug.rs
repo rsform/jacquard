@@ -3,14 +3,14 @@
 //! Loads a specific failing test case and shows exactly which blocks we compute
 //! vs what's expected.
 
+use bytes::Bytes;
+use cid::Cid as IpldCid;
+use jacquard_repo::car::parse_car_bytes;
 use jacquard_repo::mst::Mst;
 use jacquard_repo::storage::MemoryBlockStore;
-use jacquard_repo::car::parse_car_bytes;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
-use cid::Cid as IpldCid;
-use bytes::Bytes;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 const TEST_SUITE_PATH: &str = "/home/orual/Git_Repos/mst-test-suite";
@@ -85,22 +85,35 @@ async fn debug_exhaustive_001_009() {
     let ops_count = diff.creates.len() + diff.updates.len() + diff.deletes.len();
 
     for (key, _cid) in &diff.creates {
-        mst_b.blocks_for_path(key.as_str(), &mut relevant_blocks).await.unwrap();
+        mst_b
+            .blocks_for_path(key.as_str(), &mut relevant_blocks)
+            .await
+            .unwrap();
         if ops_count > 1 {
-            mst_a.blocks_for_path(key.as_str(), &mut relevant_blocks).await.unwrap();
+            mst_a
+                .blocks_for_path(key.as_str(), &mut relevant_blocks)
+                .await
+                .unwrap();
         }
     }
 
     for (key, _new_cid, _old_cid) in &diff.updates {
-        mst_b.blocks_for_path(key.as_str(), &mut relevant_blocks).await.unwrap();
+        mst_b
+            .blocks_for_path(key.as_str(), &mut relevant_blocks)
+            .await
+            .unwrap();
     }
 
     for (key, _old_cid) in &diff.deletes {
-        mst_b.blocks_for_path(key.as_str(), &mut relevant_blocks).await.unwrap();
+        mst_b
+            .blocks_for_path(key.as_str(), &mut relevant_blocks)
+            .await
+            .unwrap();
     }
 
     // Filter out removed blocks before combining
-    let removed_set: std::collections::HashSet<_> = diff.removed_mst_blocks.iter().copied().collect();
+    let removed_set: std::collections::HashSet<_> =
+        diff.removed_mst_blocks.iter().copied().collect();
     let filtered_relevant: BTreeMap<_, _> = relevant_blocks
         .into_iter()
         .filter(|(cid, _)| !removed_set.contains(cid))
@@ -110,17 +123,9 @@ async fn debug_exhaustive_001_009() {
     all_proof_blocks.extend(filtered_relevant);
 
     // Compare created_nodes
-    let actual_created: BTreeSet<String> = diff
-        .new_mst_blocks
-        .keys()
-        .map(cid_to_string)
-        .collect();
-    let expected_created: BTreeSet<String> = test_case
-        .results
-        .created_nodes
-        .iter()
-        .cloned()
-        .collect();
+    let actual_created: BTreeSet<String> = diff.new_mst_blocks.keys().map(cid_to_string).collect();
+    let expected_created: BTreeSet<String> =
+        test_case.results.created_nodes.iter().cloned().collect();
 
     println!("\n=== Created Nodes ===");
     println!("Expected ({} blocks):", expected_created.len());
@@ -129,22 +134,19 @@ async fn debug_exhaustive_001_009() {
     }
     println!("\nActual ({} blocks):", actual_created.len());
     for cid in &actual_created {
-        let marker = if expected_created.contains(cid) { " " } else { "* EXTRA" };
+        let marker = if expected_created.contains(cid) {
+            " "
+        } else {
+            "* EXTRA"
+        };
         println!("  {}{}", cid, marker);
     }
 
     // Compare deleted_nodes
-    let actual_deleted: BTreeSet<String> = diff
-        .removed_mst_blocks
-        .iter()
-        .map(cid_to_string)
-        .collect();
-    let expected_deleted: BTreeSet<String> = test_case
-        .results
-        .deleted_nodes
-        .iter()
-        .cloned()
-        .collect();
+    let actual_deleted: BTreeSet<String> =
+        diff.removed_mst_blocks.iter().map(cid_to_string).collect();
+    let expected_deleted: BTreeSet<String> =
+        test_case.results.deleted_nodes.iter().cloned().collect();
 
     println!("\n=== Deleted Nodes ===");
     println!("Expected ({} blocks):", expected_deleted.len());
@@ -153,7 +155,11 @@ async fn debug_exhaustive_001_009() {
     }
     println!("\nActual ({} blocks):", actual_deleted.len());
     for cid in &actual_deleted {
-        let marker = if expected_deleted.contains(cid) { " " } else { "* EXTRA" };
+        let marker = if expected_deleted.contains(cid) {
+            " "
+        } else {
+            "* EXTRA"
+        };
         println!("  {}{}", cid, marker);
     }
 
@@ -165,7 +171,12 @@ async fn debug_exhaustive_001_009() {
     }
     println!("Updates: {}", diff.updates.len());
     for (key, new_cid, old_cid) in &diff.updates {
-        println!("  UPDATE {} {} -> {}", key, cid_to_string(old_cid), cid_to_string(new_cid));
+        println!(
+            "  UPDATE {} {} -> {}",
+            key,
+            cid_to_string(old_cid),
+            cid_to_string(new_cid)
+        );
     }
     println!("Deletes: {}", diff.deletes.len());
     for (key, cid) in &diff.deletes {
@@ -174,20 +185,35 @@ async fn debug_exhaustive_001_009() {
 
     // Show proof nodes comparison
     println!("\n=== Proof Nodes (for reference) ===");
-    println!("Expected proof_nodes ({} blocks):", test_case.results.proof_nodes.len());
+    println!(
+        "Expected proof_nodes ({} blocks):",
+        test_case.results.proof_nodes.len()
+    );
     for cid in &test_case.results.proof_nodes {
         println!("  {}", cid);
     }
 
-    println!("\nExpected inductive_proof_nodes ({} blocks):", test_case.results.inductive_proof_nodes.len());
+    println!(
+        "\nExpected inductive_proof_nodes ({} blocks):",
+        test_case.results.inductive_proof_nodes.len()
+    );
     for cid in &test_case.results.inductive_proof_nodes {
-        let marker = if test_case.results.proof_nodes.contains(cid) { " " } else { "* EXTRA for inductive" };
+        let marker = if test_case.results.proof_nodes.contains(cid) {
+            " "
+        } else {
+            "* EXTRA for inductive"
+        };
         println!("  {}{}", cid, marker);
     }
 
     println!("\n=== Our Computed Proof (all_proof_blocks) ===");
     let computed_proof: BTreeSet<String> = all_proof_blocks.keys().map(cid_to_string).collect();
-    let expected_inductive: BTreeSet<String> = test_case.results.inductive_proof_nodes.iter().cloned().collect();
+    let expected_inductive: BTreeSet<String> = test_case
+        .results
+        .inductive_proof_nodes
+        .iter()
+        .cloned()
+        .collect();
 
     println!("Computed ({} blocks):", computed_proof.len());
     for cid in &computed_proof {

@@ -1,3 +1,4 @@
+use crate::deps::fluent_uri::Uri;
 use crate::{
     IntoStatic,
     types::{
@@ -7,17 +8,16 @@ use crate::{
         value::{AtDataError, Data, RawData},
     },
 };
+use alloc::collections::BTreeMap;
+use alloc::string::String;
 use base64::{
     Engine,
     prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE, BASE64_URL_SAFE_NO_PAD},
 };
 use bytes::Bytes;
+use core::str::FromStr;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use core::str::FromStr;
-use url::Url;
 
 /// Insert a string into an at:// `Data<'_>` map, inferring its type.
 pub fn insert_string<'s>(
@@ -137,7 +137,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Uri(_) => {
-            if let Ok(uri) = Uri::new(value) {
+            if let Ok(uri) = UriValue::new(value) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Uri(uri)));
             } else {
                 map.insert(
@@ -169,25 +169,56 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
             return AtprotoStr::AtUri(uri);
         }
     } else if string.starts_with("https://") {
-        if let Ok(uri) = Url::parse(string) {
-            return AtprotoStr::Uri(Uri::Https(uri));
+        if let Ok(uri) = Uri::parse(string) {
+            return AtprotoStr::Uri(UriValue::Https(uri.to_owned()));
         }
     } else if string.starts_with("wss://") {
-        if let Ok(uri) = Url::parse(string) {
-            return AtprotoStr::Uri(Uri::Https(uri));
+        if let Ok(uri) = Uri::parse(string) {
+            return AtprotoStr::Uri(UriValue::Wss(uri.to_owned()));
         }
     } else if string.starts_with("ipfs://") {
-        return AtprotoStr::Uri(Uri::Cid(Cid::str(string)));
+        return AtprotoStr::Uri(UriValue::Cid(Cid::str(string)));
     } else if string.contains('.') && !string.contains([' ', '\n']) {
-        if string.len() < 253 && Url::parse(string).is_ok() {
-            // probably a handle
+        // Dotted strings without a scheme could be handles, NSIDs, or URIs.
+        // Use TLD lookup and camelCase heuristic to disambiguate.
+        // - Handles: domain order with TLD at the end (e.g., "example.com")
+        // - NSIDs: reverse domain order with TLD at the start (e.g., "com.example.service")
+        // - Tiebreaker: camelCase in the last segment indicates NSID (e.g., "getRecord")
+        let first_segment = string.split('.').next().unwrap_or("");
+        let last_segment = string.rsplit('.').next().unwrap_or("");
+
+        let first_is_tld = crate::tld::is_tld(first_segment);
+        let last_is_tld = crate::tld::is_tld(last_segment);
+        let has_upper_last_segment = last_segment.chars().any(|c| c.is_ascii_uppercase());
+
+        // First segment is a known TLD → reverse domain order → try NSID first.
+        if first_is_tld {
+            if let Ok(nsid) = Nsid::new(string) {
+                return AtprotoStr::Nsid(nsid);
+            }
+        }
+
+        // Last segment is a known TLD and first is not → normal domain order → handle.
+        if last_is_tld && !first_is_tld {
             if let Ok(handle) = AtIdentifier::new(string) {
                 return AtprotoStr::AtIdentifier(handle);
-            } else {
-                return AtprotoStr::Uri(Uri::Any(string.into()));
             }
+        }
+
+        // camelCase in last segment → NSID (e.g., "com.atproto.repo.getRecord").
+        if has_upper_last_segment {
+            if let Ok(nsid) = Nsid::new(string) {
+                return AtprotoStr::Nsid(nsid);
+            }
+        }
+
+        // Fallback: try both, preferring handle.
+        if let Ok(handle) = AtIdentifier::new(string) {
+            return AtprotoStr::AtIdentifier(handle);
         } else if let Ok(nsid) = Nsid::new(string) {
             return AtprotoStr::Nsid(nsid);
+        } else if string.contains("://") && Uri::<&str>::parse(string).is_ok() {
+            return AtprotoStr::Uri(UriValue::Any(string.into()));
         }
     } else if string.len() == 13 {
         if let Ok(tid) = Tid::new(string) {

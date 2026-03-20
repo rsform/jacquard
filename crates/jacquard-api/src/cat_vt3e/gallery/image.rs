@@ -8,13 +8,7 @@
 /// defines an image in the gallery
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
@@ -52,7 +46,7 @@ pub struct Image<'a> {
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -60,37 +54,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Image;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Image = S::Image;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type CreatedAt = S::CreatedAt;
         type Image = Set<members::image>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Image = S::Image;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -127,18 +121,7 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
         ImageBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -173,10 +156,7 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `blurhash` field (optional)
-    pub fn blurhash(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn blurhash(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -189,10 +169,7 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -205,10 +182,7 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -248,10 +222,7 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
         self
     }
     /// Set the `dominantColour` field to an Option value (optional)
-    pub fn maybe_dominant_colour(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_dominant_colour(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -304,10 +275,7 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -334,8 +302,8 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::CreatedAt: image_state::IsSet,
     S::Image: image_state::IsSet,
+    S::CreatedAt: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
@@ -396,13 +364,7 @@ impl<'a> Image<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageGetRecordOutput<'a> {
@@ -459,9 +421,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -471,9 +431,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "caption",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("caption"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -483,9 +441,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -495,9 +451,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     }
 }
 
-fn lexicon_doc_cat_vt3e_gallery_image() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_cat_vt3e_gallery_image() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("cat.vt3e.gallery.image"),

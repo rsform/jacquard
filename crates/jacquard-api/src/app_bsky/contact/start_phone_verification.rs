@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartPhoneVerification<'a> {
@@ -32,7 +32,7 @@ pub struct StartPhoneVerification<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartPhoneVerificationOutput<'a> {}
@@ -46,7 +46,7 @@ pub struct StartPhoneVerificationOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -109,9 +109,8 @@ impl jacquard_common::xrpc::XrpcResp for StartPhoneVerificationResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StartPhoneVerification<'a> {
     const NSID: &'static str = "app.bsky.contact.startPhoneVerification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartPhoneVerificationResponse;
 }
 
@@ -120,9 +119,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartPhoneVerification<'a> {
 pub struct StartPhoneVerificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartPhoneVerificationRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.startPhoneVerification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = StartPhoneVerification<'de>;
     type Response = StartPhoneVerificationResponse;
 }

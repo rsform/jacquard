@@ -8,13 +8,7 @@
 /// The record containing the Resolution for a Cumulus Market
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Resolution<'a> {
@@ -28,7 +22,7 @@ pub struct Resolution<'a> {
 
 pub mod resolution_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,49 +30,49 @@ pub mod resolution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answer;
         type Market;
+        type Answer;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answer = Unset;
         type Market = Unset;
+        type Answer = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Answer = Set<members::answer>;
-        type Market = S::Market;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `market` field to Set
     pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarket<S> {}
     impl<S: State> State for SetMarket<S> {
-        type Answer = S::Answer;
         type Market = Set<members::market>;
+        type Answer = S::Answer;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswer<S> {}
+    impl<S: State> State for SetAnswer<S> {
+        type Market = S::Market;
+        type Answer = Set<members::answer>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Answer = S::Answer;
         type Market = S::Market;
+        type Answer = S::Answer;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer` field
-        pub struct answer(());
         ///Marker type for the `market` field
         pub struct market(());
+        ///Marker type for the `answer` field
+        pub struct answer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -173,8 +167,8 @@ where
 impl<'a, S> ResolutionBuilder<'a, S>
 where
     S: resolution_state::State,
-    S::Answer: resolution_state::IsSet,
     S::Market: resolution_state::IsSet,
+    S::Answer: resolution_state::IsSet,
     S::CreatedAt: resolution_state::IsSet,
 {
     /// Build the final struct
@@ -218,13 +212,7 @@ impl<'a> Resolution<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolutionGetRecordOutput<'a> {
@@ -282,9 +270,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resolution<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("answer"),
                     max: 3usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -295,9 +281,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resolution<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("answer"),
                     min: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -307,9 +291,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resolution<'a> {
     }
 }
 
-fn lexicon_doc_za_co_ciaran_cumulus_resolution() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_za_co_ciaran_cumulus_resolution() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("za.co.ciaran.cumulus.resolution"),

@@ -8,13 +8,7 @@
 /// A relationship between a game and an organization.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Credit<'a> {
@@ -35,7 +29,7 @@ pub struct Credit<'a> {
 
 pub mod credit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,51 +37,51 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Org;
         type Roles;
         type Game;
+        type Org;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Org = Unset;
         type Roles = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `org` field to Set
-    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrg<S> {}
-    impl<S: State> State for SetOrg<S> {
-        type Org = Set<members::org>;
-        type Roles = S::Roles;
-        type Game = S::Game;
+        type Org = Unset;
     }
     ///State transition - sets the `roles` field to Set
     pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoles<S> {}
     impl<S: State> State for SetRoles<S> {
-        type Org = S::Org;
         type Roles = Set<members::roles>;
         type Game = S::Game;
+        type Org = S::Org;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Org = S::Org;
         type Roles = S::Roles;
         type Game = Set<members::game>;
+        type Org = S::Org;
+    }
+    ///State transition - sets the `org` field to Set
+    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrg<S> {}
+    impl<S: State> State for SetOrg<S> {
+        type Roles = S::Roles;
+        type Game = S::Game;
+        type Org = Set<members::org>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `org` field
-        pub struct org(());
         ///Marker type for the `roles` field
         pub struct roles(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `org` field
+        pub struct org(());
     }
 }
 
@@ -143,18 +137,12 @@ impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
 
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -220,9 +208,9 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Org: credit_state::IsSet,
     S::Roles: credit_state::IsSet,
     S::Game: credit_state::IsSet,
+    S::Org: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -269,13 +257,7 @@ impl<'a> Credit<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreditGetRecordOutput<'a> {
@@ -344,14 +326,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_games_gamesgamesgamesgames_org_credit()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "games.gamesgamesgamesgames.org.credit",
-        ),
+        id: ::jacquard_common::CowStr::new_static("games.gamesgamesgamesgames.org.credit"),
         revision: None,
         description: None,
         defs: {

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -40,12 +34,12 @@ pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
+    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,67 +47,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
-        type Blog;
-        type Blocks;
         type Title;
+        type Blog;
+        type Url;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
-        type Blog = Unset;
-        type Blocks = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Blog = S::Blog;
-        type Blocks = S::Blocks;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `blog` field to Set
-    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlog<S> {}
-    impl<S: State> State for SetBlog<S> {
-        type Url = S::Url;
-        type Blog = Set<members::blog>;
-        type Blocks = S::Blocks;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Url = S::Url;
-        type Blog = S::Blog;
-        type Blocks = Set<members::blocks>;
-        type Title = S::Title;
+        type Blog = Unset;
+        type Url = Unset;
+        type Blocks = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
-        type Blog = S::Blog;
-        type Blocks = S::Blocks;
         type Title = Set<members::title>;
+        type Blog = S::Blog;
+        type Url = S::Url;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blog` field to Set
+    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlog<S> {}
+    impl<S: State> State for SetBlog<S> {
+        type Title = S::Title;
+        type Blog = Set<members::blog>;
+        type Url = S::Url;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Title = S::Title;
+        type Blog = S::Blog;
+        type Url = Set<members::url>;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Title = S::Title;
+        type Blog = S::Blog;
+        type Url = S::Url;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `blog` field
-        pub struct blog(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `blog` field
+        pub struct blog(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -130,7 +124,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -147,18 +141,7 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     pub fn new() -> Self {
         PostBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -204,18 +187,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `bodyPlain` field (optional)
-    pub fn body_plain(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn body_plain(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `bodyPlain` field to an Option value (optional)
-    pub fn maybe_body_plain(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_body_plain(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -231,10 +208,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
         self
     }
     /// Set the `cover` field to an Option value (optional)
-    pub fn maybe_cover(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_cover(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -280,18 +254,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -343,7 +311,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> PostBuilder<'a, post_state::SetUrl<S>> {
         self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         PostBuilder {
@@ -357,10 +325,10 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Url: post_state::IsSet,
-    S::Blog: post_state::IsSet,
-    S::Blocks: post_state::IsSet,
     S::Title: post_state::IsSet,
+    S::Blog: post_state::IsSet,
+    S::Url: post_state::IsSet,
+    S::Blocks: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -417,13 +385,7 @@ impl<'a> Post<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {

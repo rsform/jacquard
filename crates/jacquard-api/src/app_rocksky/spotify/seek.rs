@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SeekParams {
@@ -21,7 +15,7 @@ pub struct SeekParams {
 
 pub mod seek_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -114,7 +108,7 @@ where
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Seek;
 /// Response type for
@@ -129,9 +123,8 @@ impl jacquard_common::xrpc::XrpcResp for SeekResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
     const NSID: &'static str = "app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SeekResponse;
 }
 
@@ -140,9 +133,8 @@ impl jacquard_common::xrpc::XrpcRequest for Seek {
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Seek;
     type Response = SeekResponse;
 }

@@ -189,7 +189,7 @@ agent.update_record::<Profile>(&uri, |profile| {
 use jacquard::common::xrpc::XrpcExt;
 let http = reqwest::Client::new();
 let response = http
-    .xrpc(Url::parse("https://bsky.social")?)
+    .xrpc(Uri::parse("https://bsky.social").map_err(|(e, _)| e)?.to_owned())
     .auth(AuthorizationToken::Bearer(token))
     .proxy(did)
     .send(&request)
@@ -474,7 +474,7 @@ let pds = resolver.verify_issuer(&server_metadata, &sub_did).await?;
 **Common mistakes**:
 - Not validating doc ID (use `.parse_validated()`, not just `.parse()`)
 - Assuming DNS resolution works on WASM (it doesn't)
-- Comparing issuer URLs with string equality (use `issuer_equivalent()` for trailing slash tolerance)
+- Comparing issuer URIs with string equality (normalise trailing slashes before comparison)
 - Trusting DID documents without checking `alsoKnownAs` for handle aliases
 - Not caching resolver (it's `Clone`, cheap to share)
 

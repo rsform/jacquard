@@ -178,7 +178,7 @@ impl<'c> CodeGenerator<'c> {
             }
             Some(LexStringFormat::Nsid) => quote! { jacquard_common::types::string::Nsid<'a> },
             Some(LexStringFormat::AtUri) => quote! { jacquard_common::types::string::AtUri<'a> },
-            Some(LexStringFormat::Uri) => quote! { jacquard_common::types::string::Uri<'a> },
+            Some(LexStringFormat::Uri) => quote! { jacquard_common::types::string::UriValue<'a> },
             Some(LexStringFormat::Cid) => quote! { jacquard_common::types::string::Cid<'a> },
             Some(LexStringFormat::Language) => {
                 quote! { jacquard_common::types::string::Language }
@@ -258,10 +258,11 @@ impl<'c> CodeGenerator<'c> {
             join_path_parts(&[&self.root_module, &module_path, &file_module, &type_name])
         };
 
-        let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::PathParseError {
-            path_str: path_str.clone(),
-            source: e,
-        })?;
+        let path: syn::Path =
+            syn::parse_str(&path_str).map_err(|e| CodegenError::PathParseError {
+                path_str: path_str.clone(),
+                source: e,
+            })?;
 
         // Only add lifetime if the target type needs it
         if self.ref_needs_lifetime(ref_str) {

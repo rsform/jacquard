@@ -8,13 +8,7 @@
 /// Recipient response to a badge award.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Response<'a> {
@@ -34,7 +28,7 @@ pub struct Response<'a> {
 
 pub mod response_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,49 +36,49 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Response;
         type BadgeAward;
+        type Response;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Response = Unset;
         type BadgeAward = Unset;
+        type Response = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type Response = Set<members::response>;
-        type BadgeAward = S::BadgeAward;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `badge_award` field to Set
     pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
     impl<S: State> State for SetBadgeAward<S> {
-        type Response = S::Response;
         type BadgeAward = Set<members::badge_award>;
+        type Response = S::Response;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponse<S> {}
+    impl<S: State> State for SetResponse<S> {
+        type BadgeAward = S::BadgeAward;
+        type Response = Set<members::response>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Response = S::Response;
         type BadgeAward = S::BadgeAward;
+        type Response = S::Response;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
+        ///Marker type for the `response` field
+        pub struct response(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -179,10 +173,7 @@ where
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn weight(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -196,8 +187,8 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Response: response_state::IsSet,
     S::BadgeAward: response_state::IsSet,
+    S::Response: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
 {
     /// Build the final struct
@@ -332,13 +323,7 @@ impl jacquard_common::IntoStatic for ResponseResponse<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseGetRecordOutput<'a> {
@@ -395,9 +380,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weight",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("weight"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -407,9 +390,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.badge.response"),

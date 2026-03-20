@@ -8,13 +8,7 @@
 /// A user's RPG character sprite. One record per user (rkey: self).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sprite<'a> {
@@ -61,7 +55,7 @@ pub struct Sprite<'a> {
 
 pub mod sprite_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -69,51 +63,51 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SpriteSheet;
         type Engine;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SpriteSheet = Unset;
         type Engine = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SpriteSheet = S::SpriteSheet;
-        type Engine = S::Engine;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `sprite_sheet` field to Set
     pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
     impl<S: State> State for SetSpriteSheet<S> {
-        type CreatedAt = S::CreatedAt;
         type SpriteSheet = Set<members::sprite_sheet>;
         type Engine = S::Engine;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
-        type CreatedAt = S::CreatedAt;
         type SpriteSheet = S::SpriteSheet;
         type Engine = Set<members::engine>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SpriteSheet = S::SpriteSheet;
+        type Engine = S::Engine;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sprite_sheet` field
         pub struct sprite_sheet(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -151,19 +145,7 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
         SpriteBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -288,10 +270,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -369,9 +348,9 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
-    S::CreatedAt: sprite_state::IsSet,
     S::SpriteSheet: sprite_state::IsSet,
     S::Engine: sprite_state::IsSet,
+    S::CreatedAt: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {
@@ -533,13 +512,7 @@ impl jacquard_common::IntoStatic for SpriteEngine<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteGetRecordOutput<'a> {
@@ -617,9 +590,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.columns {
             if *value > 16i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "columns",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("columns"),
                     max: 16i64,
                     actual: *value,
                 });
@@ -628,9 +599,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.columns {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "columns",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("columns"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -661,9 +630,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frame_width {
             if *value > 512i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "frame_width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frame_width"),
                     max: 512i64,
                     actual: *value,
                 });
@@ -672,9 +639,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frame_width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "frame_width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frame_width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -683,9 +648,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frames {
             if *value > 64i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "frames",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frames"),
                     max: 64i64,
                     actual: *value,
                 });
@@ -694,9 +657,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frames {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "frames",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frames"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -705,9 +666,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.height {
             if *value > 4096i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
                     max: 4096i64,
                     actual: *value,
                 });
@@ -716,9 +675,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.height {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -728,9 +685,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -744,22 +699,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
                     )
                     .count();
                 if count > 50usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 50usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 50usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.rows {
             if *value > 16i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rows",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rows"),
                     max: 16i64,
                     actual: *value,
                 });
@@ -768,9 +723,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.rows {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rows",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rows"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -779,9 +732,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.width {
             if *value > 4096i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
                     max: 4096i64,
                     actual: *value,
                 });
@@ -790,9 +741,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
                     min: 1i64,
                     actual: *value,
                 });

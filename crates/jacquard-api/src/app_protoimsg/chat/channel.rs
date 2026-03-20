@@ -8,13 +8,7 @@
 /// A channel within a chat room. Created by the room owner.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Channel<'a> {
@@ -41,7 +35,7 @@ pub struct Channel<'a> {
 
 pub mod channel_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,51 +43,51 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
-        type Name;
         type CreatedAt;
+        type Name;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Room = S::Room;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
+        type Room = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Room = S::Room;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Room = S::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
@@ -150,18 +144,12 @@ where
 
 impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -201,10 +189,7 @@ impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
 
 impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     /// Set the `postPolicy` field (optional)
-    pub fn post_policy(
-        mut self,
-        value: impl Into<Option<ChannelPostPolicy<'a>>>,
-    ) -> Self {
+    pub fn post_policy(mut self, value: impl Into<Option<ChannelPostPolicy<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -237,9 +222,9 @@ where
 impl<'a, S> ChannelBuilder<'a, S>
 where
     S: channel_state::State,
-    S::Room: channel_state::IsSet,
-    S::Name: channel_state::IsSet,
     S::CreatedAt: channel_state::IsSet,
+    S::Name: channel_state::IsSet,
+    S::Room: channel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Channel<'a> {
@@ -382,13 +367,7 @@ impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelGetRecordOutput<'a> {
@@ -445,9 +424,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -458,9 +435,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -469,9 +444,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
         if let Some(ref value) = self.position {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "position",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -481,9 +454,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_channel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_channel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.channel"),

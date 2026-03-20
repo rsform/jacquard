@@ -7,21 +7,14 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancellationResults<'a> {
     /// DIDs for which cancellation failed with error details
     #[serde(borrow)]
-    pub failed: Vec<
-        crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<'a>,
-    >,
+    pub failed:
+        Vec<crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<'a>>,
     /// DIDs for which all pending scheduled actions were successfully cancelled
     #[serde(borrow)]
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
@@ -29,7 +22,7 @@ pub struct CancellationResults<'a> {
 
 pub mod cancellation_results_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +30,37 @@ pub mod cancellation_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Succeeded;
         type Failed;
+        type Succeeded;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Succeeded = Unset;
         type Failed = Unset;
-    }
-    ///State transition - sets the `succeeded` field to Set
-    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
-    impl<S: State> State for SetSucceeded<S> {
-        type Succeeded = Set<members::succeeded>;
-        type Failed = S::Failed;
+        type Succeeded = Unset;
     }
     ///State transition - sets the `failed` field to Set
     pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFailed<S> {}
     impl<S: State> State for SetFailed<S> {
-        type Succeeded = S::Succeeded;
         type Failed = Set<members::failed>;
+        type Succeeded = S::Succeeded;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Failed = S::Failed;
+        type Succeeded = Set<members::succeeded>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `succeeded` field
-        pub struct succeeded(());
         ///Marker type for the `failed` field
         pub struct failed(());
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
     }
 }
 
@@ -76,11 +69,7 @@ pub struct CancellationResultsBuilder<'a, S: cancellation_results_state::State> 
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            Vec<
-                crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<
-                    'a,
-                >,
-            >,
+            Vec<crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<'a>>,
         >,
         ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     ),
@@ -114,11 +103,7 @@ where
     pub fn failed(
         mut self,
         value: impl Into<
-            Vec<
-                crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<
-                    'a,
-                >,
-            >,
+            Vec<crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<'a>>,
         >,
     ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetFailed<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -152,8 +137,8 @@ where
 impl<'a, S> CancellationResultsBuilder<'a, S>
 where
     S: cancellation_results_state::State,
-    S::Succeeded: cancellation_results_state::IsSet,
     S::Failed: cancellation_results_state::IsSet,
+    S::Succeeded: cancellation_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancellationResults<'a> {
@@ -179,14 +164,11 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.ozone.moderation.cancelScheduledActions",
-        ),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.moderation.cancelScheduledActions"),
         revision: None,
         description: None,
         defs: {
@@ -260,77 +242,75 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "failedCancellation",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("failedCancellation"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("error")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("error"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "error",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "errorCode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("error"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("errorCode"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -436,13 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FailedCancellation<'a> {
@@ -457,7 +431,7 @@ pub struct FailedCancellation<'a> {
 
 pub mod failed_cancellation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -568,18 +542,12 @@ where
 
 impl<'a, S: failed_cancellation_state::State> FailedCancellationBuilder<'a, S> {
     /// Set the `errorCode` field (optional)
-    pub fn error_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn error_code(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `errorCode` field to an Option value (optional)
-    pub fn maybe_error_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_error_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -636,13 +604,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancelScheduledActions<'a> {
@@ -657,7 +619,7 @@ pub struct CancelScheduledActions<'a> {
 
 pub mod cancel_scheduled_actions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -699,10 +661,7 @@ pub struct CancelScheduledActionsBuilder<'a, S: cancel_scheduled_actions_state::
 
 impl<'a> CancelScheduledActions<'a> {
     /// Create a new builder for this type
-    pub fn new() -> CancelScheduledActionsBuilder<
-        'a,
-        cancel_scheduled_actions_state::Empty,
-    > {
+    pub fn new() -> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty> {
         CancelScheduledActionsBuilder::new()
     }
 }
@@ -720,10 +679,7 @@ impl<'a> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty
 
 impl<'a, S: cancel_scheduled_actions_state::State> CancelScheduledActionsBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -743,10 +699,7 @@ where
     pub fn subjects(
         mut self,
         value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
-    ) -> CancelScheduledActionsBuilder<
-        'a,
-        cancel_scheduled_actions_state::SetSubjects<S>,
-    > {
+    ) -> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::SetSubjects<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         CancelScheduledActionsBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -787,13 +740,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancelScheduledActionsOutput<'a> {
@@ -814,9 +761,8 @@ impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
     const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CancelScheduledActionsResponse;
 }
 
@@ -825,9 +771,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
 pub struct CancelScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CancelScheduledActions<'de>;
     type Response = CancelScheduledActionsResponse;
 }

@@ -8,13 +8,7 @@
 /// Associates an annotation with a collection
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItem<'a> {
@@ -32,7 +26,7 @@ pub struct CollectionItem<'a> {
 
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,51 +34,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Annotation;
         type CreatedAt;
         type Collection;
+        type Annotation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Annotation = Unset;
         type CreatedAt = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `annotation` field to Set
-    pub struct SetAnnotation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnnotation<S> {}
-    impl<S: State> State for SetAnnotation<S> {
-        type Annotation = Set<members::annotation>;
-        type CreatedAt = S::CreatedAt;
-        type Collection = S::Collection;
+        type Annotation = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Annotation = S::Annotation;
         type CreatedAt = Set<members::created_at>;
         type Collection = S::Collection;
+        type Annotation = S::Annotation;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Annotation = S::Annotation;
         type CreatedAt = S::CreatedAt;
         type Collection = Set<members::collection>;
+        type Annotation = S::Annotation;
+    }
+    ///State transition - sets the `annotation` field to Set
+    pub struct SetAnnotation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnnotation<S> {}
+    impl<S: State> State for SetAnnotation<S> {
+        type CreatedAt = S::CreatedAt;
+        type Collection = S::Collection;
+        type Annotation = Set<members::annotation>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `annotation` field
-        pub struct annotation(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `annotation` field
+        pub struct annotation(());
     }
 }
 
@@ -191,9 +185,9 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Annotation: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
     S::Collection: collection_item_state::IsSet,
+    S::Annotation: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -238,13 +232,7 @@ impl<'a> CollectionItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<'a> {
@@ -300,9 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
         if let Some(ref value) = self.position {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "position",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -312,9 +298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     }
 }
 
-fn lexicon_doc_at_margin_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_at_margin_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("at.margin.collectionItem"),

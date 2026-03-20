@@ -8,13 +8,7 @@
 /// Active real-time collaboration session. Published when joining a collaborative editing session, deleted on disconnect.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Session<'a> {
@@ -28,7 +22,7 @@ pub struct Session<'a> {
     /// DERP relay URL if using relay-only mode (browser clients).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub relay_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub relay_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The resource being collaboratively edited.
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -36,7 +30,7 @@ pub struct Session<'a> {
 
 pub mod session_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -44,51 +38,51 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type NodeId;
         type Resource;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type NodeId = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type NodeId = S::NodeId;
-        type Resource = S::Resource;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `node_id` field to Set
     pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNodeId<S> {}
     impl<S: State> State for SetNodeId<S> {
-        type CreatedAt = S::CreatedAt;
         type NodeId = Set<members::node_id>;
         type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type CreatedAt = S::CreatedAt;
         type NodeId = S::NodeId;
         type Resource = Set<members::resource>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type NodeId = S::NodeId;
+        type Resource = S::Resource;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -99,7 +93,7 @@ pub struct SessionBuilder<'a, S: session_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -184,7 +178,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relayUrl` field (optional)
     pub fn relay_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -192,7 +186,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relayUrl` field to an Option value (optional)
     pub fn maybe_relay_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -221,9 +215,9 @@ where
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::CreatedAt: session_state::IsSet,
     S::NodeId: session_state::IsSet,
     S::Resource: session_state::IsSet,
+    S::CreatedAt: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
@@ -270,13 +264,7 @@ impl<'a> Session<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SessionGetRecordOutput<'a> {
@@ -333,9 +321,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.collab.session"),

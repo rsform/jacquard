@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Authorize<'a> {
@@ -25,7 +19,7 @@ pub struct Authorize<'a> {
 
 pub mod authorize_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,7 +166,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizeOutput<'a> {
@@ -192,9 +186,8 @@ impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
     const NSID: &'static str = "app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AuthorizeResponse;
 }
 
@@ -203,9 +196,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
 pub struct AuthorizeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Authorize<'de>;
     type Response = AuthorizeResponse;
 }

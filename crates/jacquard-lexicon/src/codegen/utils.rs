@@ -3,17 +3,14 @@ use jacquard_common::CowStr;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-
 /// Rust keywords that need escaping with r# prefix in module paths
 const RUST_KEYWORDS: &[&str] = &[
-    "as", "break", "const", "continue", "crate", "else", "enum", "extern",
-    "false", "fn", "for", "if", "impl", "in", "let", "loop", "match", "mod",
-    "move", "mut", "pub", "ref", "return", "self", "static", "struct",
-    "super", "trait", "true", "type", "unsafe", "use", "where", "while",
-    // Reserved keywords
-    "abstract", "become", "box", "do", "final", "macro", "override", "priv",
-    "try", "typeof", "unsized", "virtual", "yield",
-    // 2018+ edition keywords
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
+    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
+    "while", // Reserved keywords
+    "abstract", "become", "box", "do", "final", "macro", "override", "priv", "try", "typeof",
+    "unsized", "virtual", "yield", // 2018+ edition keywords
     "async", "await", "dyn",
 ];
 
@@ -79,7 +76,9 @@ pub(super) fn sanitize_name_cow(s: &str) -> CowStr<'_> {
     }
 
     if s.is_empty() {
-        return CowStr::Owned(jacquard_common::deps::smol_str::SmolStr::new_static("unknown"));
+        return CowStr::Owned(jacquard_common::deps::smol_str::SmolStr::new_static(
+            "unknown",
+        ));
     }
 
     // Replace invalid characters with underscores

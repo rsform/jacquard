@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Astral<'a> {
@@ -24,7 +18,7 @@ pub struct Astral<'a> {
 
 pub mod astral_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,37 +26,37 @@ pub mod astral_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Powers;
         type Points;
+        type Powers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Powers = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `powers` field to Set
-    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPowers<S> {}
-    impl<S: State> State for SetPowers<S> {
-        type Powers = Set<members::powers>;
-        type Points = S::Points;
+        type Powers = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoints<S> {}
     impl<S: State> State for SetPoints<S> {
-        type Powers = S::Powers;
         type Points = Set<members::points>;
+        type Powers = S::Powers;
+    }
+    ///State transition - sets the `powers` field to Set
+    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPowers<S> {}
+    impl<S: State> State for SetPowers<S> {
+        type Points = S::Points;
+        type Powers = Set<members::powers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `powers` field
-        pub struct powers(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `powers` field
+        pub struct powers(());
     }
 }
 
@@ -135,8 +129,8 @@ where
 impl<'a, S> AstralBuilder<'a, S>
 where
     S: astral_state::State,
-    S::Powers: astral_state::IsSet,
     S::Points: astral_state::IsSet,
+    S::Powers: astral_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Astral<'a> {
@@ -177,13 +171,7 @@ impl<'a> Astral<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AstralGetRecordOutput<'a> {
@@ -240,9 +228,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Astral<'a> {
     }
 }
 
-fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.vielle.dnd.astral"),
@@ -301,18 +287,20 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("power"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: None,
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: None,
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map
         },
@@ -347,9 +335,7 @@ impl<'a> Power<'a> {
             Self::DevVielleDndPowerEldritchAdaptability => {
                 "dev.vielle.dnd.power#eldritchAdaptability"
             }
-            Self::DevVielleDndPowerEldritchAssault => {
-                "dev.vielle.dnd.power#eldritchAssault"
-            }
+            Self::DevVielleDndPowerEldritchAssault => "dev.vielle.dnd.power#eldritchAssault",
             Self::DevVielleDndPowerRuneSeeker => "dev.vielle.dnd.power#runeSeeker",
             Self::DevVielleDndPowerFateScriber => "dev.vielle.dnd.power#fateScriber",
             Self::DevVielleDndPowerFaceless => "dev.vielle.dnd.power#faceless",
@@ -357,9 +343,7 @@ impl<'a> Power<'a> {
             Self::DevVielleDndPowerSpray => "dev.vielle.dnd.power#spray",
             Self::DevVielleDndPowerAcursed => "dev.vielle.dnd.power#acursed",
             Self::DevVielleDndPowerDarksight => "dev.vielle.dnd.power#darksight",
-            Self::DevVielleDndPowerEldritchVisage => {
-                "dev.vielle.dnd.power#eldritchVisage"
-            }
+            Self::DevVielleDndPowerEldritchVisage => "dev.vielle.dnd.power#eldritchVisage",
             Self::DevVielleDndPowerRegenerate => "dev.vielle.dnd.power#regenerate",
             Self::DevVielleDndPowerInstil => "dev.vielle.dnd.power#instil",
             Self::DevVielleDndPowerEldritchEnchantment => {
@@ -380,9 +364,7 @@ impl<'a> From<&'a str> for Power<'a> {
             "dev.vielle.dnd.power#eldritchAdaptability" => {
                 Self::DevVielleDndPowerEldritchAdaptability
             }
-            "dev.vielle.dnd.power#eldritchAssault" => {
-                Self::DevVielleDndPowerEldritchAssault
-            }
+            "dev.vielle.dnd.power#eldritchAssault" => Self::DevVielleDndPowerEldritchAssault,
             "dev.vielle.dnd.power#runeSeeker" => Self::DevVielleDndPowerRuneSeeker,
             "dev.vielle.dnd.power#fateScriber" => Self::DevVielleDndPowerFateScriber,
             "dev.vielle.dnd.power#faceless" => Self::DevVielleDndPowerFaceless,
@@ -390,9 +372,7 @@ impl<'a> From<&'a str> for Power<'a> {
             "dev.vielle.dnd.power#spray" => Self::DevVielleDndPowerSpray,
             "dev.vielle.dnd.power#acursed" => Self::DevVielleDndPowerAcursed,
             "dev.vielle.dnd.power#darksight" => Self::DevVielleDndPowerDarksight,
-            "dev.vielle.dnd.power#eldritchVisage" => {
-                Self::DevVielleDndPowerEldritchVisage
-            }
+            "dev.vielle.dnd.power#eldritchVisage" => Self::DevVielleDndPowerEldritchVisage,
             "dev.vielle.dnd.power#regenerate" => Self::DevVielleDndPowerRegenerate,
             "dev.vielle.dnd.power#instil" => Self::DevVielleDndPowerInstil,
             "dev.vielle.dnd.power#eldritchEnchantment" => {
@@ -413,9 +393,7 @@ impl<'a> From<String> for Power<'a> {
             "dev.vielle.dnd.power#eldritchAdaptability" => {
                 Self::DevVielleDndPowerEldritchAdaptability
             }
-            "dev.vielle.dnd.power#eldritchAssault" => {
-                Self::DevVielleDndPowerEldritchAssault
-            }
+            "dev.vielle.dnd.power#eldritchAssault" => Self::DevVielleDndPowerEldritchAssault,
             "dev.vielle.dnd.power#runeSeeker" => Self::DevVielleDndPowerRuneSeeker,
             "dev.vielle.dnd.power#fateScriber" => Self::DevVielleDndPowerFateScriber,
             "dev.vielle.dnd.power#faceless" => Self::DevVielleDndPowerFaceless,
@@ -423,9 +401,7 @@ impl<'a> From<String> for Power<'a> {
             "dev.vielle.dnd.power#spray" => Self::DevVielleDndPowerSpray,
             "dev.vielle.dnd.power#acursed" => Self::DevVielleDndPowerAcursed,
             "dev.vielle.dnd.power#darksight" => Self::DevVielleDndPowerDarksight,
-            "dev.vielle.dnd.power#eldritchVisage" => {
-                Self::DevVielleDndPowerEldritchVisage
-            }
+            "dev.vielle.dnd.power#eldritchVisage" => Self::DevVielleDndPowerEldritchVisage,
             "dev.vielle.dnd.power#regenerate" => Self::DevVielleDndPowerRegenerate,
             "dev.vielle.dnd.power#instil" => Self::DevVielleDndPowerInstil,
             "dev.vielle.dnd.power#eldritchEnchantment" => {
@@ -481,9 +457,7 @@ impl jacquard_common::IntoStatic for Power<'_> {
             Power::DevVielleDndPowerEldritchAdaptability => {
                 Power::DevVielleDndPowerEldritchAdaptability
             }
-            Power::DevVielleDndPowerEldritchAssault => {
-                Power::DevVielleDndPowerEldritchAssault
-            }
+            Power::DevVielleDndPowerEldritchAssault => Power::DevVielleDndPowerEldritchAssault,
             Power::DevVielleDndPowerRuneSeeker => Power::DevVielleDndPowerRuneSeeker,
             Power::DevVielleDndPowerFateScriber => Power::DevVielleDndPowerFateScriber,
             Power::DevVielleDndPowerFaceless => Power::DevVielleDndPowerFaceless,
@@ -491,9 +465,7 @@ impl jacquard_common::IntoStatic for Power<'_> {
             Power::DevVielleDndPowerSpray => Power::DevVielleDndPowerSpray,
             Power::DevVielleDndPowerAcursed => Power::DevVielleDndPowerAcursed,
             Power::DevVielleDndPowerDarksight => Power::DevVielleDndPowerDarksight,
-            Power::DevVielleDndPowerEldritchVisage => {
-                Power::DevVielleDndPowerEldritchVisage
-            }
+            Power::DevVielleDndPowerEldritchVisage => Power::DevVielleDndPowerEldritchVisage,
             Power::DevVielleDndPowerRegenerate => Power::DevVielleDndPowerRegenerate,
             Power::DevVielleDndPowerInstil => Power::DevVielleDndPowerInstil,
             Power::DevVielleDndPowerEldritchEnchantment => {

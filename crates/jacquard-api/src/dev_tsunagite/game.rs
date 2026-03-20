@@ -8,21 +8,13 @@
 /// A closed set of indexable named values.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Enum<'a> {
     /// The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// The human-readable name of this component in UI.
     #[serde(borrow)]
     pub name: jacquard_common::types::value::Data<'a>,
@@ -33,7 +25,7 @@ pub struct Enum<'a> {
 
 pub mod enum_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,51 +33,51 @@ pub mod enum_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
         type Name;
         type Values;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
         type Name = Unset;
         type Values = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Values = S::Values;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
-        type Name = S::Name;
-        type Values = Set<members::values>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
         type Name = S::Name;
         type Values = S::Values;
-        type Id = Set<members::id>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
+        type Values = S::Values;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValues<S> {}
+    impl<S: State> State for SetValues<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type Values = Set<members::values>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `values` field
         pub struct values(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
@@ -94,9 +86,7 @@ pub struct EnumBuilder<'a, S: enum_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
@@ -131,9 +121,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> EnumBuilder<'a, enum_state::SetId<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -186,9 +174,9 @@ where
 impl<'a, S> EnumBuilder<'a, S>
 where
     S: enum_state::State,
+    S::Id: enum_state::IsSet,
     S::Name: enum_state::IsSet,
     S::Values: enum_state::IsSet,
-    S::Id: enum_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Enum<'a> {
@@ -701,9 +689,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -714,9 +700,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -729,21 +713,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
 /// A record describing a game hosting leaderboards via Tsunagite.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     /// The default component for leaderboard sorting.
     #[serde(borrow)]
-    pub default_component: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub default_component:
+        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -769,7 +746,7 @@ pub struct Game<'a> {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -777,67 +754,67 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Judgments;
-        type DefaultComponent;
-        type ScoreComponents;
         type Name;
+        type DefaultComponent;
+        type Judgments;
+        type ScoreComponents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Judgments = Unset;
-        type DefaultComponent = Unset;
-        type ScoreComponents = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `judgments` field to Set
-    pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJudgments<S> {}
-    impl<S: State> State for SetJudgments<S> {
-        type Judgments = Set<members::judgments>;
-        type DefaultComponent = S::DefaultComponent;
-        type ScoreComponents = S::ScoreComponents;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `default_component` field to Set
-    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
-    impl<S: State> State for SetDefaultComponent<S> {
-        type Judgments = S::Judgments;
-        type DefaultComponent = Set<members::default_component>;
-        type ScoreComponents = S::ScoreComponents;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `score_components` field to Set
-    pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
-    impl<S: State> State for SetScoreComponents<S> {
-        type Judgments = S::Judgments;
-        type DefaultComponent = S::DefaultComponent;
-        type ScoreComponents = Set<members::score_components>;
-        type Name = S::Name;
+        type DefaultComponent = Unset;
+        type Judgments = Unset;
+        type ScoreComponents = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Judgments = S::Judgments;
-        type DefaultComponent = S::DefaultComponent;
-        type ScoreComponents = S::ScoreComponents;
         type Name = Set<members::name>;
+        type DefaultComponent = S::DefaultComponent;
+        type Judgments = S::Judgments;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `default_component` field to Set
+    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
+    impl<S: State> State for SetDefaultComponent<S> {
+        type Name = S::Name;
+        type DefaultComponent = Set<members::default_component>;
+        type Judgments = S::Judgments;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `judgments` field to Set
+    pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJudgments<S> {}
+    impl<S: State> State for SetJudgments<S> {
+        type Name = S::Name;
+        type DefaultComponent = S::DefaultComponent;
+        type Judgments = Set<members::judgments>;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `score_components` field to Set
+    pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
+    impl<S: State> State for SetScoreComponents<S> {
+        type Name = S::Name;
+        type DefaultComponent = S::DefaultComponent;
+        type Judgments = S::Judgments;
+        type ScoreComponents = Set<members::score_components>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `judgments` field
-        pub struct judgments(());
-        ///Marker type for the `default_component` field
-        pub struct default_component(());
-        ///Marker type for the `score_components` field
-        pub struct score_components(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `default_component` field
+        pub struct default_component(());
+        ///Marker type for the `judgments` field
+        pub struct judgments(());
+        ///Marker type for the `score_components` field
+        pub struct score_components(());
     }
 }
 
@@ -846,9 +823,7 @@ pub struct GameBuilder<'a, S: game_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
@@ -887,9 +862,7 @@ where
     pub fn default_component(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> GameBuilder<'a, game_state::SetDefaultComponent<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -911,10 +884,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
         self
     }
     /// Set the `inputMethods` field to an Option value (optional)
-    pub fn maybe_input_methods(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_input_methods(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -949,10 +919,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_logo(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -960,18 +927,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1018,10 +979,10 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Judgments: game_state::IsSet,
-    S::DefaultComponent: game_state::IsSet,
-    S::ScoreComponents: game_state::IsSet,
     S::Name: game_state::IsSet,
+    S::DefaultComponent: game_state::IsSet,
+    S::Judgments: game_state::IsSet,
+    S::ScoreComponents: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -1072,13 +1033,7 @@ impl<'a> Game<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1095,13 +1050,7 @@ pub enum GameScoreComponentsItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {
@@ -1161,21 +1110,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
 /// A percentage score with customizable precision.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Percentage<'a> {
     /// The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// The maximum allowed percentage for this score.
     pub maximum: i64,
     /// The human-readable name of this component in UI.
@@ -1187,7 +1128,7 @@ pub struct Percentage<'a> {
 
 pub mod percentage_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1195,67 +1136,67 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Id;
         type Maximum;
+        type Name;
         type Precision;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Id = Unset;
         type Maximum = Unset;
+        type Name = Unset;
         type Precision = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Id = S::Id;
-        type Maximum = S::Maximum;
-        type Precision = S::Precision;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Name = S::Name;
-        type Id = Set<members::id>;
-        type Maximum = S::Maximum;
-        type Precision = S::Precision;
+        type Id = Unset;
     }
     ///State transition - sets the `maximum` field to Set
     pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMaximum<S> {}
     impl<S: State> State for SetMaximum<S> {
-        type Name = S::Name;
-        type Id = S::Id;
         type Maximum = Set<members::maximum>;
+        type Name = S::Name;
         type Precision = S::Precision;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Maximum = S::Maximum;
+        type Name = Set<members::name>;
+        type Precision = S::Precision;
+        type Id = S::Id;
     }
     ///State transition - sets the `precision` field to Set
     pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPrecision<S> {}
     impl<S: State> State for SetPrecision<S> {
-        type Name = S::Name;
-        type Id = S::Id;
         type Maximum = S::Maximum;
+        type Name = S::Name;
         type Precision = Set<members::precision>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Maximum = S::Maximum;
+        type Name = S::Name;
+        type Precision = S::Precision;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `maximum` field
         pub struct maximum(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `precision` field
         pub struct precision(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1264,9 +1205,7 @@ pub struct PercentageBuilder<'a, S: percentage_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -1302,9 +1241,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> PercentageBuilder<'a, percentage_state::SetId<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -1376,10 +1313,10 @@ where
 impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
-    S::Name: percentage_state::IsSet,
-    S::Id: percentage_state::IsSet,
     S::Maximum: percentage_state::IsSet,
+    S::Name: percentage_state::IsSet,
     S::Precision: percentage_state::IsSet,
+    S::Id: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1427,9 +1364,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1440,9 +1375,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1455,21 +1388,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
 /// An integer point score, with or without a cap.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Points<'a> {
     /// The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// The maximum allowed value for this score.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub maximum: std::option::Option<i64>,
@@ -1480,7 +1405,7 @@ pub struct Points<'a> {
 
 pub mod points_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1527,9 +1452,7 @@ pub struct PointsBuilder<'a, S: points_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -1564,9 +1487,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> PointsBuilder<'a, points_state::SetId<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -1660,9 +1581,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1673,9 +1592,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1688,21 +1605,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
 /// A fallback component for displaying arbitrary text.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
     /// The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     /// The human-readable name of this component in UI.
     #[serde(borrow)]
     pub name: jacquard_common::types::value::Data<'a>,
@@ -1710,7 +1619,7 @@ pub struct Text<'a> {
 
 pub mod text_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1757,9 +1666,7 @@ pub struct TextBuilder<'a, S: text_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
     ),
@@ -1793,9 +1700,7 @@ where
     pub fn id(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
+            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
         >,
     ) -> TextBuilder<'a, text_state::SetId<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -1874,9 +1779,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1887,9 +1790,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });

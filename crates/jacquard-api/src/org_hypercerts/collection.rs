@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
@@ -28,7 +22,7 @@ pub struct Item<'a> {
 
 pub mod item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,18 +101,12 @@ where
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `itemWeight` field (optional)
-    pub fn item_weight(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn item_weight(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `itemWeight` field to an Option value (optional)
-    pub fn maybe_item_weight(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_item_weight(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -153,9 +141,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.collection"),
@@ -420,9 +406,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "item_weight",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("item_weight"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -435,13 +419,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
 /// A collection/group of items (activities and/or other collections). Collections support recursive nesting.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collection<'a> {
@@ -458,9 +436,8 @@ pub struct Collection<'a> {
     /// Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
-        crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
-    >,
+    pub description:
+        std::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
     /// Array of items in this collection with optional weights.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -468,9 +445,7 @@ pub struct Collection<'a> {
     /// A strong reference to the location where this collection's activities were performed. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub location: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Short summary of this collection, suitable for previews and list views
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -486,7 +461,7 @@ pub struct Collection<'a> {
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -494,37 +469,37 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -535,9 +510,7 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
         ::core::option::Option<CollectionAvatar<'a>>,
         ::core::option::Option<CollectionBanner<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
-        >,
+        ::core::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
         ::core::option::Option<Vec<crate::org_hypercerts::collection::Item<'a>>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -559,17 +532,7 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
     pub fn new() -> Self {
         CollectionBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -624,9 +587,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<
-            Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
-        >,
+        value: impl Into<Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -689,10 +650,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         self
     }
     /// Set the `shortDescription` field to an Option value (optional)
-    pub fn maybe_short_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_short_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -719,10 +677,7 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -736,8 +691,8 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S> CollectionBuilder<'a, S>
 where
     S: collection_state::State,
-    S::Title: collection_state::IsSet,
     S::CreatedAt: collection_state::IsSet,
+    S::Title: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
@@ -792,13 +747,7 @@ impl<'a> Collection<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -811,13 +760,7 @@ pub enum CollectionAvatar<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -830,13 +773,7 @@ pub enum CollectionBanner<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionGetRecordOutput<'a> {
@@ -893,9 +830,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("items"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -921,13 +856,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "short_description",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "short_description",
+                            ),
+                            max: 300usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -936,9 +873,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 800usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 800usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -953,13 +888,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
                     )
                     .count();
                 if count > 80usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 80usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "title",
+                            ),
+                            max: 80usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -967,9 +904,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImportContacts<'a> {
@@ -27,7 +21,7 @@ pub struct ImportContacts<'a> {
 
 pub mod import_contacts_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod import_contacts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Contacts;
         type Token;
+        type Contacts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Contacts = Unset;
         type Token = Unset;
-    }
-    ///State transition - sets the `contacts` field to Set
-    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContacts<S> {}
-    impl<S: State> State for SetContacts<S> {
-        type Contacts = Set<members::contacts>;
-        type Token = S::Token;
+        type Contacts = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
-        type Contacts = S::Contacts;
         type Token = Set<members::token>;
+        type Contacts = S::Contacts;
+    }
+    ///State transition - sets the `contacts` field to Set
+    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContacts<S> {}
+    impl<S: State> State for SetContacts<S> {
+        type Token = S::Token;
+        type Contacts = Set<members::contacts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contacts` field
-        pub struct contacts(());
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `contacts` field
+        pub struct contacts(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> ImportContactsBuilder<'a, S>
 where
     S: import_contacts_state::State,
-    S::Contacts: import_contacts_state::IsSet,
     S::Token: import_contacts_state::IsSet,
+    S::Contacts: import_contacts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImportContacts<'a> {
@@ -167,21 +161,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImportContactsOutput<'a> {
     /// The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.
     #[serde(borrow)]
-    pub matches_and_contact_indexes: Vec<
-        crate::app_bsky::contact::MatchAndContactIndex<'a>,
-    >,
+    pub matches_and_contact_indexes: Vec<crate::app_bsky::contact::MatchAndContactIndex<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -194,7 +180,7 @@ pub struct ImportContactsOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -266,9 +252,8 @@ impl jacquard_common::xrpc::XrpcResp for ImportContactsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ImportContacts<'a> {
     const NSID: &'static str = "app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ImportContactsResponse;
 }
 
@@ -277,9 +262,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ImportContacts<'a> {
 pub struct ImportContactsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportContactsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = ImportContacts<'de>;
     type Response = ImportContactsResponse;
 }

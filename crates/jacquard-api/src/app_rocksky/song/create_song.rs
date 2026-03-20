@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSong<'a> {
@@ -24,7 +24,7 @@ pub struct CreateSong<'a> {
     /// The URL of the album art for the song
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub album_art: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// The album artist of the song, if different from the main artist
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
@@ -62,13 +62,7 @@ pub struct CreateSong<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSongOutput<'a> {
@@ -89,9 +83,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSong<'a> {
     const NSID: &'static str = "app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateSongResponse;
 }
 
@@ -100,9 +93,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSong<'a> {
 pub struct CreateSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateSong<'de>;
     type Response = CreateSongResponse;
 }

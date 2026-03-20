@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiddenRef<'a> {
@@ -30,7 +24,7 @@ pub struct HiddenRef<'a> {
 
 pub mod hidden_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,13 +201,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiddenRefOutput<'a> {
@@ -241,9 +229,8 @@ impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for HiddenRef<'a> {
     const NSID: &'static str = "sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = HiddenRefResponse;
 }
 
@@ -252,9 +239,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for HiddenRef<'a> {
 pub struct HiddenRefRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = HiddenRef<'de>;
     type Response = HiddenRefResponse;
 }

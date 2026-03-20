@@ -1,10 +1,10 @@
 use crate::types::cid::Cid;
 use crate::{CowStr, IntoStatic, types::cid::CidLink};
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
-use smol_str::ToSmolStr;
 use alloc::string::{String, ToString};
 use core::convert::Infallible;
 use core::{fmt, hash::Hash, ops::Deref, str::FromStr};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
+use smol_str::ToSmolStr;
 
 /// Blob reference for binary data in AT Protocol
 ///

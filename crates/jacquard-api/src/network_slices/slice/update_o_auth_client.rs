@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateOAuthClient<'a> {
@@ -28,19 +28,19 @@ pub struct UpdateOAuthClient<'a> {
     /// New URI of the client application
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub client_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// New URI of the client logo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub logo_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// New URI of the privacy policy
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub policy_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub policy_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// New allowed redirect URIs for OAuth flow
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub redirect_uris: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub redirect_uris: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     /// New OAuth scope
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -48,18 +48,12 @@ pub struct UpdateOAuthClient<'a> {
     /// New URI of the terms of service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tos_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub tos_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateOAuthClientOutput<'a> {
@@ -80,9 +74,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateOAuthClientResponse;
 }
 
@@ -91,9 +84,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
 pub struct UpdateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.updateOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateOAuthClient<'de>;
     type Response = UpdateOAuthClientResponse;
 }

@@ -8,13 +8,7 @@
 /// A post (response) in a thread
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
@@ -34,7 +28,7 @@ pub struct Comment<'a> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,13 +240,7 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -309,9 +297,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blobs",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blobs"),
                     max: 1usize,
                     actual: value.len(),
                 });
@@ -322,9 +308,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 4000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -339,13 +323,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
                     )
                     .count();
                 if count > 40000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 40000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 40000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -353,9 +339,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_blue_skytalk_talk_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_skytalk_talk_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.skytalk.talk.comment"),

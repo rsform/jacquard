@@ -8,13 +8,7 @@
 /// DEPRECATED: Use app.gainforest.dwc.occurrence with basisOfRecord='MachineObservation' instead. A declaration of a fauna prediction for an organization.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fauna<'a> {
@@ -27,7 +21,7 @@ pub struct Fauna<'a> {
 
 pub mod fauna_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod fauna_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type GbifTaxonKeys;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type GbifTaxonKeys = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type GbifTaxonKeys = S::GbifTaxonKeys;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `gbif_taxon_keys` field to Set
     pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
     impl<S: State> State for SetGbifTaxonKeys<S> {
-        type CreatedAt = S::CreatedAt;
         type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type GbifTaxonKeys = S::GbifTaxonKeys;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `gbif_taxon_keys` field
         pub struct gbif_taxon_keys(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -138,8 +132,8 @@ where
 impl<'a, S> FaunaBuilder<'a, S>
 where
     S: fauna_state::State,
-    S::CreatedAt: fauna_state::IsSet,
     S::GbifTaxonKeys: fauna_state::IsSet,
+    S::CreatedAt: fauna_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fauna<'a> {
@@ -180,13 +174,7 @@ impl<'a> Fauna<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FaunaGetRecordOutput<'a> {
@@ -243,14 +231,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fauna<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_predictions_fauna() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_organization_predictions_fauna()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "app.gainforest.organization.predictions.fauna",
-        ),
+        id: ::jacquard_common::CowStr::new_static("app.gainforest.organization.predictions.fauna"),
         revision: None,
         description: None,
         defs: {

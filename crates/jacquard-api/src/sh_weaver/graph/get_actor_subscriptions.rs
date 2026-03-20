@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorSubscriptions<'a> {
@@ -28,7 +22,7 @@ pub struct GetActorSubscriptions<'a> {
 
 pub mod get_actor_subscriptions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,10 +65,7 @@ pub struct GetActorSubscriptionsBuilder<'a, S: get_actor_subscriptions_state::St
 
 impl<'a> GetActorSubscriptions<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetActorSubscriptionsBuilder<
-        'a,
-        get_actor_subscriptions_state::Empty,
-    > {
+    pub fn new() -> GetActorSubscriptionsBuilder<'a, get_actor_subscriptions_state::Empty> {
         GetActorSubscriptionsBuilder::new()
     }
 }
@@ -111,10 +102,7 @@ where
 
 impl<'a, S: get_actor_subscriptions_state::State> GetActorSubscriptionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -155,13 +143,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorSubscriptionsOutput<'a> {

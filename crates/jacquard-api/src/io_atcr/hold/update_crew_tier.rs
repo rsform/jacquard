@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCrewTier<'a> {
@@ -26,7 +20,7 @@ pub struct UpdateCrewTier<'a> {
 
 pub mod update_crew_tier_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +28,37 @@ pub mod update_crew_tier_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
         type TierRank;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
         type TierRank = Unset;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type UserDid = Set<members::user_did>;
-        type TierRank = S::TierRank;
+        type UserDid = Unset;
     }
     ///State transition - sets the `tier_rank` field to Set
     pub struct SetTierRank<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTierRank<S> {}
     impl<S: State> State for SetTierRank<S> {
-        type UserDid = S::UserDid;
         type TierRank = Set<members::tier_rank>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type TierRank = S::TierRank;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `tier_rank` field
         pub struct tier_rank(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -137,8 +131,8 @@ where
 impl<'a, S> UpdateCrewTierBuilder<'a, S>
 where
     S: update_crew_tier_state::State,
-    S::UserDid: update_crew_tier_state::IsSet,
     S::TierRank: update_crew_tier_state::IsSet,
+    S::UserDid: update_crew_tier_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateCrewTier<'a> {
@@ -173,7 +167,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCrewTierOutput<'a> {
@@ -192,7 +186,7 @@ pub struct UpdateCrewTierOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -239,9 +233,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateCrewTierResponse;
 }
 
@@ -250,9 +243,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
 pub struct UpdateCrewTierRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateCrewTier<'de>;
     type Response = UpdateCrewTierResponse;
 }

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fact<'a> {
@@ -43,7 +37,7 @@ pub struct Fact<'a> {
 
 pub mod fact_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,51 +45,51 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Predicate;
         type Args;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Predicate = Unset;
         type Args = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `predicate` field to Set
-    pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPredicate<S> {}
-    impl<S: State> State for SetPredicate<S> {
-        type Predicate = Set<members::predicate>;
-        type Args = S::Args;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `args` field to Set
-    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArgs<S> {}
-    impl<S: State> State for SetArgs<S> {
-        type Predicate = S::Predicate;
-        type Args = Set<members::args>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Predicate = S::Predicate;
         type Args = S::Args;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `predicate` field to Set
+    pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPredicate<S> {}
+    impl<S: State> State for SetPredicate<S> {
+        type CreatedAt = S::CreatedAt;
+        type Predicate = Set<members::predicate>;
+        type Args = S::Args;
+    }
+    ///State transition - sets the `args` field to Set
+    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArgs<S> {}
+    impl<S: State> State for SetArgs<S> {
+        type CreatedAt = S::CreatedAt;
+        type Predicate = S::Predicate;
+        type Args = Set<members::args>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `predicate` field
         pub struct predicate(());
         ///Marker type for the `args` field
         pub struct args(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -154,18 +148,12 @@ where
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `confidence` field (optional)
-    pub fn confidence(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn confidence(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `confidence` field to an Option value (optional)
-    pub fn maybe_confidence(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_confidence(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -230,10 +218,7 @@ where
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -246,18 +231,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
-    pub fn supersedes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn supersedes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
-    pub fn maybe_supersedes(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_supersedes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -265,18 +244,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -285,9 +258,9 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
+    S::CreatedAt: fact_state::IsSet,
     S::Predicate: fact_state::IsSet,
     S::Args: fact_state::IsSet,
-    S::CreatedAt: fact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fact<'a> {
@@ -340,13 +313,7 @@ impl<'a> Fact<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FactGetRecordOutput<'a> {
@@ -404,9 +371,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "args",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("args"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -417,9 +382,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "predicate",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("predicate"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -429,9 +392,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -441,9 +402,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("diy.razorgirl.winter.fact"),

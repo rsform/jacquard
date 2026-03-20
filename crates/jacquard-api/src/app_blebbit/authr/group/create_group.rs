@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroup<'a> {
@@ -39,7 +39,7 @@ pub struct CreateGroup<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroupOutput<'a> {
@@ -71,9 +71,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateGroupResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGroup<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.createGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateGroupResponse;
 }
 
@@ -82,9 +81,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGroup<'a> {
 pub struct CreateGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.createGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = CreateGroup<'de>;
     type Response = CreateGroupResponse;
 }

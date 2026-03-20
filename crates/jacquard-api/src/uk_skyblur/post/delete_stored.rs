@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteStored<'a> {
@@ -32,7 +32,7 @@ pub struct DeleteStored<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteStoredOutput<'a> {
@@ -52,9 +52,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteStoredResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteStored<'a> {
     const NSID: &'static str = "uk.skyblur.post.deleteStored";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteStoredResponse;
 }
 
@@ -63,9 +62,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteStored<'a> {
 pub struct DeleteStoredRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteStoredRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.deleteStored";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteStored<'de>;
     type Response = DeleteStoredResponse;
 }

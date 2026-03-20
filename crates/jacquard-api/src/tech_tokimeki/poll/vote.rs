@@ -8,13 +8,7 @@
 /// A vote on a poll
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
@@ -28,7 +22,7 @@ pub struct Vote<'a> {
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,51 +30,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type OptionIndex;
         type Poll;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type OptionIndex = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type OptionIndex = S::OptionIndex;
-        type Poll = S::Poll;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `option_index` field to Set
     pub struct SetOptionIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptionIndex<S> {}
     impl<S: State> State for SetOptionIndex<S> {
-        type CreatedAt = S::CreatedAt;
         type OptionIndex = Set<members::option_index>;
         type Poll = S::Poll;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
         type OptionIndex = S::OptionIndex;
         type Poll = Set<members::poll>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type OptionIndex = S::OptionIndex;
+        type Poll = S::Poll;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `option_index` field
         pub struct option_index(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -173,9 +167,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::CreatedAt: vote_state::IsSet,
     S::OptionIndex: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
+    S::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -218,13 +212,7 @@ impl<'a> Vote<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<'a> {
@@ -305,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.poll.vote"),

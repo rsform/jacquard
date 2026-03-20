@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
@@ -40,14 +34,14 @@ pub struct Vote<'a> {
     pub src: jacquard_common::types::string::Did<'a>,
     /// AT URI of the record, repository (account), or other resource that this vote applies to.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
     /// The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.
     pub val: i64,
 }
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,67 +49,67 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
-        type Val;
-        type Uri;
         type Cts;
+        type Uri;
+        type Val;
+        type Src;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
-        type Val = Unset;
-        type Uri = Unset;
         type Cts = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Val = S::Val;
-        type Uri = S::Uri;
-        type Cts = S::Cts;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVal<S> {}
-    impl<S: State> State for SetVal<S> {
-        type Src = S::Src;
-        type Val = Set<members::val>;
-        type Uri = S::Uri;
-        type Cts = S::Cts;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Src = S::Src;
-        type Val = S::Val;
-        type Uri = Set<members::uri>;
-        type Cts = S::Cts;
+        type Uri = Unset;
+        type Val = Unset;
+        type Src = Unset;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Src = S::Src;
-        type Val = S::Val;
-        type Uri = S::Uri;
         type Cts = Set<members::cts>;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cts = S::Cts;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Cts = S::Cts;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Cts = S::Cts;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Src = Set<members::src>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cts` field
         pub struct cts(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
     }
 }
 
@@ -129,7 +123,7 @@ pub struct VoteBuilder<'a, S: vote_state::State> {
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -176,10 +170,7 @@ impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
+    pub fn maybe_cid(mut self, value: Option<jacquard_common::types::string::Cid<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -206,18 +197,12 @@ where
 
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -225,18 +210,12 @@ impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
 
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `sig` field (optional)
-    pub fn sig(
-        mut self,
-        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
-    ) -> Self {
+    pub fn sig(mut self, value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sig` field to an Option value (optional)
-    pub fn maybe_sig(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_sig(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -269,7 +248,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> VoteBuilder<'a, vote_state::SetUri<S>> {
         self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         VoteBuilder {
@@ -286,10 +265,7 @@ where
     S::Val: vote_state::IsUnset,
 {
     /// Set the `val` field (required)
-    pub fn val(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VoteBuilder<'a, vote_state::SetVal<S>> {
+    pub fn val(mut self, value: impl Into<i64>) -> VoteBuilder<'a, vote_state::SetVal<S>> {
         self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         VoteBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -302,10 +278,10 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Src: vote_state::IsSet,
-    S::Val: vote_state::IsSet,
-    S::Uri: vote_state::IsSet,
     S::Cts: vote_state::IsSet,
+    S::Uri: vote_state::IsSet,
+    S::Val: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -358,13 +334,7 @@ impl<'a> Vote<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<'a> {

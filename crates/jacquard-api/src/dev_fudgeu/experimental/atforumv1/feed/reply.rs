@@ -8,13 +8,7 @@
 /// An initial post that starts a discussion
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Reply<'a> {
@@ -29,7 +23,7 @@ pub struct Reply<'a> {
 
 pub mod reply_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,51 +31,51 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Root;
         type Content;
+        type Root;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Root = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Root = S::Root;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
-        type Root = Set<members::root>;
-        type Content = S::Content;
+        type Root = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Root = S::Root;
         type Content = Set<members::content>;
+        type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Content = S::Content;
+        type Root = Set<members::root>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type Root = S::Root;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -194,9 +188,9 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::CreatedAt: reply_state::IsSet,
-    S::Root: reply_state::IsSet,
     S::Content: reply_state::IsSet,
+    S::Root: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reply<'a> {
@@ -241,13 +235,7 @@ impl<'a> Reply<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyGetRecordOutput<'a> {
@@ -305,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reply<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -317,14 +303,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reply<'a> {
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_reply() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_reply()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "dev.fudgeu.experimental.atforumv1.feed.reply",
-        ),
+        id: ::jacquard_common::CowStr::new_static("dev.fudgeu.experimental.atforumv1.feed.reply"),
         revision: None,
         description: None,
         defs: {

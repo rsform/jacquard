@@ -10,13 +10,7 @@ pub mod favorite;
 /// A specific episode or VOD of a show.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Episode<'a> {
@@ -41,12 +35,12 @@ pub struct Episode<'a> {
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub vod_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub vod_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,7 +107,7 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<EpisodeStatus<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -195,18 +189,12 @@ where
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -267,7 +255,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `vodUrl` field (optional)
     pub fn vod_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
@@ -275,7 +263,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `vodUrl` field to an Option value (optional)
     pub fn maybe_vod_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
@@ -434,13 +422,7 @@ impl jacquard_common::IntoStatic for EpisodeStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
@@ -497,9 +479,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -510,9 +490,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -522,9 +500,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     }
 }
 
-fn lexicon_doc_haus_opn_mic_show_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_haus_opn_mic_show_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("haus.opn.mic.show.episode"),

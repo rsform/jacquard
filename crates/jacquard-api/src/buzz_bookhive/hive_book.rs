@@ -8,13 +8,7 @@
 /// A book within the hive
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiveBook<'a> {
@@ -66,7 +60,7 @@ pub struct HiveBook<'a> {
 
 pub mod hive_book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,105 +68,105 @@ pub mod hive_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
+        type Thumbnail;
         type CreatedAt;
+        type Id;
+        type Title;
         type Authors;
         type UpdatedAt;
-        type Id;
-        type Thumbnail;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
+        type Thumbnail = Unset;
         type CreatedAt = Unset;
+        type Id = Unset;
+        type Title = Unset;
         type Authors = Unset;
         type UpdatedAt = Unset;
-        type Id = Unset;
-        type Thumbnail = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Authors = S::Authors;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type Thumbnail = S::Thumbnail;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Authors = S::Authors;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type Thumbnail = S::Thumbnail;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Authors = Set<members::authors>;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type Thumbnail = S::Thumbnail;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Authors = S::Authors;
-        type UpdatedAt = Set<members::updated_at>;
-        type Id = S::Id;
-        type Thumbnail = S::Thumbnail;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Authors = S::Authors;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = Set<members::id>;
-        type Thumbnail = S::Thumbnail;
     }
     ///State transition - sets the `thumbnail` field to Set
     pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumbnail<S> {}
     impl<S: State> State for SetThumbnail<S> {
-        type Title = S::Title;
+        type Thumbnail = Set<members::thumbnail>;
         type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Title = S::Title;
         type Authors = S::Authors;
         type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = Set<members::created_at>;
         type Id = S::Id;
-        type Thumbnail = Set<members::thumbnail>;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Title = S::Title;
+        type Authors = Set<members::authors>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `thumbnail` field
+        pub struct thumbnail(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `thumbnail` field
-        pub struct thumbnail(());
     }
 }
 
@@ -211,20 +205,7 @@ impl<'a> HiveBookBuilder<'a, hive_book_state::Empty> {
         HiveBookBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -252,10 +233,7 @@ where
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `cover` field (optional)
-    pub fn cover(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cover(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -287,18 +265,12 @@ where
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -370,10 +342,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -386,18 +355,12 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `sourceId` field (optional)
-    pub fn source_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `sourceId` field to an Option value (optional)
-    pub fn maybe_source_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_source_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -405,18 +368,12 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `sourceUrl` field (optional)
-    pub fn source_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source_url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `sourceUrl` field to an Option value (optional)
-    pub fn maybe_source_url(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_source_url(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -482,12 +439,12 @@ where
 impl<'a, S> HiveBookBuilder<'a, S>
 where
     S: hive_book_state::State,
-    S::Title: hive_book_state::IsSet,
+    S::Thumbnail: hive_book_state::IsSet,
     S::CreatedAt: hive_book_state::IsSet,
+    S::Id: hive_book_state::IsSet,
+    S::Title: hive_book_state::IsSet,
     S::Authors: hive_book_state::IsSet,
     S::UpdatedAt: hive_book_state::IsSet,
-    S::Id: hive_book_state::IsSet,
-    S::Thumbnail: hive_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HiveBook<'a> {
@@ -552,13 +509,7 @@ impl<'a> HiveBook<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiveBookGetRecordOutput<'a> {
@@ -616,9 +567,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("authors"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -629,9 +578,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("authors"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -641,9 +588,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -652,9 +597,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         if let Some(ref value) = self.rating {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
                     max: 1000i64,
                     actual: *value,
                 });
@@ -663,9 +606,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         if let Some(ref value) = self.rating {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -676,9 +617,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -689,9 +628,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -701,9 +638,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     }
 }
 
-fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("buzz.bookhive.hiveBook"),

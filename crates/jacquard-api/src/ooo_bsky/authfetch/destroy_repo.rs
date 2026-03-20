@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct DestroyRepo;
 /// Response type for
@@ -29,9 +29,8 @@ impl jacquard_common::xrpc::XrpcResp for DestroyRepoResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DestroyRepo {
     const NSID: &'static str = "ooo.bsky.authfetch.destroyRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DestroyRepoResponse;
 }
 
@@ -40,9 +39,8 @@ impl jacquard_common::xrpc::XrpcRequest for DestroyRepo {
 pub struct DestroyRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DestroyRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.destroyRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DestroyRepo;
     type Response = DestroyRepoResponse;
 }

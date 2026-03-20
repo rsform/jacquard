@@ -110,9 +110,7 @@ impl jacquard_common::IntoStatic for BasisOfRecordEnum<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             BasisOfRecordEnum::HumanObservation => BasisOfRecordEnum::HumanObservation,
-            BasisOfRecordEnum::MachineObservation => {
-                BasisOfRecordEnum::MachineObservation
-            }
+            BasisOfRecordEnum::MachineObservation => BasisOfRecordEnum::MachineObservation,
             BasisOfRecordEnum::PreservedSpecimen => BasisOfRecordEnum::PreservedSpecimen,
             BasisOfRecordEnum::LivingSpecimen => BasisOfRecordEnum::LivingSpecimen,
             BasisOfRecordEnum::FossilSpecimen => BasisOfRecordEnum::FossilSpecimen,
@@ -242,7 +240,7 @@ impl jacquard_common::IntoStatic for DublinCoreTypeEnum<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Geolocation<'a> {
@@ -261,9 +259,7 @@ pub struct Geolocation<'a> {
     pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.defs"),
@@ -293,25 +289,23 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "dublinCoreTypeEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dublinCoreTypeEnum"),
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Dublin Core type vocabulary for the nature of the resource.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: Some(64usize),
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("geolocation"),
@@ -433,25 +427,23 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "occurrenceStatusEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("occurrenceStatusEnum"),
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Statement about the presence or absence of a taxon at a location.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: Some(64usize),
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sexEnum"),
@@ -644,22 +636,22 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("taxonRankEnum"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The taxonomic rank of the most specific name in the scientificName.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: Some(64usize),
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map
         },
@@ -699,13 +691,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_latitude",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "decimal_latitude",
+                            ),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -718,13 +712,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_longitude",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "decimal_longitude",
+                            ),
+                            max: 32usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -736,13 +732,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "geodetic_datum",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "geodetic_datum",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -843,9 +841,7 @@ impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
             NomenclaturalCodeEnum::Icnp => NomenclaturalCodeEnum::Icnp,
             NomenclaturalCodeEnum::Ictv => NomenclaturalCodeEnum::Ictv,
             NomenclaturalCodeEnum::BioCode => NomenclaturalCodeEnum::BioCode,
-            NomenclaturalCodeEnum::Other(v) => {
-                NomenclaturalCodeEnum::Other(v.into_static())
-            }
+            NomenclaturalCodeEnum::Other(v) => NomenclaturalCodeEnum::Other(v.into_static()),
         }
     }
 }
@@ -928,9 +924,7 @@ impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
         match self {
             OccurrenceStatusEnum::Present => OccurrenceStatusEnum::Present,
             OccurrenceStatusEnum::Absent => OccurrenceStatusEnum::Absent,
-            OccurrenceStatusEnum::Other(v) => {
-                OccurrenceStatusEnum::Other(v.into_static())
-            }
+            OccurrenceStatusEnum::Other(v) => OccurrenceStatusEnum::Other(v.into_static()),
         }
     }
 }
@@ -1033,7 +1027,7 @@ impl jacquard_common::IntoStatic for SexEnum<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TaxonIdentification<'a> {
@@ -1087,13 +1081,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "date_identified",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "date_identified",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1105,13 +1101,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "gbif_taxon_key",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "gbif_taxon_key",
+                            ),
+                            max: 64usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1123,13 +1121,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_qualifier",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "identification_qualifier",
+                            ),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1141,13 +1141,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "identification_remarks",
+                            ),
+                            max: 2048usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1159,13 +1161,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "identified_by",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1177,13 +1181,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by_id",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "identified_by_id",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -1196,13 +1202,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "scientific_name",
+                            ),
+                            max: 512usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }

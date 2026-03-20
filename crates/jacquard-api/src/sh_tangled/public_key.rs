@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKey<'a> {
@@ -29,7 +23,7 @@ pub struct PublicKey<'a> {
 
 pub mod public_key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,49 +31,49 @@ pub mod public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Name;
+        type Key;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Name = Unset;
+        type Key = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Key = S::Key;
         type Name = Set<members::name>;
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Name = S::Name;
+        type Key = Set<members::key>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Key = S::Key;
         type Name = S::Name;
+        type Key = S::Key;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -174,8 +168,8 @@ where
 impl<'a, S> PublicKeyBuilder<'a, S>
 where
     S: public_key_state::State,
-    S::Key: public_key_state::IsSet,
     S::Name: public_key_state::IsSet,
+    S::Key: public_key_state::IsSet,
     S::CreatedAt: public_key_state::IsSet,
 {
     /// Build the final struct
@@ -219,13 +213,7 @@ impl<'a> PublicKey<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKeyGetRecordOutput<'a> {
@@ -283,9 +271,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4096usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
                     max: 4096usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -295,9 +281,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_publicKey() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_tangled_publicKey() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.publicKey"),

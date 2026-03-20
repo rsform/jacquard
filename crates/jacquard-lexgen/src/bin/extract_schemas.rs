@@ -34,8 +34,7 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    let discovery = WorkspaceDiscovery::new()
-        .verbose(args.verbose);
+    let discovery = WorkspaceDiscovery::new().verbose(args.verbose);
 
     discovery.generate_and_write(args.output)?;
 

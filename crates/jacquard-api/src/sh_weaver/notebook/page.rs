@@ -8,13 +8,7 @@
 /// A grouping of entries in a notebook, intended to be displayed as a single page.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Page<'a> {
@@ -36,7 +30,7 @@ pub struct Page<'a> {
 
 pub mod page_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -182,18 +176,12 @@ where
 
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<crate::sh_weaver::notebook::Tags<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -209,10 +197,7 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Title<'a>>,
-    ) -> Self {
+    pub fn maybe_title(mut self, value: Option<crate::sh_weaver::notebook::Title<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -270,13 +255,7 @@ impl<'a> Page<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PageGetRecordOutput<'a> {
@@ -333,9 +312,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_page() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_notebook_page() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.page"),

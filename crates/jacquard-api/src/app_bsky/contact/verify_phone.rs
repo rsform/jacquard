@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerifyPhone<'a> {
@@ -35,7 +35,7 @@ pub struct VerifyPhone<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerifyPhoneOutput<'a> {
@@ -54,7 +54,7 @@ pub struct VerifyPhoneOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -126,9 +126,8 @@ impl jacquard_common::xrpc::XrpcResp for VerifyPhoneResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for VerifyPhone<'a> {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = VerifyPhoneResponse;
 }
 
@@ -137,9 +136,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for VerifyPhone<'a> {
 pub struct VerifyPhoneRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for VerifyPhoneRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.verifyPhone";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = VerifyPhone<'de>;
     type Response = VerifyPhoneResponse;
 }

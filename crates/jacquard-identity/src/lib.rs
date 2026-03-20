@@ -80,16 +80,19 @@ use jacquard_api::com_atproto::identity::resolve_did;
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
-use jacquard_common::http_client::HttpClient;
+use jacquard_common::deps::fluent_uri::Uri;
+use jacquard_common::deps::fluent_uri::pct_enc::{
+    EString,
+    encoder::{Data as EncData, Query},
+};
 use jacquard_common::deps::smol_str::{SmolStr, ToSmolStr};
+use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::{IntoStatic, types::string::Handle};
-use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
-use url::{ParseError, Url};
 
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
 use {
@@ -99,8 +102,7 @@ use {
 
 #[cfg(feature = "cache")]
 use {
-    crate::lexicon_resolver::ResolvedLexiconSchema,
-    jacquard_common::types::string::Nsid,
+    crate::lexicon_resolver::ResolvedLexiconSchema, jacquard_common::types::string::Nsid,
     mini_moka::time::Duration,
 };
 
@@ -415,7 +417,7 @@ impl JacquardResolver {
     ///
     /// - `did:web:example.com` → `https://example.com/.well-known/did.json`
     /// - `did:web:example.com:user:alice` → `https://example.com/user/alice/did.json`
-    fn did_web_url(&self, did: &Did<'_>) -> resolver::Result<Url> {
+    fn did_web_url(&self, did: &Did<'_>) -> resolver::Result<Uri<String>> {
         // did:web:example.com[:path:segments]
         let s = did.as_str();
         let rest = s
@@ -425,24 +427,25 @@ impl JacquardResolver {
         let host = parts
             .next()
             .ok_or_else(|| IdentityError::unsupported_did_method(s))?;
-        let mut url = Url::parse(&format!("https://{host}/"))?;
-        let path: Vec<&str> = parts.collect();
-        if path.is_empty() {
-            url.set_path(".well-known/did.json");
+
+        let path_segments: Vec<&str> = parts.collect();
+
+        // Build the path using fluent-uri builder
+        let mut path = String::from("/");
+        if path_segments.is_empty() {
+            path.push_str(".well-known/did.json");
         } else {
-            // Append path segments and did.json
-            let mut segments = url
-                .path_segments_mut()
-                .map_err(|_| IdentityError::url(ParseError::SetHostOnCannotBeABaseUrl))?;
-            for seg in path {
-                // Minimally percent-decode each segment per spec guidance
-                let decoded = percent_decode_str(seg).decode_utf8_lossy();
-                segments.push(&decoded);
+            for seg in path_segments {
+                path.push_str(seg);
+                path.push('/');
             }
-            segments.push("did.json");
-            // drop segments
+            path.push_str("did.json");
         }
-        Ok(url)
+
+        let url_str = format!("https://{}{}", host, path);
+        Uri::parse(url_str)
+            .map_err(|(e, _)| IdentityError::url(e))
+            .map(|u| u.to_owned())
     }
 
     #[cfg(test)]
@@ -451,16 +454,16 @@ impl JacquardResolver {
         self.did_web_url(&did).unwrap().to_string()
     }
 
-    async fn get_json_bytes(&self, url: Url) -> resolver::Result<(Bytes, StatusCode)> {
-        let resp = self.http.get(url).send().await?;
+    async fn get_json_bytes(&self, uri: Uri<&str>) -> resolver::Result<(Bytes, StatusCode)> {
+        let resp = self.http.get(uri.as_str()).send().await?;
         let status = resp.status();
         let buf = resp.bytes().await?;
         Ok((buf, status))
     }
 
-    async fn get_text(&self, url: Url) -> resolver::Result<String> {
-        let u = url.to_smolstr();
-        let resp = self.http.get(url).send().await?;
+    async fn get_text(&self, uri: Uri<&str>) -> resolver::Result<String> {
+        let u = SmolStr::from(uri.as_str());
+        let resp = self.http.get(uri.as_str()).send().await?;
         if resp.status() == StatusCode::OK {
             Ok(resp.text().await?)
         } else {
@@ -496,16 +499,16 @@ impl JacquardResolver {
         #[cfg(feature = "tracing")]
         tracing::trace!("querying DNS via DoH: {} ({})", name, record_type);
 
-        let mut url = Url::parse("https://cloudflare-dns.com/dns-query")
-            .expect("hardcoded URL should be valid");
-
-        url.query_pairs_mut()
-            .append_pair("name", name)
-            .append_pair("type", record_type);
+        let mut enc_name = EString::<Query>::new();
+        enc_name.encode_str::<EncData>(name);
+        let mut enc_type = EString::<Query>::new();
+        enc_type.encode_str::<EncData>(record_type);
+        let url_str =
+            format!("https://cloudflare-dns.com/dns-query?name={enc_name}&type={enc_type}");
 
         let response = self
             .http
-            .get(url)
+            .get(url_str.as_str())
             .header("Accept", "application/dns-json")
             .send()
             .await?;
@@ -573,12 +576,9 @@ impl JacquardResolver {
         let req = ResolveHandle::new()
             .handle(handle.clone().into_static())
             .build();
-        let resp = self
-            .http
-            .xrpc(pds)
-            .send(&req)
-            .await
-            .map_err(|e| IdentityError::from(e).with_context(format!("resolving handle {}", handle)))?;
+        let resp = self.http.xrpc(pds).send(&req).await.map_err(|e| {
+            IdentityError::from(e).with_context(format!("resolving handle {}", handle))
+        })?;
         // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
         let out = resp.parse().map_err(|e| {
             IdentityError::xrpc(jacquard_common::deps::smol_str::format_smolstr!("{:?}", e))
@@ -605,12 +605,9 @@ impl JacquardResolver {
             None => return Err(IdentityError::no_pds_fallback()),
         };
         let req = resolve_did::ResolveDid::new().did(did.clone()).build();
-        let resp = self
-            .http
-            .xrpc(pds)
-            .send(&req)
-            .await
-            .map_err(|e| IdentityError::from(e).with_context(format!("fetching DID doc for {}", did)))?;
+        let resp = self.http.xrpc(pds).send(&req).await.map_err(|e| {
+            IdentityError::from(e).with_context(format!("fetching DID doc for {}", did))
+        })?;
         // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
         let out = resp.parse().map_err(|e| {
             IdentityError::xrpc(jacquard_common::deps::smol_str::format_smolstr!("{:?}", e))
@@ -637,16 +634,29 @@ impl JacquardResolver {
                 .with_context(format!("resolving {}", did)));
             }
         };
-        let mut url = base;
-        url.set_path("/xrpc/com.bad-example.identity.resolveMiniDoc");
-        if let Ok(qs) = serde_html_form::to_string(
+        // Build URL using string manipulation, then parse
+        let qs = serde_html_form::to_string(
             &resolve_did::ResolveDid::new()
                 .did(did.clone().into_static())
                 .build(),
-        ) {
-            url.set_query(Some(&qs));
-        }
-        let (buf, status) = self.get_json_bytes(url).await?;
+        )
+        .unwrap_or_default();
+        let url_str = if qs.is_empty() {
+            format!(
+                "{}xrpc/com.bad-example.identity.resolveMiniDoc",
+                base.as_str().trim_end_matches('/').to_string() + "/"
+            )
+        } else {
+            format!(
+                "{}xrpc/com.bad-example.identity.resolveMiniDoc?{}",
+                base.as_str().trim_end_matches('/').to_string() + "/",
+                qs
+            )
+        };
+        let url = Uri::parse(url_str)
+            .map_err(|(e, _)| IdentityError::url(e))?
+            .to_owned();
+        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
         Ok(DidDocResponse {
             buffer: buf,
             status,
@@ -688,8 +698,11 @@ impl IdentityResolver for JacquardResolver {
                     }
                 }
                 HandleStep::HttpsWellKnown => {
-                    let url = Url::parse(&format!("https://{host}/.well-known/atproto-did"))?;
-                    if let Ok(text) = self.get_text(url).await {
+                    let url_str = format!("https://{host}/.well-known/atproto-did");
+                    let url = Uri::parse(url_str)
+                        .map_err(|(e, _)| IdentityError::url(e))?
+                        .to_owned();
+                    if let Ok(text) = self.get_text(url.borrow()).await {
                         if let Ok(did) = Self::parse_atproto_did_body(&text, handle.as_str()) {
                             resolved_did = Some(did);
                             break 'outer;
@@ -704,16 +717,62 @@ impl IdentityResolver for JacquardResolver {
                     }
                     // Public unauth fallback
                     if self.opts.public_fallback_for_handle {
-                        if let Ok(mut url) = Url::parse("https://public.api.bsky.app") {
-                            url.set_path("/xrpc/com.atproto.identity.resolveHandle");
-                            if let Ok(qs) = serde_html_form::to_string(
-                                &ResolveHandle::new().handle((*handle).clone()).build(),
-                            ) {
-                                url.set_query(Some(&qs));
-                            } else {
-                                continue;
+                        if let Ok(qs) = serde_html_form::to_string(
+                            &ResolveHandle::new().handle((*handle).clone()).build(),
+                        ) {
+                            let url_str = format!(
+                                "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?{}",
+                                qs
+                            );
+                            if let Ok(url) = Uri::parse(url_str)
+                                .map(|u| u.to_owned())
+                                .map_err(|(e, _)| IdentityError::url(e))
+                            {
+                                if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                                    if status.is_success() {
+                                        if let Ok(val) =
+                                            serde_json::from_slice::<serde_json::Value>(&buf)
+                                        {
+                                            if let Some(did_str) =
+                                                val.get("did").and_then(|v| v.as_str())
+                                            {
+                                                if let Ok(did) = Did::new_owned(did_str) {
+                                                    resolved_did = Some(did.into_static());
+                                                    break 'outer;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            if let Ok((buf, status)) = self.get_json_bytes(url).await {
+                        } else {
+                            continue;
+                        }
+                    }
+                    // Non-auth path: if PlcSource is Slingshot, use its resolveHandle endpoint.
+                    if let PlcSource::Slingshot { base } = &self.opts.plc_source {
+                        let qs = serde_html_form::to_string(
+                            &ResolveHandle::new().handle((*handle).clone()).build(),
+                        )
+                        .unwrap_or_default();
+                        let url_str = if qs.is_empty() {
+                            format!(
+                                "{}xrpc/com.atproto.identity.resolveHandle",
+                                base.as_str().trim_end_matches('/').to_string() + "/"
+                            )
+                        } else {
+                            format!(
+                                "{}xrpc/com.atproto.identity.resolveHandle?{}",
+                                base.as_str().trim_end_matches('/').to_string() + "/",
+                                qs
+                            )
+                        };
+                        // TODO: Surface URI parse errors through tracing when the feature is available.
+                        if let Ok(url) = Uri::parse(url_str)
+                            .map(|u| u.to_owned())
+                            .map_err(|(e, _)| e)
+                        {
+                            if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
                                 if status.is_success() {
                                     if let Ok(val) =
                                         serde_json::from_slice::<serde_json::Value>(&buf)
@@ -725,30 +784,6 @@ impl IdentityResolver for JacquardResolver {
                                                 resolved_did = Some(did.into_static());
                                                 break 'outer;
                                             }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // Non-auth path: if PlcSource is Slingshot, use its resolveHandle endpoint.
-                    if let PlcSource::Slingshot { base } = &self.opts.plc_source {
-                        let mut url = base.clone();
-                        url.set_path("/xrpc/com.atproto.identity.resolveHandle");
-                        if let Ok(qs) = serde_html_form::to_string(
-                            &ResolveHandle::new().handle((*handle).clone()).build(),
-                        ) {
-                            url.set_query(Some(&qs));
-                        } else {
-                            continue;
-                        }
-                        if let Ok((buf, status)) = self.get_json_bytes(url).await {
-                            if status.is_success() {
-                                if let Ok(val) = serde_json::from_slice::<serde_json::Value>(&buf) {
-                                    if let Some(did_str) = val.get("did").and_then(|v| v.as_str()) {
-                                        if let Ok(did) = Did::new_owned(did_str) {
-                                            resolved_did = Some(did.into_static());
-                                            break 'outer;
                                         }
                                     }
                                 }
@@ -798,7 +833,7 @@ impl IdentityResolver for JacquardResolver {
             match step {
                 DidStep::DidWebHttps if s.starts_with("did:web:") => {
                     let url = self.did_web_url(did)?;
-                    if let Ok((buf, status)) = self.get_json_bytes(url).await {
+                    if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
                         resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
@@ -808,20 +843,27 @@ impl IdentityResolver for JacquardResolver {
                     }
                 }
                 DidStep::PlcHttp if s.starts_with("did:plc:") => {
-                    let url = match &self.opts.plc_source {
+                    let url_str = match &self.opts.plc_source {
                         PlcSource::PlcDirectory { base } => {
                             // this is odd, the join screws up with the plc directory but NOT slingshot
-                            Url::parse(&format!("{}{}", base, did.as_str())).expect("Invalid URL")
+                            format!("{}{}", base, did.as_str())
                         }
-                        PlcSource::Slingshot { base } => base.join(did.as_str())?,
+                        PlcSource::Slingshot { base } => {
+                            format!("{}{}", base, did.as_str())
+                        }
                     };
-                    if let Ok((buf, status)) = self.get_json_bytes(url).await {
-                        resolved_doc = Some(DidDocResponse {
-                            buffer: buf,
-                            status,
-                            requested: Some(did.clone().into_static()),
-                        });
-                        break 'outer;
+                    if let Ok(url) = Uri::parse(url_str)
+                        .map(|u| u.to_owned())
+                        .map_err(|(_, _)| IdentityError::unsupported_did_method(did.as_str()))
+                    {
+                        if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                            resolved_doc = Some(DidDocResponse {
+                                buffer: buf,
+                                status,
+                                requested: Some(did.clone().into_static()),
+                            });
+                            break 'outer;
+                        }
                     }
                 }
                 DidStep::PdsResolveDid => {
@@ -838,7 +880,7 @@ impl IdentityResolver for JacquardResolver {
                     // Fallback: if Slingshot configured, return mini-doc response (partial doc)
                     if let PlcSource::Slingshot { base } = &self.opts.plc_source {
                         let url = self.slingshot_mini_doc_url(base, did.as_str())?;
-                        let (buf, status) = self.get_json_bytes(url).await?;
+                        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
                         resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
@@ -1020,14 +1062,23 @@ impl JacquardResolver {
     }
 
     /// Build Slingshot mini-doc URL for an identifier (handle or DID)
-    fn slingshot_mini_doc_url(&self, base: &Url, identifier: &str) -> resolver::Result<Url> {
-        let mut url = base.clone();
-        url.set_path("/xrpc/com.bad-example.identity.resolveMiniDoc");
-        url.set_query(Some(&format!(
-            "identifier={}",
-            urlencoding::Encoded::new(identifier)
-        )));
-        Ok(url)
+    fn slingshot_mini_doc_url(
+        &self,
+        base: &Uri<String>,
+        identifier: &str,
+    ) -> resolver::Result<Uri<String>> {
+        let mut enc_id = EString::<Query>::new();
+        enc_id.encode_str::<EncData>(identifier);
+        let qs = format!("identifier={enc_id}");
+        let url_str = format!(
+            "{}://{}/xrpc/com.bad-example.identity.resolveMiniDoc?{}",
+            base.scheme().as_str(),
+            base.authority().map(|a| a.as_str()).unwrap_or(""),
+            qs
+        );
+        Uri::parse(url_str)
+            .map_err(|(e, _)| IdentityError::url(e))
+            .map(|u| u.to_owned())
     }
 
     #[cfg(feature = "cache")]
@@ -1098,7 +1149,7 @@ impl JacquardResolver {
             }
         };
         let url = self.slingshot_mini_doc_url(&base, identifier.as_str())?;
-        let (buf, status) = self.get_json_bytes(url).await?;
+        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
         Ok(MiniDocResponse {
             buffer: buf,
             status,
@@ -1188,8 +1239,12 @@ mod tests {
     #[test]
     fn slingshot_mini_doc_url_build() {
         let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
-        let base = Url::parse("https://slingshot.microcosm.blue").unwrap();
-        let url = r.slingshot_mini_doc_url(&base, "bad-example.com").unwrap();
+        let base_uri = Uri::parse("https://slingshot.microcosm.blue")
+            .unwrap()
+            .to_owned();
+        let url = r
+            .slingshot_mini_doc_url(&base_uri, "bad-example.com")
+            .unwrap();
         assert_eq!(
             url.as_str(),
             "https://slingshot.microcosm.blue/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=bad-example.com"
@@ -1243,5 +1298,56 @@ mod tests {
             },
             other => panic!("unexpected: {:?}", other),
         }
+    }
+
+    #[test]
+    fn did_web_resolution_basic() {
+        // AC6.1: `did:web:example.com` resolves to `https://example.com/.well-known/did.json`
+        let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
+        assert_eq!(
+            r.test_did_web_url_raw("did:web:example.com"),
+            "https://example.com/.well-known/did.json"
+        );
+    }
+
+    #[test]
+    fn did_web_resolution_with_path() {
+        // AC6.1: `did:web:example.com:path:to` resolves to `https://example.com/path/to/did.json`
+        // with correct percent-encoding
+        let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
+        assert_eq!(
+            r.test_did_web_url_raw("did:web:example.com:path:to"),
+            "https://example.com/path/to/did.json"
+        );
+    }
+
+    #[test]
+    fn pds_endpoint_parsing_returns_uri() {
+        // AC6.3: PDS endpoint parsing returns `Uri<String>` — verified by type system.
+        // This test ensures that did_doc.pds_endpoint() returns the correct type.
+        let buf = Bytes::from_static(
+            b"{
+  \"id\": \"did:plc:example\",
+  \"service\": [
+    {
+      \"id\": \"#pds\",
+      \"type\": \"AtprotoPersonalDataServer\",
+      \"serviceEndpoint\": \"https://pds.example.com\"
+    }
+  ]
+}",
+        );
+        let resp = resolver::DidDocResponse {
+            buffer: buf,
+            status: StatusCode::OK,
+            requested: None,
+        };
+        let doc = resp.parse().expect("parse document");
+        let pds = doc.pds_endpoint();
+
+        // Verify it returns Some(Uri<String>)
+        assert!(pds.is_some());
+        let pds_uri = pds.unwrap();
+        assert_eq!(pds_uri.as_str(), "https://pds.example.com");
     }
 }

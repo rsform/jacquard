@@ -8,13 +8,7 @@
 /// An initial question that starts a discussion
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Question<'a> {
@@ -34,7 +28,7 @@ pub struct Question<'a> {
 
 pub mod question_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,105 +36,105 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tags;
         type IsOpen;
+        type Content;
         type CreatedAt;
         type Forum;
+        type Tags;
         type Title;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tags = Unset;
         type IsOpen = Unset;
+        type Content = Unset;
         type CreatedAt = Unset;
         type Forum = Unset;
+        type Tags = Unset;
         type Title = Unset;
-        type Content = Unset;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Tags = Set<members::tags>;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-        type Forum = S::Forum;
-        type Title = S::Title;
-        type Content = S::Content;
     }
     ///State transition - sets the `is_open` field to Set
     pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsOpen<S> {}
     impl<S: State> State for SetIsOpen<S> {
-        type Tags = S::Tags;
         type IsOpen = Set<members::is_open>;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
         type Forum = S::Forum;
-        type Title = S::Title;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Tags = S::Tags;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = Set<members::created_at>;
-        type Forum = S::Forum;
         type Title = S::Title;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForum<S> {}
-    impl<S: State> State for SetForum<S> {
-        type Tags = S::Tags;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-        type Forum = Set<members::forum>;
-        type Title = S::Title;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Tags = S::Tags;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-        type Forum = S::Forum;
-        type Title = Set<members::title>;
-        type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Tags = S::Tags;
         type IsOpen = S::IsOpen;
+        type Content = Set<members::content>;
         type CreatedAt = S::CreatedAt;
         type Forum = S::Forum;
+        type Tags = S::Tags;
         type Title = S::Title;
-        type Content = Set<members::content>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForum<S> {}
+    impl<S: State> State for SetForum<S> {
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Forum = Set<members::forum>;
+        type Tags = S::Tags;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Tags = Set<members::tags>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `forum` field
         pub struct forum(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
@@ -313,12 +307,12 @@ impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Tags: question_state::IsSet,
     S::IsOpen: question_state::IsSet,
+    S::Content: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
     S::Forum: question_state::IsSet,
+    S::Tags: question_state::IsSet,
     S::Title: question_state::IsSet,
-    S::Content: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
@@ -369,13 +363,7 @@ impl<'a> Question<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuestionGetRecordOutput<'a> {
@@ -433,9 +421,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -446,9 +432,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -459,9 +443,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -472,9 +454,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -485,9 +465,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -497,9 +475,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(

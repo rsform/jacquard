@@ -16,13 +16,7 @@ pub mod whoami;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthCallback<'a> {
@@ -38,7 +32,7 @@ pub struct AuthCallback<'a> {
 
 pub mod auth_callback_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,66 +41,66 @@ pub mod auth_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type RefreshJwt;
         type Did;
         type AccessJwt;
+        type RefreshJwt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type RefreshJwt = Unset;
         type Did = Unset;
         type AccessJwt = Unset;
+        type RefreshJwt = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+        type AccessJwt = S::AccessJwt;
         type RefreshJwt = S::RefreshJwt;
-        type Did = S::Did;
-        type AccessJwt = S::AccessJwt;
-    }
-    ///State transition - sets the `refresh_jwt` field to Set
-    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
-    impl<S: State> State for SetRefreshJwt<S> {
-        type Handle = S::Handle;
-        type RefreshJwt = Set<members::refresh_jwt>;
-        type Did = S::Did;
-        type AccessJwt = S::AccessJwt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Handle = S::Handle;
-        type RefreshJwt = S::RefreshJwt;
         type Did = Set<members::did>;
         type AccessJwt = S::AccessJwt;
+        type RefreshJwt = S::RefreshJwt;
     }
     ///State transition - sets the `access_jwt` field to Set
     pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
     impl<S: State> State for SetAccessJwt<S> {
         type Handle = S::Handle;
-        type RefreshJwt = S::RefreshJwt;
         type Did = S::Did;
         type AccessJwt = Set<members::access_jwt>;
+        type RefreshJwt = S::RefreshJwt;
+    }
+    ///State transition - sets the `refresh_jwt` field to Set
+    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
+    impl<S: State> State for SetRefreshJwt<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type AccessJwt = S::AccessJwt;
+        type RefreshJwt = Set<members::refresh_jwt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `refresh_jwt` field
-        pub struct refresh_jwt(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `access_jwt` field
         pub struct access_jwt(());
+        ///Marker type for the `refresh_jwt` field
+        pub struct refresh_jwt(());
     }
 }
 
@@ -220,9 +214,9 @@ impl<'a, S> AuthCallbackBuilder<'a, S>
 where
     S: auth_callback_state::State,
     S::Handle: auth_callback_state::IsSet,
-    S::RefreshJwt: auth_callback_state::IsSet,
     S::Did: auth_callback_state::IsSet,
     S::AccessJwt: auth_callback_state::IsSet,
+    S::RefreshJwt: auth_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthCallback<'a> {
@@ -262,93 +256,95 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("authCallback"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("refreshJwt"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("accessJwt"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("handle"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessJwt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("accessJwt"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "handle",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "refreshJwt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("handle"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "refreshJwt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },

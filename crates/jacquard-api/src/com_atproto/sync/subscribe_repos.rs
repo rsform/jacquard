@@ -8,13 +8,7 @@
 /// Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Account<'a> {
@@ -32,7 +26,7 @@ pub struct Account<'a> {
 
 pub mod account_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,66 +35,66 @@ pub mod account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Active;
-        type Seq;
-        type Time;
         type Did;
+        type Time;
+        type Seq;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Active = Unset;
-        type Seq = Unset;
-        type Time = Unset;
         type Did = Unset;
+        type Time = Unset;
+        type Seq = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
         type Active = Set<members::active>;
-        type Seq = S::Seq;
+        type Did = S::Did;
         type Time = S::Time;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Active = S::Active;
-        type Seq = Set<members::seq>;
-        type Time = S::Time;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Active = S::Active;
         type Seq = S::Seq;
-        type Time = Set<members::time>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Active = S::Active;
-        type Seq = S::Seq;
-        type Time = S::Time;
         type Did = Set<members::did>;
+        type Time = S::Time;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Active = S::Active;
+        type Did = S::Did;
+        type Time = Set<members::time>;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Active = S::Active;
+        type Did = S::Did;
+        type Time = S::Time;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `active` field
         pub struct active(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
     }
 }
 
@@ -179,10 +173,7 @@ where
     S::Seq: account_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> AccountBuilder<'a, account_state::SetSeq<S>> {
+    pub fn seq(mut self, value: impl Into<i64>) -> AccountBuilder<'a, account_state::SetSeq<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         AccountBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -228,9 +219,9 @@ impl<'a, S> AccountBuilder<'a, S>
 where
     S: account_state::State,
     S::Active: account_state::IsSet,
-    S::Seq: account_state::IsSet,
-    S::Time: account_state::IsSet,
     S::Did: account_state::IsSet,
+    S::Time: account_state::IsSet,
+    S::Seq: account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Account<'a> {
@@ -371,9 +362,8 @@ impl jacquard_common::IntoStatic for AccountStatus<'_> {
     }
 }
 
-fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.atproto.sync.subscribeRepos"),
@@ -795,54 +785,54 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("info"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "message",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -879,76 +869,70 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("repoOp"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "A repo operation, ie a mutation of a single record.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("path"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "action",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
-                                description: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "path",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "prev",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
-                                description: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(
+                                    ::jacquard_lexicon::lexicon::LexCidLink { description: None },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("path"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("prev"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(
+                                    ::jacquard_lexicon::lexicon::LexCidLink { description: None },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sync"),
@@ -1090,13 +1074,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Account<'a> {
 /// Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
@@ -1133,7 +1111,7 @@ pub struct Commit<'a> {
 
 pub mod commit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1141,205 +1119,205 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ops;
-        type Rev;
-        type Rebase;
-        type Commit;
         type Blobs;
+        type Blocks;
+        type Commit;
+        type Rev;
         type TooBig;
+        type Rebase;
+        type Repo;
+        type Ops;
         type Time;
         type Seq;
-        type Blocks;
-        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ops = Unset;
-        type Rev = Unset;
-        type Rebase = Unset;
-        type Commit = Unset;
         type Blobs = Unset;
+        type Blocks = Unset;
+        type Commit = Unset;
+        type Rev = Unset;
         type TooBig = Unset;
+        type Rebase = Unset;
+        type Repo = Unset;
+        type Ops = Unset;
         type Time = Unset;
         type Seq = Unset;
-        type Blocks = Unset;
-        type Repo = Unset;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOps<S> {}
-    impl<S: State> State for SetOps<S> {
-        type Ops = Set<members::ops>;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Ops = S::Ops;
-        type Rev = Set<members::rev>;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `rebase` field to Set
-    pub struct SetRebase<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRebase<S> {}
-    impl<S: State> State for SetRebase<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = Set<members::rebase>;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `commit` field to Set
-    pub struct SetCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommit<S> {}
-    impl<S: State> State for SetCommit<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = Set<members::commit>;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
     }
     ///State transition - sets the `blobs` field to Set
     pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlobs<S> {}
     impl<S: State> State for SetBlobs<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type Blobs = Set<members::blobs>;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
         type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
         type Time = S::Time;
         type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `too_big` field to Set
-    pub struct SetTooBig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTooBig<S> {}
-    impl<S: State> State for SetTooBig<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = Set<members::too_big>;
-        type Time = S::Time;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = Set<members::time>;
-        type Seq = S::Seq;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type Blobs = S::Blobs;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Seq = Set<members::seq>;
-        type Blocks = S::Blocks;
-        type Repo = S::Repo;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type Blobs = S::Blobs;
+        type Blocks = Set<members::blocks>;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
         type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
         type Time = S::Time;
         type Seq = S::Seq;
-        type Blocks = Set<members::blocks>;
+    }
+    ///State transition - sets the `commit` field to Set
+    pub struct SetCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommit<S> {}
+    impl<S: State> State for SetCommit<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = Set<members::commit>;
+        type Rev = S::Rev;
+        type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
         type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = Set<members::rev>;
+        type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `too_big` field to Set
+    pub struct SetTooBig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTooBig<S> {}
+    impl<S: State> State for SetTooBig<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type TooBig = Set<members::too_big>;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `rebase` field to Set
+    pub struct SetRebase<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRebase<S> {}
+    impl<S: State> State for SetRebase<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type TooBig = S::TooBig;
+        type Rebase = Set<members::rebase>;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Seq = S::Seq;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
         type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = Set<members::repo>;
+        type Ops = S::Ops;
         type Time = S::Time;
         type Seq = S::Seq;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type Blobs = S::Blobs;
         type Blocks = S::Blocks;
-        type Repo = Set<members::repo>;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = Set<members::ops>;
+        type Time = S::Time;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = Set<members::time>;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Blobs = S::Blobs;
+        type Blocks = S::Blocks;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type TooBig = S::TooBig;
+        type Rebase = S::Rebase;
+        type Repo = S::Repo;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ops` field
-        pub struct ops(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `rebase` field
-        pub struct rebase(());
-        ///Marker type for the `commit` field
-        pub struct commit(());
         ///Marker type for the `blobs` field
         pub struct blobs(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `commit` field
+        pub struct commit(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `too_big` field
         pub struct too_big(());
+        ///Marker type for the `rebase` field
+        pub struct rebase(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
         ///Marker type for the `time` field
         pub struct time(());
         ///Marker type for the `seq` field
         pub struct seq(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
     }
 }
 
@@ -1350,9 +1328,7 @@ pub struct CommitBuilder<'a, S: commit_state::State> {
         ::core::option::Option<Vec<jacquard_common::types::cid::CidLink<'a>>>,
         ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
-        ::core::option::Option<
-            Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>>,
         ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -1378,18 +1354,7 @@ impl<'a> CommitBuilder<'a, commit_state::Empty> {
         CommitBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1554,10 +1519,7 @@ where
     S::Seq: commit_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> CommitBuilder<'a, commit_state::SetSeq<S>> {
+    pub fn seq(mut self, value: impl Into<i64>) -> CommitBuilder<'a, commit_state::SetSeq<S>> {
         self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
         CommitBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1569,18 +1531,12 @@ where
 
 impl<'a, S: commit_state::State> CommitBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Tid>>,
-    ) -> Self {
+    pub fn since(mut self, value: impl Into<Option<jacquard_common::types::string::Tid>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(
-        mut self,
-        value: Option<jacquard_common::types::string::Tid>,
-    ) -> Self {
+    pub fn maybe_since(mut self, value: Option<jacquard_common::types::string::Tid>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -1627,16 +1583,16 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Ops: commit_state::IsSet,
-    S::Rev: commit_state::IsSet,
-    S::Rebase: commit_state::IsSet,
-    S::Commit: commit_state::IsSet,
     S::Blobs: commit_state::IsSet,
+    S::Blocks: commit_state::IsSet,
+    S::Commit: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
     S::TooBig: commit_state::IsSet,
+    S::Rebase: commit_state::IsSet,
+    S::Repo: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
     S::Time: commit_state::IsSet,
     S::Seq: commit_state::IsSet,
-    S::Blocks: commit_state::IsSet,
-    S::Repo: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -1700,9 +1656,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ops",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ops"),
                     max: 200usize,
                     actual: value.len(),
                 });
@@ -1715,13 +1669,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
 /// Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
@@ -1737,7 +1685,7 @@ pub struct Identity<'a> {
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1867,10 +1815,7 @@ where
     S::Seq: identity_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> IdentityBuilder<'a, identity_state::SetSeq<S>> {
+    pub fn seq(mut self, value: impl Into<i64>) -> IdentityBuilder<'a, identity_state::SetSeq<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         IdentityBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1960,7 +1905,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
@@ -2072,13 +2017,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
 }
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
@@ -2088,7 +2027,7 @@ pub struct SubscribeRepos {
 
 pub mod subscribe_repos_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2155,13 +2094,7 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2183,45 +2116,31 @@ impl<'a> SubscribeReposMessage<'a> {
     pub fn decode_framed<'de: 'a>(
         bytes: &'de [u8],
     ) -> Result<SubscribeReposMessage<'a>, jacquard_common::error::DecodeError> {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
-            bytes,
-        )?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
         match header.t.as_str() {
             "#commit" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Commit(Box::new(variant)))
             }
             "#sync" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Sync(Box::new(variant)))
             }
             "#identity" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Identity(Box::new(variant)))
             }
             "#account" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Account(Box::new(variant)))
             }
             "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Info(Box::new(variant)))
             }
-            unknown => {
-                Err(
-                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
-                )
-            }
+            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
+                unknown.into(),
+            )),
         }
     }
 }
@@ -2236,7 +2155,7 @@ impl<'a> SubscribeReposMessage<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2275,7 +2194,8 @@ impl core::fmt::Display for SubscribeReposError<'_> {
 pub struct SubscribeReposStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Message<'de> = SubscribeReposMessage<'de>;
     type Error<'de> = SubscribeReposError<'de>;
     fn decode_message<'de>(
@@ -2287,14 +2207,16 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Stream = SubscribeReposStream;
 }
 
 pub struct SubscribeReposEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     const PATH: &'static str = "/xrpc/com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Params<'de> = SubscribeRepos;
     type Stream = SubscribeReposStream;
 }
@@ -2302,13 +2224,7 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
 /// A repo operation, ie a mutation of a single record.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoOp<'a> {
@@ -2327,7 +2243,7 @@ pub struct RepoOp<'a> {
 
 pub mod repo_op_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2335,37 +2251,37 @@ pub mod repo_op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Action;
         type Path;
+        type Action;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Action = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Action = Set<members::action>;
-        type Path = S::Path;
+        type Action = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
-        type Action = S::Action;
         type Path = Set<members::path>;
+        type Action = S::Action;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Path = S::Path;
+        type Action = Set<members::action>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `action` field
+        pub struct action(());
     }
 }
 
@@ -2428,10 +2344,7 @@ impl<'a, S: repo_op_state::State> RepoOpBuilder<'a, S> {
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(
-        mut self,
-        value: Option<jacquard_common::types::cid::CidLink<'a>>,
-    ) -> Self {
+    pub fn maybe_cid(mut self, value: Option<jacquard_common::types::cid::CidLink<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -2466,10 +2379,7 @@ impl<'a, S: repo_op_state::State> RepoOpBuilder<'a, S> {
         self
     }
     /// Set the `prev` field to an Option value (optional)
-    pub fn maybe_prev(
-        mut self,
-        value: Option<jacquard_common::types::cid::CidLink<'a>>,
-    ) -> Self {
+    pub fn maybe_prev(mut self, value: Option<jacquard_common::types::cid::CidLink<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -2478,8 +2388,8 @@ impl<'a, S: repo_op_state::State> RepoOpBuilder<'a, S> {
 impl<'a, S> RepoOpBuilder<'a, S>
 where
     S: repo_op_state::State,
-    S::Action: repo_op_state::IsSet,
     S::Path: repo_op_state::IsSet,
+    S::Action: repo_op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoOp<'a> {
@@ -2622,13 +2532,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoOp<'a> {
 /// Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sync<'a> {
@@ -2649,7 +2553,7 @@ pub struct Sync<'a> {
 
 pub mod sync_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2657,85 +2561,85 @@ pub mod sync_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
-        type Did;
-        type Time;
         type Rev;
+        type Time;
+        type Did;
         type Seq;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
-        type Did = Unset;
-        type Time = Unset;
         type Rev = Unset;
+        type Time = Unset;
+        type Did = Unset;
         type Seq = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type Did = S::Did;
-        type Time = S::Time;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Blocks = S::Blocks;
-        type Did = Set<members::did>;
-        type Time = S::Time;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Blocks = S::Blocks;
-        type Did = S::Did;
-        type Time = Set<members::time>;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
+        type Blocks = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Blocks = S::Blocks;
-        type Did = S::Did;
-        type Time = S::Time;
         type Rev = Set<members::rev>;
+        type Time = S::Time;
+        type Did = S::Did;
         type Seq = S::Seq;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Rev = S::Rev;
+        type Time = Set<members::time>;
+        type Did = S::Did;
+        type Seq = S::Seq;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Rev = S::Rev;
+        type Time = S::Time;
+        type Did = Set<members::did>;
+        type Seq = S::Seq;
+        type Blocks = S::Blocks;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Blocks = S::Blocks;
-        type Did = S::Did;
-        type Time = S::Time;
         type Rev = S::Rev;
+        type Time = S::Time;
+        type Did = S::Did;
         type Seq = Set<members::seq>;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Rev = S::Rev;
+        type Time = S::Time;
+        type Did = S::Did;
+        type Seq = S::Seq;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -2833,10 +2737,7 @@ where
     S::Seq: sync_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> SyncBuilder<'a, sync_state::SetSeq<S>> {
+    pub fn seq(mut self, value: impl Into<i64>) -> SyncBuilder<'a, sync_state::SetSeq<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         SyncBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -2868,11 +2769,11 @@ where
 impl<'a, S> SyncBuilder<'a, S>
 where
     S: sync_state::State,
-    S::Blocks: sync_state::IsSet,
-    S::Did: sync_state::IsSet,
-    S::Time: sync_state::IsSet,
     S::Rev: sync_state::IsSet,
+    S::Time: sync_state::IsSet,
+    S::Did: sync_state::IsSet,
     S::Seq: sync_state::IsSet,
+    S::Blocks: sync_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sync<'a> {

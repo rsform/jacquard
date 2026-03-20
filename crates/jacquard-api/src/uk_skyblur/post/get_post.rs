@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPost<'a> {
@@ -28,7 +22,7 @@ pub struct GetPost<'a> {
 
 pub mod get_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,10 +82,7 @@ impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
 
 impl<'a, S: get_post_state::State> GetPostBuilder<'a, S> {
     /// Set the `password` field (optional)
-    pub fn password(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn password(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -159,7 +150,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostOutput<'a> {
@@ -201,9 +192,8 @@ impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     const NSID: &'static str = "uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetPostResponse;
 }
 
@@ -212,9 +202,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = GetPost<'de>;
     type Response = GetPostResponse;
 }

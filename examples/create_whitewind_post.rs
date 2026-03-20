@@ -5,8 +5,8 @@ use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::string::Datetime;
+use jacquard_common::deps::fluent_uri::Uri;
 use miette::IntoDiagnostic;
-use url::Url;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Create a WhiteWind blog post")]
@@ -59,12 +59,12 @@ async fn main() -> miette::Result<()> {
 
     let output = agent.create_record(entry, None).await?;
     println!("Created WhiteWind blog post: {}", output.uri);
-    let url = Url::parse(&format!(
+    let url_str = format!(
         "https://whtwnd.nat.vg/{}/{}",
         output.uri.authority(),
         output.uri.rkey().map(|r| r.as_ref()).unwrap_or("")
-    ))
-    .into_diagnostic()?;
+    );
+    let url = Uri::parse(url_str.as_str()).into_diagnostic()?;
     println!("View at: {}", url);
 
     Ok(())

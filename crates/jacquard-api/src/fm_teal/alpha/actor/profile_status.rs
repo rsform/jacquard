@@ -8,13 +8,7 @@
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the profile status of the actor.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileStatus<'a> {
@@ -31,7 +25,7 @@ pub struct ProfileStatus<'a> {
 
 pub mod profile_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -281,9 +275,7 @@ impl jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<'_> {
     type Output = ProfileStatusCompletedOnboarding<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ProfileStatusCompletedOnboarding::None => {
-                ProfileStatusCompletedOnboarding::None
-            }
+            ProfileStatusCompletedOnboarding::None => ProfileStatusCompletedOnboarding::None,
             ProfileStatusCompletedOnboarding::ProfileOnboarding => {
                 ProfileStatusCompletedOnboarding::ProfileOnboarding
             }
@@ -302,13 +294,7 @@ impl jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileStatusGetRecordOutput<'a> {
@@ -365,9 +351,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileStatus<'a> {
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_actor_profileStatus() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fm_teal_alpha_actor_profileStatus()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.actor.profileStatus"),

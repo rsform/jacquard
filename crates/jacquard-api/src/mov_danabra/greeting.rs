@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Greeting<'a> {
@@ -26,13 +26,7 @@ pub struct Greeting<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GreetingOutput<'a> {
@@ -53,9 +47,8 @@ impl jacquard_common::xrpc::XrpcResp for GreetingResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Greeting<'a> {
     const NSID: &'static str = "mov.danabra.Greeting";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GreetingResponse;
 }
 
@@ -64,9 +57,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Greeting<'a> {
 pub struct GreetingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GreetingRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.Greeting";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Greeting<'de>;
     type Response = GreetingResponse;
 }

@@ -12,20 +12,19 @@
 use bon::Builder;
 use bytes::Bytes;
 use http::StatusCode;
+use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::BoxError;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::{DidDocument, Service, default_context};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtprotoStr, Handle};
-use jacquard_common::types::uri::Uri;
+use jacquard_common::types::uri::UriValue;
 use jacquard_common::types::value::{AtDataError, Data};
 use jacquard_common::{CowStr, IntoStatic, deps::smol_str};
 use n0_future::time::Duration;
 use smol_str::SmolStr;
 use std::collections::BTreeMap;
 use std::marker::Sync;
-use std::str::FromStr;
-use url::Url;
 
 /// Source to fetch PLC (did:plc) documents from.
 ///
@@ -38,19 +37,21 @@ pub enum PlcSource {
     /// Use the public PLC directory
     PlcDirectory {
         /// Base URL for the PLC directory
-        base: Url,
+        base: Uri<String>,
     },
     /// Use the slingshot mini-docs service
     Slingshot {
         /// Base URL for the Slingshot service
-        base: Url,
+        base: Uri<String>,
     },
 }
 
 impl Default for PlcSource {
     fn default() -> Self {
         Self::PlcDirectory {
-            base: Url::parse("https://plc.directory/").expect("valid url"),
+            base: Uri::parse("https://plc.directory/")
+                .expect("hardcoded URI is valid")
+                .to_owned(),
         }
     }
 }
@@ -59,7 +60,9 @@ impl PlcSource {
     /// Default Slingshot source (`https://slingshot.microcosm.blue`)
     pub fn slingshot_default() -> Self {
         PlcSource::Slingshot {
-            base: Url::parse("https://slingshot.microcosm.blue").expect("valid url"),
+            base: Uri::parse("https://slingshot.microcosm.blue")
+                .expect("hardcoded URI is valid")
+                .to_owned(),
         }
     }
 }
@@ -88,6 +91,9 @@ impl DidDocResponse {
             if let Ok(doc) = serde_json::from_slice::<DidDocument<'b>>(&self.buffer) {
                 Ok(doc)
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'b>>(&self.buffer) {
+                let pds_uri = Uri::parse(mini_doc.pds.as_ref())
+                    .map_err(|e| IdentityError::url(e))?
+                    .to_owned();
                 Ok(DidDocument {
                     context: default_context(),
                     id: mini_doc.did,
@@ -96,8 +102,8 @@ impl DidDocResponse {
                     service: Some(vec![Service {
                         id: CowStr::new_static("#atproto_pds"),
                         r#type: CowStr::new_static("AtprotoPersonalDataServer"),
-                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
-                            Url::from_str(&mini_doc.pds).unwrap(),
+                        service_endpoint: Some(Data::String(AtprotoStr::Uri(UriValue::Https(
+                            pds_uri,
                         )))),
                         extra_data: BTreeMap::new(),
                     }]),
@@ -150,6 +156,9 @@ impl DidDocResponse {
             if let Ok(doc) = serde_json::from_slice::<DidDocument<'_>>(&self.buffer) {
                 Ok(doc.into_static())
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'_>>(&self.buffer) {
+                let pds_uri = Uri::parse(mini_doc.pds.as_ref())
+                    .map_err(|e| IdentityError::url(e))?
+                    .to_owned();
                 Ok(DidDocument {
                     context: default_context(),
                     id: mini_doc.did,
@@ -158,8 +167,8 @@ impl DidDocResponse {
                     service: Some(vec![Service {
                         id: CowStr::new_static("#atproto_pds"),
                         r#type: CowStr::new_static("AtprotoPersonalDataServer"),
-                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
-                            Url::from_str(&mini_doc.pds).unwrap(),
+                        service_endpoint: Some(Data::String(AtprotoStr::Uri(UriValue::Https(
+                            pds_uri,
                         )))),
                         extra_data: BTreeMap::new(),
                     }]),
@@ -231,7 +240,7 @@ pub struct ResolverOptions {
     /// PLC data source (directory or slingshot)
     pub plc_source: PlcSource,
     /// Optional PDS base to use for fallbacks
-    pub pds_fallback: Option<Url>,
+    pub pds_fallback: Option<Uri<String>>,
     /// Order of attempts for handle → DID resolution
     pub handle_order: Vec<HandleStep>,
     /// Order of attempts for DID → Doc resolution
@@ -409,7 +418,10 @@ pub trait IdentityResolver {
 
     /// Return the PDS url for a DID
     #[cfg(not(target_arch = "wasm32"))]
-    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url>>
+    fn pds_for_did(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>>
     where
         Self: Sync,
     {
@@ -432,7 +444,10 @@ pub trait IdentityResolver {
 
     /// Return the PDS url for a DID
     #[cfg(target_arch = "wasm32")]
-    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url>> {
+    fn pds_for_did(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>> {
         async {
             let resp = self.resolve_did_doc(did).await?;
             let doc = resp.parse()?;
@@ -455,7 +470,7 @@ pub trait IdentityResolver {
     fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, Url)>>
+    ) -> impl Future<Output = Result<(Did<'static>, jacquard_common::deps::fluent_uri::Uri<String>)>>
     where
         Self: Sync,
     {
@@ -471,7 +486,8 @@ pub trait IdentityResolver {
     fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, Url)>> {
+    ) -> impl Future<Output = Result<(Did<'static>, jacquard_common::deps::fluent_uri::Uri<String>)>>
+    {
         async {
             let did = self.resolve_handle(handle).await?;
             let pds = self.pds_for_did(&did).await?;
@@ -792,10 +808,10 @@ pub type Result<T> = std::result::Result<T, IdentityError>;
 //     }
 // }
 
-impl From<url::ParseError> for IdentityError {
-    fn from(e: url::ParseError) -> Self {
+impl From<jacquard_common::deps::fluent_uri::ParseError> for IdentityError {
+    fn from(e: jacquard_common::deps::fluent_uri::ParseError) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
-        Self::new(IdentityErrorKind::Url, Some(Box::new(e))).with_context(msg)
+        IdentityError::new(IdentityErrorKind::Url, Some(Box::new(e))).with_context(msg)
     }
 }
 

@@ -8,13 +8,7 @@
 /// Links a Fitsky workout record to its cross-posted Bluesky post
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlueskyPost<'a> {
@@ -27,7 +21,7 @@ pub struct BlueskyPost<'a> {
 
 pub mod bluesky_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,51 +29,51 @@ pub mod bluesky_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type WorkoutUri;
         type PostUri;
         type CreatedAt;
-        type WorkoutUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type WorkoutUri = Unset;
         type PostUri = Unset;
         type CreatedAt = Unset;
-        type WorkoutUri = Unset;
-    }
-    ///State transition - sets the `post_uri` field to Set
-    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostUri<S> {}
-    impl<S: State> State for SetPostUri<S> {
-        type PostUri = Set<members::post_uri>;
-        type CreatedAt = S::CreatedAt;
-        type WorkoutUri = S::WorkoutUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type PostUri = S::PostUri;
-        type CreatedAt = Set<members::created_at>;
-        type WorkoutUri = S::WorkoutUri;
     }
     ///State transition - sets the `workout_uri` field to Set
     pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
     impl<S: State> State for SetWorkoutUri<S> {
+        type WorkoutUri = Set<members::workout_uri>;
         type PostUri = S::PostUri;
         type CreatedAt = S::CreatedAt;
-        type WorkoutUri = Set<members::workout_uri>;
+    }
+    ///State transition - sets the `post_uri` field to Set
+    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostUri<S> {}
+    impl<S: State> State for SetPostUri<S> {
+        type WorkoutUri = S::WorkoutUri;
+        type PostUri = Set<members::post_uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type WorkoutUri = S::WorkoutUri;
+        type PostUri = S::PostUri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `workout_uri` field
+        pub struct workout_uri(());
         ///Marker type for the `post_uri` field
         pub struct post_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `workout_uri` field
-        pub struct workout_uri(());
     }
 }
 
@@ -172,9 +166,9 @@ where
 impl<'a, S> BlueskyPostBuilder<'a, S>
 where
     S: bluesky_post_state::State,
+    S::WorkoutUri: bluesky_post_state::IsSet,
     S::PostUri: bluesky_post_state::IsSet,
     S::CreatedAt: bluesky_post_state::IsSet,
-    S::WorkoutUri: bluesky_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlueskyPost<'a> {
@@ -217,13 +211,7 @@ impl<'a> BlueskyPost<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlueskyPostGetRecordOutput<'a> {
@@ -280,9 +268,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyPost<'a> {
     }
 }
 
-fn lexicon_doc_app_fitsky_blueskyPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_fitsky_blueskyPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.fitsky.blueskyPost"),

@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterestedParty<'a> {
@@ -48,9 +48,7 @@ pub struct InterestedParty<'a> {
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ch.indiemusi.alpha.song"),
@@ -323,9 +321,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 11usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ipi",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ipi"),
                     max: 11usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -335,9 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -347,9 +341,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("role"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -362,13 +354,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
 /// A song or musical work: the melody, lyrics, and arrangement created by composers and authors
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
@@ -385,7 +371,7 @@ pub struct Song<'a> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -393,37 +379,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type InterestedParties;
         type Title;
+        type InterestedParties;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type InterestedParties = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `interested_parties` field to Set
-    pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
-    impl<S: State> State for SetInterestedParties<S> {
-        type InterestedParties = Set<members::interested_parties>;
-        type Title = S::Title;
+        type InterestedParties = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type InterestedParties = S::InterestedParties;
         type Title = Set<members::title>;
+        type InterestedParties = S::InterestedParties;
+    }
+    ///State transition - sets the `interested_parties` field to Set
+    pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
+    impl<S: State> State for SetInterestedParties<S> {
+        type Title = S::Title;
+        type InterestedParties = Set<members::interested_parties>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interested_parties` field
-        pub struct interested_parties(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `interested_parties` field
+        pub struct interested_parties(());
     }
 }
 
@@ -431,9 +417,7 @@ pub mod song_state {
 pub struct SongBuilder<'a, S: song_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -479,10 +463,7 @@ where
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `iswc` field (optional)
-    pub fn iswc(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn iswc(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -515,8 +496,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::InterestedParties: song_state::IsSet,
     S::Title: song_state::IsSet,
+    S::InterestedParties: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -559,13 +540,7 @@ impl<'a> Song<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
@@ -635,9 +610,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 13usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "iswc",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("iswc"),
                     max: 13usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -648,9 +621,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });

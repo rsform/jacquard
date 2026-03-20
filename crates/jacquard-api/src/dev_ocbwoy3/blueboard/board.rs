@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
@@ -31,7 +25,7 @@ pub struct Board<'a> {
 
 pub mod board_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,67 +33,67 @@ pub mod board_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Nsfw;
         type Description;
         type Title;
         type CreatedAt;
-        type Nsfw;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Nsfw = Unset;
         type Description = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-        type Nsfw = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Nsfw = S::Nsfw;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Description = S::Description;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Nsfw = S::Nsfw;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Description = S::Description;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Nsfw = S::Nsfw;
     }
     ///State transition - sets the `nsfw` field to Set
     pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsfw<S> {}
     impl<S: State> State for SetNsfw<S> {
+        type Nsfw = Set<members::nsfw>;
         type Description = S::Description;
         type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Nsfw = Set<members::nsfw>;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Nsfw = S::Nsfw;
+        type Description = Set<members::description>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Nsfw = S::Nsfw;
+        type Description = S::Description;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Nsfw = S::Nsfw;
+        type Description = S::Description;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `nsfw` field
+        pub struct nsfw(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `nsfw` field
-        pub struct nsfw(());
     }
 }
 
@@ -177,10 +171,7 @@ where
     S::Nsfw: board_state::IsUnset,
 {
     /// Set the `nsfw` field (required)
-    pub fn nsfw(
-        mut self,
-        value: impl Into<bool>,
-    ) -> BoardBuilder<'a, board_state::SetNsfw<S>> {
+    pub fn nsfw(mut self, value: impl Into<bool>) -> BoardBuilder<'a, board_state::SetNsfw<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         BoardBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -212,10 +203,10 @@ where
 impl<'a, S> BoardBuilder<'a, S>
 where
     S: board_state::State,
+    S::Nsfw: board_state::IsSet,
     S::Description: board_state::IsSet,
     S::Title: board_state::IsSet,
     S::CreatedAt: board_state::IsSet,
-    S::Nsfw: board_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Board<'a> {
@@ -260,13 +251,7 @@ impl<'a> Board<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGetRecordOutput<'a> {
@@ -328,13 +313,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
                     )
                     .count();
                 if count > 30usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 30usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "description",
+                            ),
+                            max: 30usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -343,9 +330,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -355,9 +340,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     }
 }
 
-fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.ocbwoy3.blueboard.board"),

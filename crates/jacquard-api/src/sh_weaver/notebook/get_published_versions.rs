@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPublishedVersions<'a> {
@@ -25,7 +19,7 @@ pub struct GetPublishedVersions<'a> {
 
 pub mod get_published_versions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -67,10 +61,7 @@ pub struct GetPublishedVersionsBuilder<'a, S: get_published_versions_state::Stat
 
 impl<'a> GetPublishedVersions<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetPublishedVersionsBuilder<
-        'a,
-        get_published_versions_state::Empty,
-    > {
+    pub fn new() -> GetPublishedVersionsBuilder<'a, get_published_versions_state::Empty> {
         GetPublishedVersionsBuilder::new()
     }
 }
@@ -134,21 +125,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPublishedVersionsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub canonical: std::option::Option<
-        crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    >,
+    pub canonical: std::option::Option<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub has_divergence: std::option::Option<bool>,
     /// Full entry records if includeContent=true

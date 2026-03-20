@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBlob<'a> {
@@ -41,13 +41,7 @@ pub struct UpdateBlob<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBlobOutput<'a> {
@@ -64,7 +58,7 @@ pub struct UpdateBlobOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -111,9 +105,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateBlobResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateBlob<'a> {
     const NSID: &'static str = "place.stream.branding.updateBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateBlobResponse;
 }
 
@@ -122,9 +115,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateBlob<'a> {
 pub struct UpdateBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.updateBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = UpdateBlob<'de>;
     type Response = UpdateBlobResponse;
 }

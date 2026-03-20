@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDraft<'a> {
@@ -22,7 +16,7 @@ pub struct DeleteDraft<'a> {
 
 pub mod delete_draft_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,9 +49,7 @@ pub mod delete_draft_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteDraftBuilder<'a, S: delete_draft_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Tid>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Tid>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -137,9 +129,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
     const NSID: &'static str = "app.bsky.draft.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteDraftResponse;
 }
 
@@ -148,9 +139,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
 pub struct DeleteDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
     const PATH: &'static str = "/xrpc/app.bsky.draft.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteDraft<'de>;
     type Response = DeleteDraftResponse;
 }

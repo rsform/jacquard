@@ -1,13 +1,14 @@
+use crate::deps::fluent_uri::Uri;
 use crate::{
     CowStr, IntoStatic,
     types::{
         aturi::AtUri, cid::Cid, collection::Collection, did::Did, nsid::Nsid, string::AtStrError,
     },
 };
+use alloc::string::String;
+use core::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::ToSmolStr;
-use core::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
-use url::Url;
 
 /// Generic URI with type-specific parsing
 ///
@@ -16,15 +17,15 @@ use url::Url;
 ///
 /// Variants are checked by prefix: `did:`, `at://`, `https://`, `wss://`, `ipld://`
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Uri<'u> {
+pub enum UriValue<'u> {
     /// DID URI (did:)
     Did(Did<'u>),
     /// AT Protocol URI (at://)
     At(AtUri<'u>),
     /// HTTPS URL
-    Https(Url),
+    Https(Uri<String>),
     /// WebSocket Secure URL
-    Wss(Url),
+    Wss(Uri<String>),
     /// IPLD CID URI
     Cid(Cid<'u>),
     /// Unrecognized URI scheme (catch-all)
@@ -38,90 +39,90 @@ pub enum UriParseError {
     /// AT Protocol string parsing error
     #[error("Invalid atproto string: {0}")]
     At(#[from] AtStrError),
-    /// Generic URL parsing error
+    /// URI parsing error
     #[error(transparent)]
-    Url(#[from] url::ParseError),
+    Uri(#[from] crate::deps::fluent_uri::ParseError),
     /// CID parsing error
     #[error(transparent)]
     Cid(#[from] crate::types::cid::Error),
 }
 
-impl<'u> Uri<'u> {
+impl<'u> UriValue<'u> {
     /// Parse a URI from a string slice, borrowing
     pub fn new(uri: &'u str) -> Result<Self, UriParseError> {
         if uri.starts_with("did:") {
-            Ok(Uri::Did(Did::new(uri)?))
+            Ok(UriValue::Did(Did::new(uri)?))
         } else if uri.starts_with("at://") {
-            Ok(Uri::At(AtUri::new(uri)?))
+            Ok(UriValue::At(AtUri::new(uri)?))
         } else if uri.starts_with("https://") {
-            Ok(Uri::Https(Url::parse(uri)?))
+            Ok(UriValue::Https(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("wss://") {
-            Ok(Uri::Https(Url::parse(uri)?))
+            Ok(UriValue::Wss(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("ipld://") {
             match Cid::from_str(&uri[7..]) {
-                Ok(cid) => Ok(Uri::Cid(cid)),
-                Err(_) => Ok(Uri::Any(CowStr::Borrowed(uri))),
+                Ok(cid) => Ok(UriValue::Cid(cid)),
+                Err(_) => Ok(UriValue::Any(CowStr::Borrowed(uri))),
             }
         } else {
-            Ok(Uri::Any(CowStr::Borrowed(uri)))
+            Ok(UriValue::Any(CowStr::Borrowed(uri)))
         }
     }
 
     /// Parse a URI from a string, taking ownership
-    pub fn new_owned(uri: impl AsRef<str>) -> Result<Uri<'static>, UriParseError> {
+    pub fn new_owned(uri: impl AsRef<str>) -> Result<UriValue<'static>, UriParseError> {
         let uri = uri.as_ref();
         if uri.starts_with("did:") {
-            Ok(Uri::Did(Did::new_owned(uri)?))
+            Ok(UriValue::Did(Did::new_owned(uri)?))
         } else if uri.starts_with("at://") {
-            Ok(Uri::At(AtUri::new_owned(uri)?))
+            Ok(UriValue::At(AtUri::new_owned(uri)?))
         } else if uri.starts_with("https://") {
-            Ok(Uri::Https(Url::parse(uri)?))
+            Ok(UriValue::Https(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("wss://") {
-            Ok(Uri::Https(Url::parse(uri)?))
+            Ok(UriValue::Wss(Uri::parse(uri)?.to_owned()))
         } else if uri.starts_with("ipld://") {
             match Cid::from_str(&uri[7..]) {
-                Ok(cid) => Ok(Uri::Cid(cid)),
-                Err(_) => Ok(Uri::Any(CowStr::Owned(uri.to_smolstr()))),
+                Ok(cid) => Ok(UriValue::Cid(cid)),
+                Err(_) => Ok(UriValue::Any(CowStr::Owned(uri.to_smolstr()))),
             }
         } else {
-            Ok(Uri::Any(CowStr::Owned(uri.to_smolstr())))
+            Ok(UriValue::Any(CowStr::Owned(uri.to_smolstr())))
         }
     }
 
     /// Parse a URI from a CowStr, borrowing where possible
     pub fn new_cow(uri: CowStr<'u>) -> Result<Self, UriParseError> {
         if uri.starts_with("did:") {
-            Ok(Uri::Did(Did::new_cow(uri)?))
+            Ok(UriValue::Did(Did::new_cow(uri)?))
         } else if uri.starts_with("at://") {
-            Ok(Uri::At(AtUri::new_cow(uri)?))
+            Ok(UriValue::At(AtUri::new_cow(uri)?))
         } else if uri.starts_with("https://") {
-            Ok(Uri::Https(Url::parse(uri.as_ref())?))
+            Ok(UriValue::Https(Uri::parse(uri.as_ref())?.to_owned()))
         } else if uri.starts_with("wss://") {
-            Ok(Uri::Https(Url::parse(uri.as_ref())?))
+            Ok(UriValue::Wss(Uri::parse(uri.as_ref())?.to_owned()))
         } else if uri.starts_with("ipld://") {
             match Cid::from_str(&uri.as_str()[7..]) {
-                Ok(cid) => Ok(Uri::Cid(cid)),
-                Err(_) => Ok(Uri::Any(uri)),
+                Ok(cid) => Ok(UriValue::Cid(cid)),
+                Err(_) => Ok(UriValue::Any(uri)),
             }
         } else {
-            Ok(Uri::Any(uri))
+            Ok(UriValue::Any(uri))
         }
     }
 
     /// Get the URI as a string slice
     pub fn as_str(&self) -> &str {
         match self {
-            Uri::Did(did) => did.as_str(),
-            Uri::At(at_uri) => at_uri.as_str(),
-            Uri::Https(url) => url.as_str(),
-            Uri::Wss(url) => url.as_str(),
-            Uri::Cid(cid) => cid.as_str(),
-            Uri::Any(s) => s.as_ref(),
+            UriValue::Did(did) => did.as_str(),
+            UriValue::At(at_uri) => at_uri.as_str(),
+            UriValue::Https(url) => url.as_str(),
+            UriValue::Wss(url) => url.as_str(),
+            UriValue::Cid(cid) => cid.as_str(),
+            UriValue::Any(s) => s.as_ref(),
         }
     }
 }
 
-impl Serialize for Uri<'_> {
+impl Serialize for UriValue<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -130,7 +131,7 @@ impl Serialize for Uri<'_> {
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Uri<'a>
+impl<'de, 'a> Deserialize<'de> for UriValue<'a>
 where
     'de: 'a,
 {
@@ -144,30 +145,30 @@ where
     }
 }
 
-impl<'s> AsRef<str> for Uri<'s> {
+impl<'s> AsRef<str> for UriValue<'s> {
     fn as_ref(&self) -> &str {
         match self {
-            Uri::Did(did) => did.as_str(),
-            Uri::At(at_uri) => at_uri.as_str(),
-            Uri::Https(url) => url.as_str(),
-            Uri::Wss(url) => url.as_str(),
-            Uri::Cid(cid) => cid.as_str(),
-            Uri::Any(s) => s.as_ref(),
+            UriValue::Did(did) => did.as_str(),
+            UriValue::At(at_uri) => at_uri.as_str(),
+            UriValue::Https(url) => url.as_str(),
+            UriValue::Wss(url) => url.as_str(),
+            UriValue::Cid(cid) => cid.as_str(),
+            UriValue::Any(s) => s.as_ref(),
         }
     }
 }
 
-impl IntoStatic for Uri<'_> {
-    type Output = Uri<'static>;
+impl IntoStatic for UriValue<'_> {
+    type Output = UriValue<'static>;
 
     fn into_static(self) -> Self::Output {
         match self {
-            Uri::Did(did) => Uri::Did(did.into_static()),
-            Uri::At(at_uri) => Uri::At(AtUri::new_owned(at_uri.as_str()).unwrap()),
-            Uri::Https(url) => Uri::Https(url),
-            Uri::Wss(url) => Uri::Wss(url),
-            Uri::Cid(cid) => Uri::Cid(cid.into_static()),
-            Uri::Any(s) => Uri::Any(s.into_static()),
+            UriValue::Did(did) => UriValue::Did(did.into_static()),
+            UriValue::At(at_uri) => UriValue::At(at_uri.into_static()),
+            UriValue::Https(url) => UriValue::Https(url),
+            UriValue::Wss(url) => UriValue::Wss(url),
+            UriValue::Cid(cid) => UriValue::Cid(cid.into_static()),
+            UriValue::Any(s) => UriValue::Any(s.into_static()),
         }
     }
 }
@@ -238,4 +239,98 @@ pub enum UriError {
     /// Couldn't parse the string as an AtUri
     #[error("Invalid URI: {0}")]
     InvalidUri(#[from] AtStrError),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_wss_variant_parsing() {
+        // Test that wss:// URIs are parsed as UriValue::Wss, not UriValue::Https
+        let uri = UriValue::new("wss://example.com/path").expect("valid wss uri");
+        assert!(
+            matches!(uri, UriValue::Wss(_)),
+            "wss:// should parse to UriValue::Wss"
+        );
+        assert_eq!(uri.as_str(), "wss://example.com/path");
+    }
+
+    #[test]
+    fn test_https_variant_parsing() {
+        // Test that https:// URIs are parsed as UriValue::Https
+        let uri = UriValue::new("https://example.com/path").expect("valid https uri");
+        assert!(
+            matches!(uri, UriValue::Https(_)),
+            "https:// should parse to UriValue::Https"
+        );
+        assert_eq!(uri.as_str(), "https://example.com/path");
+    }
+
+    #[test]
+    fn test_wss_owned_variant_parsing() {
+        // Test that owned wss:// parsing works correctly
+        let uri = UriValue::new_owned("wss://example.com").expect("valid wss uri");
+        assert!(
+            matches!(uri, UriValue::Wss(_)),
+            "owned wss:// should parse to UriValue::Wss"
+        );
+        assert_eq!(uri.as_str(), "wss://example.com");
+    }
+
+    #[test]
+    fn test_https_owned_variant_parsing() {
+        // Test that owned https:// parsing works correctly
+        let uri = UriValue::new_owned("https://example.com").expect("valid https uri");
+        assert!(
+            matches!(uri, UriValue::Https(_)),
+            "owned https:// should parse to UriValue::Https"
+        );
+        assert_eq!(uri.as_str(), "https://example.com");
+    }
+
+    #[test]
+    fn test_wss_cow_variant_parsing() {
+        // Test that cow variant parsing works correctly for wss://
+        let uri = UriValue::new_cow(CowStr::Borrowed("wss://example.com")).expect("valid wss uri");
+        assert!(
+            matches!(uri, UriValue::Wss(_)),
+            "cow wss:// should parse to UriValue::Wss"
+        );
+        assert_eq!(uri.as_str(), "wss://example.com");
+    }
+
+    #[test]
+    fn test_https_cow_variant_parsing() {
+        // Test that cow variant parsing works correctly for https://
+        let uri =
+            UriValue::new_cow(CowStr::Borrowed("https://example.com")).expect("valid https uri");
+        assert!(
+            matches!(uri, UriValue::Https(_)),
+            "cow https:// should parse to UriValue::Https"
+        );
+        assert_eq!(uri.as_str(), "https://example.com");
+    }
+
+    #[test]
+    fn test_uri_display() {
+        // Test that Display output preserves the original scheme
+        let wss = UriValue::new_owned("wss://example.com").unwrap();
+        assert_eq!(wss.as_str(), "wss://example.com");
+
+        let https = UriValue::new_owned("https://example.com").unwrap();
+        assert_eq!(https.as_str(), "https://example.com");
+    }
+
+    #[test]
+    fn test_into_static_preserves_variant() {
+        // Test that IntoStatic conversion preserves the variant type
+        let wss = UriValue::new_owned("wss://example.com").unwrap();
+        let static_wss = wss.into_static();
+        assert!(matches!(static_wss, UriValue::Wss(_)));
+
+        let https = UriValue::new_owned("https://example.com").unwrap();
+        let static_https = https.into_static();
+        assert!(matches!(static_https, UriValue::Https(_)));
+    }
 }

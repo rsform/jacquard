@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveSecret<'a> {
@@ -25,7 +19,7 @@ pub struct RemoveSecret<'a> {
 
 pub mod remove_secret_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,37 +27,37 @@ pub mod remove_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Key;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Key = S::Key;
+        type Repo = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Repo = S::Repo;
         type Key = Set<members::key>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Key = S::Key;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -136,8 +130,8 @@ where
 impl<'a, S> RemoveSecretBuilder<'a, S>
 where
     S: remove_secret_state::State,
-    S::Repo: remove_secret_state::IsSet,
     S::Key: remove_secret_state::IsSet,
+    S::Repo: remove_secret_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveSecret<'a> {
@@ -175,9 +169,8 @@ impl jacquard_common::xrpc::XrpcResp for RemoveSecretResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveSecret<'a> {
     const NSID: &'static str = "sh.tangled.repo.removeSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveSecretResponse;
 }
 
@@ -186,9 +179,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveSecret<'a> {
 pub struct RemoveSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.removeSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RemoveSecret<'de>;
     type Response = RemoveSecretResponse;
 }

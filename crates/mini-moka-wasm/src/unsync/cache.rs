@@ -1,20 +1,21 @@
 use super::{
-    AccessTime, CacheBuilder, Iter, KeyDate, KeyHashDate, ValueEntry, Weigher, deques::Deques,
+    deques::Deques, AccessTime, CacheBuilder, Iter, KeyDate, KeyHashDate, ValueEntry, Weigher,
 };
 use crate::{
-    Policy,
     common::{
-        self, CacheRegion,
+        self,
         deque::{DeqNode, Deque},
         frequency_sketch::FrequencySketch,
         time::{CheckedTimeOps, Clock, Instant},
+        CacheRegion,
     },
+    Policy,
 };
 
 use smallvec::SmallVec;
 use std::{
     borrow::Borrow,
-    collections::{HashMap, hash_map::RandomState},
+    collections::{hash_map::RandomState, HashMap},
     fmt,
     hash::{BuildHasher, Hash},
     ptr::NonNull,

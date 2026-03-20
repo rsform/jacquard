@@ -41,26 +41,35 @@ pub enum ClientErrorKind {
 
     /// Request validation/construction failed
     #[error("invalid request: {0}")]
-    #[cfg_attr(feature = "std", diagnostic(
-        code(jacquard::client::invalid_request),
-        help("check request parameters and format")
-    ))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(
+            code(jacquard::client::invalid_request),
+            help("check request parameters and format")
+        )
+    )]
     InvalidRequest(SmolStr),
 
     /// Request serialization failed
     #[error("encode error: {0}")]
-    #[cfg_attr(feature = "std", diagnostic(
-        code(jacquard::client::encode),
-        help("check request body format and encoding")
-    ))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(
+            code(jacquard::client::encode),
+            help("check request body format and encoding")
+        )
+    )]
     Encode(SmolStr),
 
     /// Response deserialization failed
     #[error("decode error: {0}")]
-    #[cfg_attr(feature = "std", diagnostic(
-        code(jacquard::client::decode),
-        help("check response format and encoding")
-    ))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(
+            code(jacquard::client::decode),
+            help("check response format and encoding")
+        )
+    )]
     Decode(SmolStr),
 
     /// HTTP error response (non-200 status)
@@ -78,18 +87,24 @@ pub enum ClientErrorKind {
 
     /// Identity resolution error (handle→DID, DID→Doc)
     #[error("identity resolution failed")]
-    #[cfg_attr(feature = "std", diagnostic(
-        code(jacquard::client::identity_resolution),
-        help("check handle/DID is valid and network is accessible")
-    ))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(
+            code(jacquard::client::identity_resolution),
+            help("check handle/DID is valid and network is accessible")
+        )
+    )]
     IdentityResolution,
 
     /// Storage/persistence error
     #[error("storage error")]
-    #[cfg_attr(feature = "std", diagnostic(
-        code(jacquard::client::storage),
-        help("check storage backend is accessible and has sufficient permissions")
-    ))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(
+            code(jacquard::client::storage),
+            help("check storage backend is accessible and has sufficient permissions")
+        )
+    )]
     Storage,
 }
 
@@ -190,7 +205,11 @@ impl ClientError {
     ///
     /// Use this when a record operation fails to indicate the target collection.
     pub fn for_collection(self, operation: &str, collection_nsid: &str) -> Self {
-        self.append_context(smol_str::format_smolstr!("{} [{}]", operation, collection_nsid))
+        self.append_context(smol_str::format_smolstr!(
+            "{} [{}]",
+            operation,
+            collection_nsid
+        ))
     }
 
     // Constructors for each kind
@@ -473,9 +492,9 @@ impl From<crate::session::SessionStoreError> for ClientError {
     }
 }
 
-// URL parse errors
-impl From<url::ParseError> for ClientError {
-    fn from(e: url::ParseError) -> Self {
+// fluent_uri parse errors
+impl From<crate::deps::fluent_uri::ParseError> for ClientError {
+    fn from(e: crate::deps::fluent_uri::ParseError) -> Self {
         Self::invalid_request(e.to_string())
     }
 }

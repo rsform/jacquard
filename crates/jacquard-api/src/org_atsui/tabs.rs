@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tabs<'a> {
@@ -24,7 +18,7 @@ pub struct Tabs<'a> {
 
 pub mod tabs_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,9 +51,7 @@ pub mod tabs_state {
 /// Builder for constructing an instance of this type
 pub struct TabsBuilder<'a, S: tabs_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::org_atsui::tabs::Tab<'a>>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<Vec<crate::org_atsui::tabs::Tab<'a>>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -129,13 +121,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TabsOutput<'a> {
@@ -156,9 +142,8 @@ impl jacquard_common::xrpc::XrpcResp for TabsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
     const NSID: &'static str = "org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = TabsResponse;
 }
 
@@ -167,22 +152,15 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
 pub struct TabsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Tabs<'de>;
     type Response = TabsResponse;
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tab<'a> {
@@ -199,7 +177,7 @@ pub struct Tab<'a> {
 
 pub mod tab_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -524,9 +502,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -537,9 +513,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("label"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteGroupRelationship<'a> {
@@ -39,9 +39,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGroupRelationshipResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGroupRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroupRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteGroupRelationshipResponse;
 }
 
@@ -50,9 +49,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGroupRelationship<'a> {
 pub struct DeleteGroupRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroupRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteGroupRelationship<'de>;
     type Response = DeleteGroupRelationshipResponse;
 }

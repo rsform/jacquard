@@ -8,13 +8,7 @@
 /// A declaration of a layer for an organization
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Layer<'a> {
@@ -32,12 +26,12 @@ pub struct Layer<'a> {
     pub r#type: jacquard_common::CowStr<'a>,
     /// The URI of the layer
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod layer_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -45,8 +39,8 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
         type CreatedAt;
         type Type;
     }
@@ -54,26 +48,26 @@ pub mod layer_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
+        type Uri = Unset;
         type CreatedAt = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
         type CreatedAt = S::CreatedAt;
         type Type = S::Type;
     }
@@ -81,8 +75,8 @@ pub mod layer_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
         type Name = S::Name;
+        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
         type Type = S::Type;
     }
@@ -90,18 +84,18 @@ pub mod layer_state {
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
         type Name = S::Name;
+        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `type` field
@@ -117,7 +111,7 @@ pub struct LayerBuilder<'a, S: layer_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -161,18 +155,12 @@ where
 
 impl<'a, S: layer_state::State> LayerBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -224,7 +212,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> LayerBuilder<'a, layer_state::SetUri<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         LayerBuilder {
@@ -238,8 +226,8 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Uri: layer_state::IsSet,
     S::Name: layer_state::IsSet,
+    S::Uri: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
     S::Type: layer_state::IsSet,
 {
@@ -288,13 +276,7 @@ impl<'a> Layer<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayerGetRecordOutput<'a> {
@@ -351,9 +333,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_organization_layer()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.organization.layer"),

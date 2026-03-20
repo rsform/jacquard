@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
@@ -38,7 +32,7 @@ pub struct Definition<'a> {
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,67 +40,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ValueType;
         type CreatedAt;
-        type Name;
         type Scope;
+        type ValueType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ValueType = Unset;
         type CreatedAt = Unset;
-        type Name = Unset;
         type Scope = Unset;
-    }
-    ///State transition - sets the `value_type` field to Set
-    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValueType<S> {}
-    impl<S: State> State for SetValueType<S> {
-        type ValueType = Set<members::value_type>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Scope = S::Scope;
+        type ValueType = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ValueType = S::ValueType;
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
         type Scope = S::Scope;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type ValueType = S::ValueType;
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Scope = S::Scope;
+        type Name = S::Name;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
-        type ValueType = S::ValueType;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Scope = Set<members::scope>;
+        type ValueType = S::ValueType;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `value_type` field to Set
+    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValueType<S> {}
+    impl<S: State> State for SetValueType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Scope = S::Scope;
+        type ValueType = Set<members::value_type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Scope = S::Scope;
+        type ValueType = S::ValueType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value_type` field
-        pub struct value_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `value_type` field
+        pub struct value_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -144,10 +138,7 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -250,10 +241,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::ValueType: definition_state::IsSet,
     S::CreatedAt: definition_state::IsSet,
-    S::Name: definition_state::IsSet,
     S::Scope: definition_state::IsSet,
+    S::ValueType: definition_state::IsSet,
+    S::Name: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -302,13 +293,7 @@ impl<'a> Definition<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
@@ -370,13 +355,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count > 40usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 40usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            max: 40usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -389,13 +376,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        min: 1usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "name",
+                            ),
+                            min: 1usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -403,9 +392,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.label.definition"),
@@ -645,7 +632,7 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValueType<'a> {

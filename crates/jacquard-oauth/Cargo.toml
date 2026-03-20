@@ -25,7 +25,6 @@ jacquard-common = { version = "0.9", path = "../jacquard-common", features = ["r
 jacquard-identity = { version = "0.9", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-url = { workspace = true }
 smol_str = { workspace = true }
 base64.workspace = true
 sha2 = { version = "0.10" }

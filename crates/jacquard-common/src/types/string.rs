@@ -1,10 +1,10 @@
+use alloc::string::{String, ToString};
+use alloc::sync::Arc;
+use core::str::FromStr;
 #[cfg(feature = "std")]
 use miette::{Diagnostic, SourceSpan};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
-use alloc::string::{String, ToString};
-use alloc::sync::Arc;
-use core::str::FromStr;
 
 /// Source span for error reporting (offset, length)
 /// With `std` feature, this is `miette::SourceSpan`. Without, a simple tuple struct.
@@ -39,7 +39,7 @@ pub use crate::{
         nsid::Nsid,
         recordkey::{RecordKey, Rkey},
         tid::Tid,
-        uri::Uri,
+        uri::UriValue,
     },
 };
 use crate::{
@@ -74,7 +74,7 @@ pub enum AtprotoStr<'s> {
     /// AT URI
     AtUri(AtUri<'s>),
     /// Generic URI
-    Uri(Uri<'s>),
+    Uri(UriValue<'s>),
     /// Content identifier
     Cid(Cid<'s>),
     /// Record key
@@ -112,7 +112,7 @@ impl<'s> AtprotoStr<'s> {
             Self::Nsid(nsid)
         } else if let Ok(aturi) = AtUri::new(string) {
             Self::AtUri(aturi)
-        } else if let Ok(uri) = Uri::new(string) {
+        } else if let Ok(uri) = UriValue::new(string) {
             Self::Uri(uri)
         } else if let Ok(cid) = Cid::new(string.as_bytes()) {
             Self::Cid(cid)
@@ -150,12 +150,12 @@ impl<'s> AtprotoStr<'s> {
             Self::Nsid(_) => LexiconStringType::Nsid,
             Self::AtUri(_) => LexiconStringType::AtUri,
             Self::Uri(uri) => LexiconStringType::Uri(match uri {
-                Uri::Did(_) => UriType::Did,
-                Uri::At(_) => UriType::At,
-                Uri::Https(_) => UriType::Https,
-                Uri::Wss(_) => UriType::Wss,
-                Uri::Cid(_) => UriType::Cid,
-                Uri::Any(_) => UriType::Any,
+                UriValue::Did(_) => UriType::Did,
+                UriValue::At(_) => UriType::At,
+                UriValue::Https(_) => UriType::Https,
+                UriValue::Wss(_) => UriType::Wss,
+                UriValue::Cid(_) => UriType::Cid,
+                UriValue::Any(_) => UriType::Any,
             }),
             Self::Cid(_) => LexiconStringType::Cid,
             Self::Tid(_) => LexiconStringType::Tid,
@@ -196,7 +196,7 @@ impl AtprotoStr<'static> {
             Self::Nsid(nsid)
         } else if let Ok(aturi) = AtUri::new_owned(string) {
             Self::AtUri(aturi)
-        } else if let Ok(uri) = Uri::new_owned(string) {
+        } else if let Ok(uri) = UriValue::new_owned(string) {
             Self::Uri(uri)
         } else if let Ok(cid) = Cid::new_owned(string.as_bytes()) {
             Self::Cid(cid)
@@ -275,12 +275,12 @@ impl From<AtprotoStr<'_>> for String {
             AtprotoStr::AtIdentifier(ident) => ident.to_string(),
             AtprotoStr::AtUri(at_uri) => at_uri.to_string(),
             AtprotoStr::Uri(uri) => match uri {
-                Uri::At(at_uri) => at_uri.to_string(),
-                Uri::Cid(cid) => cid.to_string(),
-                Uri::Did(did) => did.to_string(),
-                Uri::Https(url) => url.to_string(),
-                Uri::Wss(url) => url.to_string(),
-                Uri::Any(cow_str) => cow_str.to_string(),
+                UriValue::At(at_uri) => at_uri.to_string(),
+                UriValue::Cid(cid) => cid.to_string(),
+                UriValue::Did(did) => did.to_string(),
+                UriValue::Https(url) => url.to_string(),
+                UriValue::Wss(url) => url.to_string(),
+                UriValue::Any(cow_str) => cow_str.to_string(),
             },
             AtprotoStr::Cid(cid) => cid.to_string(),
             AtprotoStr::RecordKey(record_key) => record_key.as_ref().to_string(),
@@ -305,10 +305,13 @@ impl From<AtprotoStr<'_>> for String {
 #[derive(Debug, thiserror::Error, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
 #[error("error in `{source}`: {kind}")]
-#[cfg_attr(feature = "std", diagnostic(
-    url("https://atproto.com/specs/{spec}"),
-    help("if something doesn't match the spec, contact the crate author")
-))]
+#[cfg_attr(
+    feature = "std",
+    diagnostic(
+        url("https://atproto.com/specs/{spec}"),
+        help("if something doesn't match the spec, contact the crate author")
+    )
+)]
 pub struct AtStrError {
     /// AT Protocol spec name this error relates to
     pub spec: SmolStr,
@@ -474,7 +477,10 @@ pub enum StrParseKind {
     },
     /// String exceeds maximum allowed length
     #[error("string too long (allowed: {max}, actual: {actual})")]
-    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::wrong_length)))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(code(jacquard::types::string::wrong_length))
+    )]
     TooLong {
         /// Maximum allowed length
         max: usize,
@@ -484,7 +490,10 @@ pub enum StrParseKind {
 
     /// String is below minimum required length
     #[error("string too short (allowed: {min}, actual: {actual})")]
-    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::wrong_length)))]
+    #[cfg_attr(
+        feature = "std",
+        diagnostic(code(jacquard::types::string::wrong_length))
+    )]
     TooShort {
         /// Minimum required length
         min: usize,

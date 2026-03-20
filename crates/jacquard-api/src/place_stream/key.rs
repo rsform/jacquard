@@ -8,13 +8,7 @@
 /// Record linking an atproto identity with a stream signing key
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
@@ -31,7 +25,7 @@ pub struct Key<'a> {
 
 pub mod key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,18 +117,12 @@ where
 
 impl<'a, S: key_state::State> KeyBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
-    pub fn created_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn created_by(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
-    pub fn maybe_created_by(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_created_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -206,13 +194,7 @@ impl<'a> Key<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct KeyGetRecordOutput<'a> {
@@ -270,9 +252,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 57usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signing_key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("signing_key"),
                     max: 57usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -283,9 +263,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 57usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signing_key",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("signing_key"),
                     min: 57usize,
                     actual: <str>::len(value.as_ref()),
                 });

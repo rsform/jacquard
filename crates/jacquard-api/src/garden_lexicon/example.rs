@@ -8,13 +8,7 @@
 /// An example value for a lexicon schema
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Example<'a> {
@@ -34,7 +28,7 @@ pub struct Example<'a> {
 
 pub mod example_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,50 +37,50 @@ pub mod example_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Lexicon;
-        type Value;
         type CreatedAt;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Lexicon = Unset;
-        type Value = Unset;
         type CreatedAt = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `lexicon` field to Set
     pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLexicon<S> {}
     impl<S: State> State for SetLexicon<S> {
         type Lexicon = Set<members::lexicon>;
+        type CreatedAt = S::CreatedAt;
         type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Lexicon = S::Lexicon;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Lexicon = S::Lexicon;
-        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Lexicon = S::Lexicon;
+        type CreatedAt = S::CreatedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -141,18 +135,12 @@ where
 
 impl<'a, S: example_state::State> ExampleBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -200,8 +188,8 @@ impl<'a, S> ExampleBuilder<'a, S>
 where
     S: example_state::State,
     S::Lexicon: example_state::IsSet,
-    S::Value: example_state::IsSet,
     S::CreatedAt: example_state::IsSet,
+    S::Value: example_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Example<'a> {
@@ -246,13 +234,7 @@ impl<'a> Example<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExampleGetRecordOutput<'a> {
@@ -309,9 +291,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
     }
 }
 
-fn lexicon_doc_garden_lexicon_example() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_lexicon_example() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.lexicon.example"),

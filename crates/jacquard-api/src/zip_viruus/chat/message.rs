@@ -8,13 +8,7 @@
 /// A single chat message in a whoossh channel.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Message<'a> {
@@ -30,7 +24,7 @@ pub struct Message<'a> {
 
 pub mod message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,50 +33,50 @@ pub mod message_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type CreatedAt;
         type Channel;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type CreatedAt = Unset;
         type Channel = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type Channel = S::Channel;
         type CreatedAt = S::CreatedAt;
-        type Channel = S::Channel;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
-        type Channel = S::Channel;
     }
     ///State transition - sets the `channel` field to Set
     pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannel<S> {}
     impl<S: State> State for SetChannel<S> {
         type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
         type Channel = Set<members::channel>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type Channel = S::Channel;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `channel` field
         pub struct channel(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -176,8 +170,8 @@ impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
     S::Text: message_state::IsSet,
-    S::CreatedAt: message_state::IsSet,
     S::Channel: message_state::IsSet,
+    S::CreatedAt: message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Message<'a> {
@@ -220,13 +214,7 @@ impl<'a> Message<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "channel",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("channel"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -297,9 +283,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -314,13 +298,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "text",
+                            ),
+                            max: 500usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -328,9 +314,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     }
 }
 
-fn lexicon_doc_zip_viruus_chat_message() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_zip_viruus_chat_message() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("zip.viruus.chat.message"),

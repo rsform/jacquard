@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveApikeyParams<'a> {
@@ -22,7 +16,7 @@ pub struct RemoveApikeyParams<'a> {
 
 pub mod remove_apikey_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,13 +105,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveApikeyOutput<'a> {
@@ -135,7 +123,7 @@ pub struct RemoveApikeyOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct RemoveApikey;
 /// Response type for
@@ -150,9 +138,8 @@ impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
     const NSID: &'static str = "app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveApikeyResponse;
 }
 
@@ -161,9 +148,8 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
 pub struct RemoveApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RemoveApikey;
     type Response = RemoveApikeyResponse;
 }

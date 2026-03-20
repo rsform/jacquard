@@ -15,15 +15,13 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<
-        crate::ch_indiemusi::alpha::actor::artist::Artist<'a>,
-    >,
+    pub artist: std::option::Option<crate::ch_indiemusi::alpha::actor::artist::Artist<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -31,9 +29,7 @@ pub struct Artist<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ch.indiemusi.alpha.release"),
@@ -43,71 +39,69 @@ fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::Lexi
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Information about an artist contributing to the release",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artist",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "ch.indiemusi.alpha.actor.artist",
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "ch.indiemusi.alpha.actor.artist",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(255usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(255usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -260,9 +254,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -275,13 +267,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
 /// A release (album, EP, single) containing recordings of songs or musical works
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Release<'a> {
@@ -305,7 +291,7 @@ pub struct Release<'a> {
 
 pub mod release_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -313,49 +299,49 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Recordings;
+        type Title;
         type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Recordings = Unset;
+        type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Recordings = S::Recordings;
-        type Artists = S::Artists;
     }
     ///State transition - sets the `recordings` field to Set
     pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordings<S> {}
     impl<S: State> State for SetRecordings<S> {
-        type Title = S::Title;
         type Recordings = Set<members::recordings>;
+        type Title = S::Title;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Recordings = S::Recordings;
+        type Title = Set<members::title>;
         type Artists = S::Artists;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
         type Recordings = S::Recordings;
+        type Title = S::Title;
         type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
     }
@@ -368,9 +354,7 @@ pub struct ReleaseBuilder<'a, S: release_state::State> {
         ::core::option::Option<Vec<crate::ch_indiemusi::alpha::release::Artist<'a>>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::ch_indiemusi::alpha::recording::Recording<'a>>,
-        >,
+        ::core::option::Option<Vec<crate::ch_indiemusi::alpha::recording::Recording<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -435,10 +419,7 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
 
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `gtin` field (optional)
-    pub fn gtin(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn gtin(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -509,8 +490,8 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Title: release_state::IsSet,
     S::Recordings: release_state::IsSet,
+    S::Title: release_state::IsSet,
     S::Artists: release_state::IsSet,
 {
     /// Build the final struct
@@ -560,13 +541,7 @@ impl<'a> Release<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReleaseGetRecordOutput<'a> {
@@ -624,9 +599,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artists",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("artists"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -636,9 +609,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 14usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gtin",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("gtin"),
                     max: 14usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -649,9 +620,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "recordings",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("recordings"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -662,9 +631,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReportShout<'a> {
@@ -29,13 +29,7 @@ pub struct ReportShout<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReportShoutOutput<'a> {
@@ -56,9 +50,8 @@ impl jacquard_common::xrpc::XrpcResp for ReportShoutResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ReportShout<'a> {
     const NSID: &'static str = "app.rocksky.shout.reportShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ReportShoutResponse;
 }
 
@@ -67,9 +60,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReportShout<'a> {
 pub struct ReportShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReportShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.reportShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = ReportShout<'de>;
     type Response = ReportShoutResponse;
 }

@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddSecret<'a> {
@@ -27,7 +21,7 @@ pub struct AddSecret<'a> {
 
 pub mod add_secret_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,51 +29,51 @@ pub mod add_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
         type Repo;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Value = S::Value;
-        type Repo = S::Repo;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Key = S::Key;
         type Value = Set<members::value>;
         type Repo = S::Repo;
+        type Key = S::Key;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Key = S::Key;
         type Value = S::Value;
         type Repo = Set<members::repo>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Value = S::Value;
+        type Repo = S::Repo;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -172,9 +166,9 @@ where
 impl<'a, S> AddSecretBuilder<'a, S>
 where
     S: add_secret_state::State,
-    S::Key: add_secret_state::IsSet,
     S::Value: add_secret_state::IsSet,
     S::Repo: add_secret_state::IsSet,
+    S::Key: add_secret_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddSecret<'a> {
@@ -214,9 +208,8 @@ impl jacquard_common::xrpc::XrpcResp for AddSecretResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for AddSecret<'a> {
     const NSID: &'static str = "sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddSecretResponse;
 }
 
@@ -225,9 +218,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddSecret<'a> {
 pub struct AddSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddSecretRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = AddSecret<'de>;
     type Response = AddSecretResponse;
 }

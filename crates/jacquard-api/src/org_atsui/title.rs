@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Title<'a> {
@@ -23,7 +17,7 @@ pub struct Title<'a> {
 
 pub mod title_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,9 +50,7 @@ pub mod title_state {
 /// Builder for constructing an instance of this type
 pub struct TitleBuilder<'a, S: title_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<jacquard_common::types::value::Data<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,13 +120,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TitleOutput<'a> {
@@ -155,9 +141,8 @@ impl jacquard_common::xrpc::XrpcResp for TitleResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Title<'a> {
     const NSID: &'static str = "org.atsui.Title";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = TitleResponse;
 }
 
@@ -166,9 +151,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Title<'a> {
 pub struct TitleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TitleRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Title";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = Title<'de>;
     type Response = TitleResponse;
 }

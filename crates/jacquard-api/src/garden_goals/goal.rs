@@ -8,13 +8,7 @@
 /// A goal to track daily completions for a year.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Goal<'a> {
@@ -37,15 +31,11 @@ pub struct Goal<'a> {
     /// Uploaded image for complete state
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_piece_blob: std::option::Option<
-        jacquard_common::types::blob::BlobRef<'a>,
-    >,
+    pub completed_piece_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Favicon URL for complete state
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_piece_url: std::option::Option<
-        jacquard_common::types::string::Uri<'a>,
-    >,
+    pub completed_piece_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Timestamp when the goal was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Optional description of the goal
@@ -69,7 +59,7 @@ pub struct Goal<'a> {
     /// Favicon URL for incomplete state
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub piece_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub piece_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
     /// Target count for countable goals
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub target_count: std::option::Option<i64>,
@@ -79,7 +69,7 @@ pub struct Goal<'a> {
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -87,65 +77,65 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GoalId;
         type CreatedAt;
         type Year;
+        type GoalId;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GoalId = Unset;
         type CreatedAt = Unset;
         type Year = Unset;
+        type GoalId = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type GoalId = Set<members::goal_id>;
-        type CreatedAt = S::CreatedAt;
-        type Year = S::Year;
-        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = Set<members::created_at>;
         type Year = S::Year;
+        type GoalId = S::GoalId;
         type Name = S::Name;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = S::CreatedAt;
         type Year = Set<members::year>;
+        type GoalId = S::GoalId;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Year = S::Year;
+        type GoalId = Set<members::goal_id>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = S::CreatedAt;
         type Year = S::Year;
+        type GoalId = S::GoalId;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `year` field
         pub struct year(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -160,14 +150,14 @@ pub struct GoalBuilder<'a, S: goal_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
     ),
@@ -187,20 +177,7 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
         GoalBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _phantom: ::core::marker::PhantomData,
@@ -210,18 +187,12 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
-    pub fn accent_color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn accent_color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
-    pub fn maybe_accent_color(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_accent_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -237,10 +208,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
         self
     }
     /// Set the `categories` field to an Option value (optional)
-    pub fn maybe_categories(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_categories(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -275,10 +243,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
         self
     }
     /// Set the `completedPiece` field to an Option value (optional)
-    pub fn maybe_completed_piece(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_completed_piece(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -307,7 +272,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPieceUrl` field (optional)
     pub fn completed_piece_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -315,7 +280,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPieceUrl` field to an Option value (optional)
     pub fn maybe_completed_piece_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
@@ -343,18 +308,12 @@ where
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -400,10 +359,7 @@ where
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `piece` field (optional)
-    pub fn piece(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn piece(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -437,7 +393,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceUrl` field (optional)
     pub fn piece_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
@@ -445,7 +401,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceUrl` field to an Option value (optional)
     pub fn maybe_piece_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
@@ -471,10 +427,7 @@ where
     S::Year: goal_state::IsUnset,
 {
     /// Set the `year` field (required)
-    pub fn year(
-        mut self,
-        value: impl Into<i64>,
-    ) -> GoalBuilder<'a, goal_state::SetYear<S>> {
+    pub fn year(mut self, value: impl Into<i64>) -> GoalBuilder<'a, goal_state::SetYear<S>> {
         self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
         GoalBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -487,9 +440,9 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
-    S::GoalId: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
     S::Year: goal_state::IsSet,
+    S::GoalId: goal_state::IsSet,
     S::Name: goal_state::IsSet,
 {
     /// Build the final struct
@@ -557,13 +510,7 @@ impl<'a> Goal<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GoalGetRecordOutput<'a> {
@@ -656,9 +603,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -669,9 +614,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "goal_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("goal_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -682,9 +625,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -694,9 +635,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "piece",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("piece"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -717,9 +656,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             let value = &self.year;
             if *value < 1970i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("year"),
                     min: 1970i64,
                     actual: *value,
                 });

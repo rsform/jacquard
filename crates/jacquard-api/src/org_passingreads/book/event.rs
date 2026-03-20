@@ -8,13 +8,7 @@
 /// The status of a book has changed.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
@@ -43,7 +37,7 @@ pub struct Event<'a> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,105 +45,105 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BookSig;
-        type Book;
+        type Did;
+        type Location;
         type BookPub;
         type OccurredAt;
-        type Location;
-        type Did;
+        type BookSig;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BookSig = Unset;
-        type Book = Unset;
+        type Did = Unset;
+        type Location = Unset;
         type BookPub = Unset;
         type OccurredAt = Unset;
-        type Location = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `book_sig` field to Set
-    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookSig<S> {}
-    impl<S: State> State for SetBookSig<S> {
-        type BookSig = Set<members::book_sig>;
-        type Book = S::Book;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-        type Location = S::Location;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type BookSig = S::BookSig;
-        type Book = Set<members::book>;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-        type Location = S::Location;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `book_pub` field to Set
-    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookPub<S> {}
-    impl<S: State> State for SetBookPub<S> {
-        type BookSig = S::BookSig;
-        type Book = S::Book;
-        type BookPub = Set<members::book_pub>;
-        type OccurredAt = S::OccurredAt;
-        type Location = S::Location;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
-    impl<S: State> State for SetOccurredAt<S> {
-        type BookSig = S::BookSig;
-        type Book = S::Book;
-        type BookPub = S::BookPub;
-        type OccurredAt = Set<members::occurred_at>;
-        type Location = S::Location;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type BookSig = S::BookSig;
-        type Book = S::Book;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-        type Location = Set<members::location>;
-        type Did = S::Did;
+        type BookSig = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type BookSig = S::BookSig;
-        type Book = S::Book;
+        type Did = Set<members::did>;
+        type Location = S::Location;
         type BookPub = S::BookPub;
         type OccurredAt = S::OccurredAt;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type Did = S::Did;
+        type Location = Set<members::location>;
+        type BookPub = S::BookPub;
+        type OccurredAt = S::OccurredAt;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book_pub` field to Set
+    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookPub<S> {}
+    impl<S: State> State for SetBookPub<S> {
+        type Did = S::Did;
         type Location = S::Location;
-        type Did = Set<members::did>;
+        type BookPub = Set<members::book_pub>;
+        type OccurredAt = S::OccurredAt;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
+    impl<S: State> State for SetOccurredAt<S> {
+        type Did = S::Did;
+        type Location = S::Location;
+        type BookPub = S::BookPub;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book_sig` field to Set
+    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookSig<S> {}
+    impl<S: State> State for SetBookSig<S> {
+        type Did = S::Did;
+        type Location = S::Location;
+        type BookPub = S::BookPub;
+        type OccurredAt = S::OccurredAt;
+        type BookSig = Set<members::book_sig>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Did = S::Did;
+        type Location = S::Location;
+        type BookPub = S::BookPub;
+        type OccurredAt = S::OccurredAt;
+        type BookSig = S::BookSig;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book_sig` field
-        pub struct book_sig(());
-        ///Marker type for the `book` field
-        pub struct book(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `book_pub` field
         pub struct book_pub(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
-        ///Marker type for the `location` field
-        pub struct location(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `book_sig` field
+        pub struct book_sig(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -316,12 +310,12 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::BookSig: event_state::IsSet,
-    S::Book: event_state::IsSet,
+    S::Did: event_state::IsSet,
+    S::Location: event_state::IsSet,
     S::BookPub: event_state::IsSet,
     S::OccurredAt: event_state::IsSet,
-    S::Location: event_state::IsSet,
-    S::Did: event_state::IsSet,
+    S::BookSig: event_state::IsSet,
+    S::Book: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -456,9 +450,7 @@ impl jacquard_common::IntoStatic for EventEvent<'_> {
     type Output = EventEvent<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            EventEvent::OrgPassingreadsBookCheckin => {
-                EventEvent::OrgPassingreadsBookCheckin
-            }
+            EventEvent::OrgPassingreadsBookCheckin => EventEvent::OrgPassingreadsBookCheckin,
             EventEvent::OrgPassingreadsBookDrop => EventEvent::OrgPassingreadsBookDrop,
             EventEvent::OrgPassingreadsBookFind => EventEvent::OrgPassingreadsBookFind,
             EventEvent::Other(v) => EventEvent::Other(v.into_static()),
@@ -468,13 +460,7 @@ impl jacquard_common::IntoStatic for EventEvent<'_> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -489,13 +475,7 @@ pub enum EventLocation<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
@@ -552,9 +532,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     }
 }
 
-fn lexicon_doc_org_passingreads_book_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_passingreads_book_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.passingreads.book.event"),
@@ -830,7 +808,7 @@ fn lexicon_doc_org_passingreads_book_event() -> ::jacquard_lexicon::lexicon::Lex
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OsmLocation<'a> {

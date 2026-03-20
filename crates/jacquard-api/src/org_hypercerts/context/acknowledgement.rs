@@ -8,13 +8,7 @@
 /// Acknowledges a record (subject) or its relationship in a context. Created in the acknowledging actor's repo to form a bidirectional link. Examples: a contributor acknowledging inclusion in an activity, an activity owner acknowledging inclusion in a collection, or a record owner acknowledging an evaluation.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Acknowledgement<'a> {
@@ -37,7 +31,7 @@ pub struct Acknowledgement<'a> {
 
 pub mod acknowledgement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -45,49 +39,49 @@ pub mod acknowledgement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Acknowledged;
         type CreatedAt;
+        type Acknowledged;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Acknowledged = Unset;
         type CreatedAt = Unset;
+        type Acknowledged = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `acknowledged` field to Set
-    pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
-    impl<S: State> State for SetAcknowledged<S> {
-        type Acknowledged = Set<members::acknowledged>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Acknowledged = S::Acknowledged;
         type CreatedAt = Set<members::created_at>;
+        type Acknowledged = S::Acknowledged;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `acknowledged` field to Set
+    pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
+    impl<S: State> State for SetAcknowledged<S> {
+        type CreatedAt = S::CreatedAt;
+        type Acknowledged = Set<members::acknowledged>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Acknowledged = S::Acknowledged;
         type CreatedAt = S::CreatedAt;
+        type Acknowledged = S::Acknowledged;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `acknowledged` field
-        pub struct acknowledged(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `acknowledged` field
+        pub struct acknowledged(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -145,10 +139,7 @@ where
 
 impl<'a, S: acknowledgement_state::State> AcknowledgementBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -161,10 +152,7 @@ impl<'a, S: acknowledgement_state::State> AcknowledgementBuilder<'a, S> {
 
 impl<'a, S: acknowledgement_state::State> AcknowledgementBuilder<'a, S> {
     /// Set the `context` field (optional)
-    pub fn context(
-        mut self,
-        value: impl Into<Option<AcknowledgementContext<'a>>>,
-    ) -> Self {
+    pub fn context(mut self, value: impl Into<Option<AcknowledgementContext<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -216,8 +204,8 @@ where
 impl<'a, S> AcknowledgementBuilder<'a, S>
 where
     S: acknowledgement_state::State,
-    S::Acknowledged: acknowledgement_state::IsSet,
     S::CreatedAt: acknowledgement_state::IsSet,
+    S::Acknowledged: acknowledgement_state::IsSet,
     S::Subject: acknowledgement_state::IsSet,
 {
     /// Build the final struct
@@ -265,13 +253,7 @@ impl<'a> Acknowledgement<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -284,13 +266,7 @@ pub enum AcknowledgementContext<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AcknowledgementGetRecordOutput<'a> {
@@ -347,9 +323,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Acknowledgement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "comment",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("comment"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -363,13 +337,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Acknowledgement<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "comment",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                                "comment",
+                            ),
+                            max: 1000usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
@@ -377,14 +353,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Acknowledgement<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_acknowledgement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_context_acknowledgement()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "org.hypercerts.context.acknowledgement",
-        ),
+        id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.acknowledgement"),
         revision: None,
         description: None,
         defs: {

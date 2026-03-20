@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetStateOutput<'a> {
@@ -31,7 +25,7 @@ pub struct GetStateOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct GetState;
 /// Response type for
@@ -62,13 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Output<'a> {
@@ -89,7 +77,7 @@ pub struct Output<'a> {
 
 pub mod output_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,8 +86,8 @@ pub mod output_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type FavoriteArtists;
-        type FavoriteGames;
         type FavoriteAlbums;
+        type FavoriteGames;
         type UseSusieProphecy;
         type FavoriteDeltaruneCharacters;
         type TitleColors;
@@ -109,8 +97,8 @@ pub mod output_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type FavoriteArtists = Unset;
-        type FavoriteGames = Unset;
         type FavoriteAlbums = Unset;
+        type FavoriteGames = Unset;
         type UseSusieProphecy = Unset;
         type FavoriteDeltaruneCharacters = Unset;
         type TitleColors = Unset;
@@ -120,19 +108,8 @@ pub mod output_state {
     impl<S: State> sealed::Sealed for SetFavoriteArtists<S> {}
     impl<S: State> State for SetFavoriteArtists<S> {
         type FavoriteArtists = Set<members::favorite_artists>;
+        type FavoriteAlbums = S::FavoriteAlbums;
         type FavoriteGames = S::FavoriteGames;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type TitleColors = S::TitleColors;
-    }
-    ///State transition - sets the `favorite_games` field to Set
-    pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
-    impl<S: State> State for SetFavoriteGames<S> {
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteGames = Set<members::favorite_games>;
-        type FavoriteAlbums = S::FavoriteAlbums;
         type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type TitleColors = S::TitleColors;
@@ -142,8 +119,19 @@ pub mod output_state {
     impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
     impl<S: State> State for SetFavoriteAlbums<S> {
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteGames = S::FavoriteGames;
         type FavoriteAlbums = Set<members::favorite_albums>;
+        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `favorite_games` field to Set
+    pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
+    impl<S: State> State for SetFavoriteGames<S> {
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = Set<members::favorite_games>;
         type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type TitleColors = S::TitleColors;
@@ -153,8 +141,8 @@ pub mod output_state {
     impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
     impl<S: State> State for SetUseSusieProphecy<S> {
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteGames = S::FavoriteGames;
         type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
         type UseSusieProphecy = Set<members::use_susie_prophecy>;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type TitleColors = S::TitleColors;
@@ -164,8 +152,8 @@ pub mod output_state {
     impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
     impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteGames = S::FavoriteGames;
         type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
         type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
         type TitleColors = S::TitleColors;
@@ -175,8 +163,8 @@ pub mod output_state {
     impl<S: State> sealed::Sealed for SetTitleColors<S> {}
     impl<S: State> State for SetTitleColors<S> {
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteGames = S::FavoriteGames;
         type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
         type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type TitleColors = Set<members::title_colors>;
@@ -186,10 +174,10 @@ pub mod output_state {
     pub mod members {
         ///Marker type for the `favorite_artists` field
         pub struct favorite_artists(());
-        ///Marker type for the `favorite_games` field
-        pub struct favorite_games(());
         ///Marker type for the `favorite_albums` field
         pub struct favorite_albums(());
+        ///Marker type for the `favorite_games` field
+        pub struct favorite_games(());
         ///Marker type for the `use_susie_prophecy` field
         pub struct use_susie_prophecy(());
         ///Marker type for the `favorite_deltarune_characters` field
@@ -349,8 +337,8 @@ impl<'a, S> OutputBuilder<'a, S>
 where
     S: output_state::State,
     S::FavoriteArtists: output_state::IsSet,
-    S::FavoriteGames: output_state::IsSet,
     S::FavoriteAlbums: output_state::IsSet,
+    S::FavoriteGames: output_state::IsSet,
     S::UseSusieProphecy: output_state::IsSet,
     S::FavoriteDeltaruneCharacters: output_state::IsSet,
     S::TitleColors: output_state::IsSet,
@@ -491,9 +479,8 @@ impl jacquard_common::IntoStatic for OutputTitleColors<'_> {
     }
 }
 
-fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
+{
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("download.darkworld.site.getState"),
@@ -503,153 +490,181 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
-                    parameters: None,
-                    output: None,
-                    errors: None,
-                }),
+                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(
+                    ::jacquard_lexicon::lexicon::LexXrpcQuery {
+                        description: None,
+                        parameters: None,
+                        output: None,
+                        errors: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("output"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("useSusieProphecy"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("titleColors"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteGames"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteArtists"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteAlbums"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteDeltaruneCharacters")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "favoriteAlbums",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "favoriteArtists",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "favoriteDeltaruneCharacters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "favoriteGames",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "titleColors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Named title color mode for the site.",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "useSusieProphecy",
                             ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("titleColors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteGames"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "favoriteArtists",
+                            ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "favoriteAlbums",
+                            ),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "favoriteDeltaruneCharacters",
+                            ),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "favoriteAlbums",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "favoriteArtists",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "favoriteDeltaruneCharacters",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "favoriteGames",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
+                                            ::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "titleColors",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "Named title color mode for the site.",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "useSusieProphecy",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
+                                    ::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },

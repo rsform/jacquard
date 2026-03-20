@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatus<'a> {
@@ -29,7 +23,7 @@ pub struct GetSubjectStatus<'a> {
 
 pub mod get_subject_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,10 +79,7 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
         self
     }
     /// Set the `blob` field to an Option value (optional)
-    pub fn maybe_blob(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
+    pub fn maybe_blob(mut self, value: Option<jacquard_common::types::string::Cid<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -104,10 +95,7 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -123,10 +111,7 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_uri(mut self, value: Option<jacquard_common::types::string::AtUri<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -148,13 +133,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatusOutput<'a> {
@@ -170,13 +149,7 @@ pub struct GetSubjectStatusOutput<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]

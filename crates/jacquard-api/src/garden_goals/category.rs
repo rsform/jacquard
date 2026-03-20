@@ -8,13 +8,7 @@
 /// A category for organizing goals.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Category<'a> {
@@ -30,7 +24,7 @@ pub struct Category<'a> {
 
 pub mod category_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,51 +32,51 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CategoryId;
-        type Name;
         type CreatedAt;
+        type Name;
+        type CategoryId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CategoryId = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `category_id` field to Set
-    pub struct SetCategoryId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategoryId<S> {}
-    impl<S: State> State for SetCategoryId<S> {
-        type CategoryId = Set<members::category_id>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CategoryId = S::CategoryId;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
+        type CategoryId = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CategoryId = S::CategoryId;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type CategoryId = S::CategoryId;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type CategoryId = S::CategoryId;
+    }
+    ///State transition - sets the `category_id` field to Set
+    pub struct SetCategoryId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategoryId<S> {}
+    impl<S: State> State for SetCategoryId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type CategoryId = Set<members::category_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `category_id` field
-        pub struct category_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `category_id` field
+        pub struct category_id(());
     }
 }
 
@@ -175,9 +169,9 @@ where
 impl<'a, S> CategoryBuilder<'a, S>
 where
     S: category_state::State,
-    S::CategoryId: category_state::IsSet,
-    S::Name: category_state::IsSet,
     S::CreatedAt: category_state::IsSet,
+    S::Name: category_state::IsSet,
+    S::CategoryId: category_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Category<'a> {
@@ -220,13 +214,7 @@ impl<'a> Category<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CategoryGetRecordOutput<'a> {
@@ -284,9 +272,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category_id",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("category_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -297,9 +283,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -309,9 +293,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
     }
 }
 
-fn lexicon_doc_garden_goals_category() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_goals_category() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.goals.category"),

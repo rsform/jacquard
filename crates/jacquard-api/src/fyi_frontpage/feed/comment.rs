@@ -8,13 +8,7 @@
 /// Record containing a Frontpage comment.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
@@ -32,7 +26,7 @@ pub struct Comment<'a> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,49 +34,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type CreatedAt;
+        type Blocks;
         type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type CreatedAt = Unset;
+        type Blocks = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type CreatedAt = S::CreatedAt;
-        type Post = S::Post;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Blocks = S::Blocks;
         type CreatedAt = Set<members::created_at>;
+        type Blocks = S::Blocks;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Blocks = Set<members::blocks>;
         type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type Blocks = S::Blocks;
         type CreatedAt = S::CreatedAt;
+        type Blocks = S::Blocks;
         type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
         ///Marker type for the `post` field
         pub struct post(());
     }
@@ -197,8 +191,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Blocks: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Blocks: comment_state::IsSet,
     S::Post: comment_state::IsSet,
 {
     /// Build the final struct
@@ -244,13 +238,7 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -308,9 +296,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blocks",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blocks"),
                     max: 200usize,
                     actual: value.len(),
                 });
@@ -320,9 +306,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_fyi_frontpage_feed_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_fyi_frontpage_feed_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.frontpage.feed.comment"),

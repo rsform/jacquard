@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Search<'a> {
@@ -58,7 +52,7 @@ pub struct Search<'a> {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,19 +116,7 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
         SearchBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -151,10 +133,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
-    pub fn maybe_age_ratings(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_age_ratings(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -181,10 +160,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -197,18 +173,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -255,18 +225,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -312,10 +276,7 @@ where
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -328,18 +289,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `themes` field (optional)
-    pub fn themes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn themes(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
-    pub fn maybe_themes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_themes(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -347,18 +302,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `types` field (optional)
-    pub fn types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn types(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
-    pub fn maybe_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_types(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -391,13 +340,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchOutput<'a> {
@@ -413,13 +356,7 @@ pub struct SearchOutput<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -431,9 +368,7 @@ pub enum SearchOutputResultsItem<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#platformSummaryView")]
     PlatformSummaryView(Box<crate::games_gamesgamesgamesgames::PlatformSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#collectionSummaryView")]
-    CollectionSummaryView(
-        Box<crate::games_gamesgamesgamesgames::CollectionSummaryView<'a>>,
-    ),
+    CollectionSummaryView(Box<crate::games_gamesgamesgamesgames::CollectionSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#engineSummaryView")]
     EngineSummaryView(Box<crate::games_gamesgamesgamesgames::EngineSummaryView<'a>>),
 }

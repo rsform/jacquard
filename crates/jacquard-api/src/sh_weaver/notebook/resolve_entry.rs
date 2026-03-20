@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveEntry<'a> {
@@ -26,7 +20,7 @@ pub struct ResolveEntry<'a> {
 
 pub mod resolve_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,50 +29,50 @@ pub mod resolve_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Actor;
-        type Entry;
         type Notebook;
+        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Actor = Unset;
-        type Entry = Unset;
         type Notebook = Unset;
+        type Entry = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
         type Actor = Set<members::actor>;
+        type Notebook = S::Notebook;
         type Entry = S::Entry;
-        type Notebook = S::Notebook;
-    }
-    ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
-        type Actor = S::Actor;
-        type Entry = Set<members::entry>;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
         type Actor = S::Actor;
-        type Entry = S::Entry;
         type Notebook = Set<members::notebook>;
+        type Entry = S::Entry;
+    }
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntry<S> {}
+    impl<S: State> State for SetEntry<S> {
+        type Actor = S::Actor;
+        type Notebook = S::Notebook;
+        type Entry = Set<members::entry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `actor` field
         pub struct actor(());
-        ///Marker type for the `entry` field
-        pub struct entry(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `entry` field
+        pub struct entry(());
     }
 }
 
@@ -172,8 +166,8 @@ impl<'a, S> ResolveEntryBuilder<'a, S>
 where
     S: resolve_entry_state::State,
     S::Actor: resolve_entry_state::IsSet,
-    S::Entry: resolve_entry_state::IsSet,
     S::Notebook: resolve_entry_state::IsSet,
+    S::Entry: resolve_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveEntry<'a> {
@@ -187,13 +181,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveEntryOutput<'a> {
@@ -202,9 +190,7 @@ pub struct ResolveEntryOutput<'a> {
     pub notebook_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub notebooks: std::option::Option<
-        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-    >,
+    pub notebooks: std::option::Option<Vec<crate::sh_weaver::notebook::NotebookView<'a>>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
 }
@@ -219,7 +205,7 @@ pub struct ResolveEntryOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

@@ -242,7 +242,10 @@ mod tests {
     async fn test_cursor_single_leaf() {
         let storage = Arc::new(MemoryBlockStore::new());
         let tree = Mst::new(storage);
-        let tree = tree.add("com.example.test/key1", test_cid(1)).await.unwrap();
+        let tree = tree
+            .add("com.example.test/key1", test_cid(1))
+            .await
+            .unwrap();
 
         let mut cursor = MstCursor::new(tree);
 
@@ -280,7 +283,14 @@ mod tests {
             cursor.advance().await.unwrap();
         }
 
-        assert_eq!(keys, vec!["com.example.test/a", "com.example.test/b", "com.example.test/c"]);
+        assert_eq!(
+            keys,
+            vec![
+                "com.example.test/a",
+                "com.example.test/b",
+                "com.example.test/c"
+            ]
+        );
     }
 
     #[tokio::test]

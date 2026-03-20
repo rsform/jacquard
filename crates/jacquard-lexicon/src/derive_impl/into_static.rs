@@ -2,7 +2,7 @@
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, Data, DeriveInput, Fields, GenericParam};
+use syn::{Data, DeriveInput, Fields, GenericParam, parse2};
 
 /// Implementation for the IntoStatic derive macro
 pub fn impl_derive_into_static(input: TokenStream) -> TokenStream {
@@ -85,10 +85,7 @@ fn generate_struct_conversion(name: &syn::Ident, fields: &Fields) -> TokenStream
     }
 }
 
-fn generate_enum_conversion(
-    name: &syn::Ident,
-    data_enum: &syn::DataEnum,
-) -> TokenStream {
+fn generate_enum_conversion(name: &syn::Ident, data_enum: &syn::DataEnum) -> TokenStream {
     let variants = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
         match &variant.fields {

@@ -8,13 +8,7 @@
 /// A downloadable artifact within a distribution.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact<'a> {
@@ -33,7 +27,7 @@ pub struct Artifact<'a> {
 
 pub mod artifact_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,18 +88,12 @@ impl<'a> ArtifactBuilder<'a, artifact_state::Empty> {
 
 impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -132,18 +120,12 @@ where
 
 impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -180,14 +162,11 @@ where
     }
 }
 
-fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_garden_lexicon_exultant_zebra_distribution()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "garden.lexicon.exultant-zebra.distribution",
-        ),
+        id: ::jacquard_common::CowStr::new_static("garden.lexicon.exultant-zebra.distribution"),
         revision: None,
         description: None,
         defs: {
@@ -381,21 +360,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
 /// A distribution of an application.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Distribution<'a> {
     /// The list of downloadable artifacts for this distribution.
     #[serde(borrow)]
-    pub artifacts: Vec<
-        crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>,
-    >,
+    pub artifacts: Vec<crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>>,
     /// An optional description of this distribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -407,7 +378,7 @@ pub struct Distribution<'a> {
 
 pub mod distribution_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -488,9 +459,7 @@ where
     /// Set the `artifacts` field (required)
     pub fn artifacts(
         mut self,
-        value: impl Into<
-            Vec<crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>>,
-        >,
+        value: impl Into<Vec<crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>>>,
     ) -> DistributionBuilder<'a, distribution_state::SetArtifacts<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         DistributionBuilder {
@@ -503,18 +472,12 @@ where
 
 impl<'a, S: distribution_state::State> DistributionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -586,13 +549,7 @@ impl<'a> Distribution<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionGetRecordOutput<'a> {

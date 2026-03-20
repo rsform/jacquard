@@ -105,13 +105,7 @@ impl jacquard_common::IntoStatic for Access<'_> {
 ///
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Config<'a> {
@@ -122,7 +116,7 @@ pub struct Config<'a> {
 
 pub mod config_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -155,9 +149,8 @@ pub mod config_state {
 /// Builder for constructing an instance of this type
 pub struct ConfigBuilder<'a, S: config_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::app_bsky::ageassurance::ConfigRegion<'a>>>,
-    ),
+    __unsafe_private_named:
+        (::core::option::Option<Vec<crate::app_bsky::ageassurance::ConfigRegion<'a>>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -225,9 +218,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.ageassurance.defs"),
@@ -237,59 +228,59 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::Lexi
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("access"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The access level granted based on Age Assurance data we've processed.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: None,
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("config"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(::jacquard_common::CowStr::new_static("")),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("regions")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "regions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The per-region Age Assurance configuration.",
-                                    ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static("")),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("regions"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("regions"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
+                                    ::jacquard_lexicon::lexicon::LexArray {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The per-region Age Assurance configuration.",
+                                        )),
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
+                                            ::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "app.bsky.ageassurance.defs#configRegion",
+                                                ),
+                                            },
+                                        ),
+                                        min_length: None,
+                                        max_length: None,
+                                    },
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "app.bsky.ageassurance.defs#configRegion",
-                                    ),
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("configRegion"),
@@ -397,38 +388,34 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "configRegionRuleDefault",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("configRegionRuleDefault"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "Age Assurance rule that applies by default.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("access")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "access",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#access",
+                        )),
+                        required: Some(vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("access"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("access"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.ageassurance.defs#access",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
@@ -998,70 +985,68 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::Lexi
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("state"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The user's computed Age Assurance state.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
+                        )),
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("access")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "access",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#access",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("access"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("access"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.ageassurance.defs#access",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastInitiatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The timestamp when this state was last updated.",
-                                    ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "lastInitiatedAt",
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "The timestamp when this state was last updated.",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#status",
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
+                                    ::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.ageassurance.defs#status",
+                                        ),
+                                    },
                                 ),
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("stateMetadata"),
@@ -1105,22 +1090,22 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::Lexi
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::String(
+                    ::jacquard_lexicon::lexicon::LexString {
+                        description: Some(::jacquard_common::CowStr::new_static(
                             "The status of the Age Assurance process.",
-                        ),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                        )),
+                        format: None,
+                        default: None,
+                        min_length: None,
+                        max_length: None,
+                        min_graphemes: None,
+                        max_graphemes: None,
+                        r#enum: None,
+                        r#const: None,
+                        known_values: None,
+                    },
+                ),
             );
             map
         },
@@ -1147,13 +1132,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
 /// The Age Assurance configuration for a specific region.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegion<'a> {
@@ -1173,7 +1152,7 @@ pub struct ConfigRegion<'a> {
 
 pub mod config_region_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1181,49 +1160,49 @@ pub mod config_region_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MinAccessAge;
         type Rules;
+        type MinAccessAge;
         type CountryCode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MinAccessAge = Unset;
         type Rules = Unset;
+        type MinAccessAge = Unset;
         type CountryCode = Unset;
-    }
-    ///State transition - sets the `min_access_age` field to Set
-    pub struct SetMinAccessAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMinAccessAge<S> {}
-    impl<S: State> State for SetMinAccessAge<S> {
-        type MinAccessAge = Set<members::min_access_age>;
-        type Rules = S::Rules;
-        type CountryCode = S::CountryCode;
     }
     ///State transition - sets the `rules` field to Set
     pub struct SetRules<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRules<S> {}
     impl<S: State> State for SetRules<S> {
-        type MinAccessAge = S::MinAccessAge;
         type Rules = Set<members::rules>;
+        type MinAccessAge = S::MinAccessAge;
+        type CountryCode = S::CountryCode;
+    }
+    ///State transition - sets the `min_access_age` field to Set
+    pub struct SetMinAccessAge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMinAccessAge<S> {}
+    impl<S: State> State for SetMinAccessAge<S> {
+        type Rules = S::Rules;
+        type MinAccessAge = Set<members::min_access_age>;
         type CountryCode = S::CountryCode;
     }
     ///State transition - sets the `country_code` field to Set
     pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountryCode<S> {}
     impl<S: State> State for SetCountryCode<S> {
-        type MinAccessAge = S::MinAccessAge;
         type Rules = S::Rules;
+        type MinAccessAge = S::MinAccessAge;
         type CountryCode = Set<members::country_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `min_access_age` field
-        pub struct min_access_age(());
         ///Marker type for the `rules` field
         pub struct rules(());
+        ///Marker type for the `min_access_age` field
+        pub struct min_access_age(());
         ///Marker type for the `country_code` field
         pub struct country_code(());
     }
@@ -1299,18 +1278,12 @@ where
 
 impl<'a, S: config_region_state::State> ConfigRegionBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
-    pub fn region_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn region_code(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
-    pub fn maybe_region_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_region_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1338,8 +1311,8 @@ where
 impl<'a, S> ConfigRegionBuilder<'a, S>
 where
     S: config_region_state::State,
-    S::MinAccessAge: config_region_state::IsSet,
     S::Rules: config_region_state::IsSet,
+    S::MinAccessAge: config_region_state::IsSet,
     S::CountryCode: config_region_state::IsSet,
 {
     /// Build the final struct
@@ -1372,21 +1345,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ConfigRegionRulesItem<'a> {
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleDefault")]
-    ConfigRegionRuleDefault(
-        Box<crate::app_bsky::ageassurance::ConfigRegionRuleDefault<'a>>,
-    ),
+    ConfigRegionRuleDefault(Box<crate::app_bsky::ageassurance::ConfigRegionRuleDefault<'a>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfDeclaredOverAge")]
     ConfigRegionRuleIfDeclaredOverAge(
         Box<crate::app_bsky::ageassurance::ConfigRegionRuleIfDeclaredOverAge<'a>>,
@@ -1433,13 +1398,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegion<'a> {
 /// Age Assurance rule that applies by default.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleDefault<'a> {
@@ -1449,7 +1408,7 @@ pub struct ConfigRegionRuleDefault<'a> {
 
 pub mod config_region_rule_default_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1480,23 +1439,15 @@ pub mod config_region_rule_default_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct ConfigRegionRuleDefaultBuilder<
-    'a,
-    S: config_region_rule_default_state::State,
-> {
+pub struct ConfigRegionRuleDefaultBuilder<'a, S: config_region_rule_default_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::ageassurance::Access<'a>>,
-    ),
+    __unsafe_private_named: (::core::option::Option<crate::app_bsky::ageassurance::Access<'a>>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleDefault<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ConfigRegionRuleDefaultBuilder<
-        'a,
-        config_region_rule_default_state::Empty,
-    > {
+    pub fn new() -> ConfigRegionRuleDefaultBuilder<'a, config_region_rule_default_state::Empty> {
         ConfigRegionRuleDefaultBuilder::new()
     }
 }
@@ -1521,10 +1472,7 @@ where
     pub fn access(
         mut self,
         value: impl Into<crate::app_bsky::ageassurance::Access<'a>>,
-    ) -> ConfigRegionRuleDefaultBuilder<
-        'a,
-        config_region_rule_default_state::SetAccess<S>,
-    > {
+    ) -> ConfigRegionRuleDefaultBuilder<'a, config_region_rule_default_state::SetAccess<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ConfigRegionRuleDefaultBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1581,13 +1529,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleDefault<'
 /// Age Assurance rule that applies if the account is equal-to or newer than a certain date.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfAccountNewerThan<'a> {
@@ -1599,7 +1541,7 @@ pub struct ConfigRegionRuleIfAccountNewerThan<'a> {
 
 pub mod config_region_rule_if_account_newer_than_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1664,12 +1606,12 @@ impl<'a> ConfigRegionRuleIfAccountNewerThan<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfAccountNewerThanBuilder<
-    'a,
-    config_region_rule_if_account_newer_than_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfAccountNewerThanBuilder<
+        'a,
+        config_region_rule_if_account_newer_than_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountNewerThanBuilder {
@@ -1754,8 +1696,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfAccountNewerThan<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfAccountNewerThan<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -1775,13 +1716,7 @@ for ConfigRegionRuleIfAccountNewerThan<'a> {
 /// Age Assurance rule that applies if the account is older than a certain date.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfAccountOlderThan<'a> {
@@ -1793,7 +1728,7 @@ pub struct ConfigRegionRuleIfAccountOlderThan<'a> {
 
 pub mod config_region_rule_if_account_older_than_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1801,37 +1736,37 @@ pub mod config_region_rule_if_account_older_than_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Access;
         type Date;
+        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Access = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Access = Set<members::access>;
-        type Date = S::Date;
+        type Access = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDate<S> {}
     impl<S: State> State for SetDate<S> {
-        type Access = S::Access;
         type Date = Set<members::date>;
+        type Access = S::Access;
+    }
+    ///State transition - sets the `access` field to Set
+    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccess<S> {}
+    impl<S: State> State for SetAccess<S> {
+        type Date = S::Date;
+        type Access = Set<members::access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `access` field
-        pub struct access(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `access` field
+        pub struct access(());
     }
 }
 
@@ -1858,12 +1793,12 @@ impl<'a> ConfigRegionRuleIfAccountOlderThan<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfAccountOlderThanBuilder<
-    'a,
-    config_region_rule_if_account_older_than_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfAccountOlderThanBuilder<
+        'a,
+        config_region_rule_if_account_older_than_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountOlderThanBuilder {
@@ -1921,8 +1856,8 @@ where
 impl<'a, S> ConfigRegionRuleIfAccountOlderThanBuilder<'a, S>
 where
     S: config_region_rule_if_account_older_than_state::State,
-    S::Access: config_region_rule_if_account_older_than_state::IsSet,
     S::Date: config_region_rule_if_account_older_than_state::IsSet,
+    S::Access: config_region_rule_if_account_older_than_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAccountOlderThan<'a> {
@@ -1948,8 +1883,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfAccountOlderThan<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfAccountOlderThan<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -1969,13 +1903,7 @@ for ConfigRegionRuleIfAccountOlderThan<'a> {
 /// Age Assurance rule that applies if the user has been assured to be equal-to or over a certain age.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfAssuredOverAge<'a> {
@@ -1987,7 +1915,7 @@ pub struct ConfigRegionRuleIfAssuredOverAge<'a> {
 
 pub mod config_region_rule_if_assured_over_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2052,12 +1980,9 @@ impl<'a> ConfigRegionRuleIfAssuredOverAge<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfAssuredOverAgeBuilder<
-    'a,
-    config_region_rule_if_assured_over_age_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfAssuredOverAgeBuilder<'a, config_region_rule_if_assured_over_age_state::Empty>
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredOverAgeBuilder {
@@ -2142,8 +2067,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfAssuredOverAge<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfAssuredOverAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -2163,13 +2087,7 @@ for ConfigRegionRuleIfAssuredOverAge<'a> {
 /// Age Assurance rule that applies if the user has been assured to be under a certain age.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfAssuredUnderAge<'a> {
@@ -2181,7 +2099,7 @@ pub struct ConfigRegionRuleIfAssuredUnderAge<'a> {
 
 pub mod config_region_rule_if_assured_under_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2189,37 +2107,37 @@ pub mod config_region_rule_if_assured_under_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Age;
         type Access;
+        type Age;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Age = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Age = Set<members::age>;
-        type Access = S::Access;
+        type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
         type Access = Set<members::access>;
+        type Age = S::Age;
+    }
+    ///State transition - sets the `age` field to Set
+    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAge<S> {}
+    impl<S: State> State for SetAge<S> {
+        type Access = S::Access;
+        type Age = Set<members::age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `age` field
-        pub struct age(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `age` field
+        pub struct age(());
     }
 }
 
@@ -2246,12 +2164,12 @@ impl<'a> ConfigRegionRuleIfAssuredUnderAge<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfAssuredUnderAgeBuilder<
-    'a,
-    config_region_rule_if_assured_under_age_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfAssuredUnderAgeBuilder<
+        'a,
+        config_region_rule_if_assured_under_age_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
@@ -2309,8 +2227,8 @@ where
 impl<'a, S> ConfigRegionRuleIfAssuredUnderAgeBuilder<'a, S>
 where
     S: config_region_rule_if_assured_under_age_state::State,
-    S::Age: config_region_rule_if_assured_under_age_state::IsSet,
     S::Access: config_region_rule_if_assured_under_age_state::IsSet,
+    S::Age: config_region_rule_if_assured_under_age_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAssuredUnderAge<'a> {
@@ -2336,8 +2254,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfAssuredUnderAge<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfAssuredUnderAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -2357,13 +2274,7 @@ for ConfigRegionRuleIfAssuredUnderAge<'a> {
 /// Age Assurance rule that applies if the user has declared themselves equal-to or over a certain age.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfDeclaredOverAge<'a> {
@@ -2375,7 +2286,7 @@ pub struct ConfigRegionRuleIfDeclaredOverAge<'a> {
 
 pub mod config_region_rule_if_declared_over_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2383,37 +2294,37 @@ pub mod config_region_rule_if_declared_over_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Age;
         type Access;
+        type Age;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Age = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Age = Set<members::age>;
-        type Access = S::Access;
+        type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
         type Access = Set<members::access>;
+        type Age = S::Age;
+    }
+    ///State transition - sets the `age` field to Set
+    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAge<S> {}
+    impl<S: State> State for SetAge<S> {
+        type Access = S::Access;
+        type Age = Set<members::age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `age` field
-        pub struct age(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `age` field
+        pub struct age(());
     }
 }
 
@@ -2440,12 +2351,12 @@ impl<'a> ConfigRegionRuleIfDeclaredOverAge<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfDeclaredOverAgeBuilder<
-    'a,
-    config_region_rule_if_declared_over_age_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfDeclaredOverAgeBuilder<
+        'a,
+        config_region_rule_if_declared_over_age_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
@@ -2503,8 +2414,8 @@ where
 impl<'a, S> ConfigRegionRuleIfDeclaredOverAgeBuilder<'a, S>
 where
     S: config_region_rule_if_declared_over_age_state::State,
-    S::Age: config_region_rule_if_declared_over_age_state::IsSet,
     S::Access: config_region_rule_if_declared_over_age_state::IsSet,
+    S::Age: config_region_rule_if_declared_over_age_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
@@ -2530,8 +2441,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfDeclaredOverAge<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfDeclaredOverAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -2551,13 +2461,7 @@ for ConfigRegionRuleIfDeclaredOverAge<'a> {
 /// Age Assurance rule that applies if the user has declared themselves under a certain age.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigRegionRuleIfDeclaredUnderAge<'a> {
@@ -2569,7 +2473,7 @@ pub struct ConfigRegionRuleIfDeclaredUnderAge<'a> {
 
 pub mod config_region_rule_if_declared_under_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2577,37 +2481,37 @@ pub mod config_region_rule_if_declared_under_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Age;
         type Access;
+        type Age;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Age = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Age = Set<members::age>;
-        type Access = S::Access;
+        type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
         type Access = Set<members::access>;
+        type Age = S::Age;
+    }
+    ///State transition - sets the `age` field to Set
+    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAge<S> {}
+    impl<S: State> State for SetAge<S> {
+        type Access = S::Access;
+        type Age = Set<members::age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `age` field
-        pub struct age(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `age` field
+        pub struct age(());
     }
 }
 
@@ -2634,12 +2538,12 @@ impl<'a> ConfigRegionRuleIfDeclaredUnderAge<'a> {
     }
 }
 
-impl<
-    'a,
-> ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-    'a,
-    config_region_rule_if_declared_under_age_state::Empty,
-> {
+impl<'a>
+    ConfigRegionRuleIfDeclaredUnderAgeBuilder<
+        'a,
+        config_region_rule_if_declared_under_age_state::Empty,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
@@ -2697,8 +2601,8 @@ where
 impl<'a, S> ConfigRegionRuleIfDeclaredUnderAgeBuilder<'a, S>
 where
     S: config_region_rule_if_declared_under_age_state::State,
-    S::Age: config_region_rule_if_declared_under_age_state::IsSet,
     S::Access: config_region_rule_if_declared_under_age_state::IsSet,
+    S::Age: config_region_rule_if_declared_under_age_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfDeclaredUnderAge<'a> {
@@ -2724,8 +2628,7 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ConfigRegionRuleIfDeclaredUnderAge<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleIfDeclaredUnderAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -2745,13 +2648,7 @@ for ConfigRegionRuleIfDeclaredUnderAge<'a> {
 /// Object used to store Age Assurance data in stash.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
@@ -2797,7 +2694,7 @@ pub struct Event<'a> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2805,85 +2702,85 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Status;
         type AttemptId;
-        type CountryCode;
+        type CreatedAt;
         type Access;
+        type Status;
+        type CountryCode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Status = Unset;
         type AttemptId = Unset;
-        type CountryCode = Unset;
+        type CreatedAt = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
-        type Access = S::Access;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
-        type Access = S::Access;
+        type Status = Unset;
+        type CountryCode = Unset;
     }
     ///State transition - sets the `attempt_id` field to Set
     pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAttemptId<S> {}
     impl<S: State> State for SetAttemptId<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
         type AttemptId = Set<members::attempt_id>;
-        type CountryCode = S::CountryCode;
-        type Access = S::Access;
-    }
-    ///State transition - sets the `country_code` field to Set
-    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
-    impl<S: State> State for SetCountryCode<S> {
         type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type AttemptId = S::AttemptId;
-        type CountryCode = Set<members::country_code>;
         type Access = S::Access;
+        type Status = S::Status;
+        type CountryCode = S::CountryCode;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AttemptId = S::AttemptId;
+        type CreatedAt = Set<members::created_at>;
+        type Access = S::Access;
+        type Status = S::Status;
+        type CountryCode = S::CountryCode;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
         type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
+        type CreatedAt = S::CreatedAt;
         type Access = Set<members::access>;
+        type Status = S::Status;
+        type CountryCode = S::CountryCode;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type AttemptId = S::AttemptId;
+        type CreatedAt = S::CreatedAt;
+        type Access = S::Access;
+        type Status = Set<members::status>;
+        type CountryCode = S::CountryCode;
+    }
+    ///State transition - sets the `country_code` field to Set
+    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
+    impl<S: State> State for SetCountryCode<S> {
+        type AttemptId = S::AttemptId;
+        type CreatedAt = S::CreatedAt;
+        type Access = S::Access;
+        type Status = S::Status;
+        type CountryCode = Set<members::country_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
-        ///Marker type for the `country_code` field
-        pub struct country_code(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `country_code` field
+        pub struct country_code(());
     }
 }
 
@@ -2919,17 +2816,7 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
         EventBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -2976,18 +2863,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `completeIp` field (optional)
-    pub fn complete_ip(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn complete_ip(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `completeIp` field to an Option value (optional)
-    pub fn maybe_complete_ip(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_complete_ip(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -2995,18 +2876,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `completeUa` field (optional)
-    pub fn complete_ua(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn complete_ua(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `completeUa` field to an Option value (optional)
-    pub fn maybe_complete_ua(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_complete_ua(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -3052,10 +2927,7 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn email(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -3068,10 +2940,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `initIp` field (optional)
-    pub fn init_ip(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn init_ip(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -3084,10 +2953,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `initUa` field (optional)
-    pub fn init_ua(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn init_ua(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -3100,18 +2966,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
-    pub fn region_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn region_code(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
-    pub fn maybe_region_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_region_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -3139,11 +2999,11 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::CreatedAt: event_state::IsSet,
-    S::Status: event_state::IsSet,
     S::AttemptId: event_state::IsSet,
-    S::CountryCode: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
     S::Access: event_state::IsSet,
+    S::Status: event_state::IsSet,
+    S::CountryCode: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -3405,13 +3265,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
 /// The user's computed Age Assurance state.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct State<'a> {
@@ -3426,7 +3280,7 @@ pub struct State<'a> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3434,37 +3288,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Access;
         type Status;
+        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Access = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Access = Set<members::access>;
-        type Status = S::Status;
+        type Access = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Access = S::Access;
         type Status = Set<members::status>;
+        type Access = S::Access;
+    }
+    ///State transition - sets the `access` field to Set
+    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccess<S> {}
+    impl<S: State> State for SetAccess<S> {
+        type Status = S::Status;
+        type Access = Set<members::access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `access` field
-        pub struct access(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `access` field
+        pub struct access(());
     }
 }
 
@@ -3557,8 +3411,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Access: state_state::IsSet,
     S::Status: state_state::IsSet,
+    S::Access: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -3613,15 +3467,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StateMetadata<'a> {
     /// The account creation timestamp.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_created_at: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    pub account_created_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StateMetadata<'a> {

@@ -6,13 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsers {
@@ -25,7 +19,7 @@ pub struct GetLiveUsers {
 
 pub mod get_live_users_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -78,10 +72,7 @@ impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
         self
     }
     /// Set the `before` field to an Option value (optional)
-    pub fn maybe_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_before(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -122,15 +113,13 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsersOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub streams: std::option::Option<
-        Vec<crate::place_stream::livestream::LivestreamView<'a>>,
-    >,
+    pub streams: std::option::Option<Vec<crate::place_stream::livestream::LivestreamView<'a>>>,
 }
 
 /// Response type for

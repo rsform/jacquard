@@ -8,13 +8,7 @@
 /// Declares a chat room. Created by whoever starts the room.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
@@ -36,9 +30,7 @@ pub struct Room<'a> {
     pub purpose: RoomPurpose<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub settings: std::option::Option<
-        crate::app_protoimsg::chat::room::RoomSettings<'a>,
-    >,
+    pub settings: std::option::Option<crate::app_protoimsg::chat::room::RoomSettings<'a>>,
     /// Room topic for sorting, filtering, and discovery.
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
@@ -46,7 +38,7 @@ pub struct Room<'a> {
 
 pub mod room_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,66 +47,66 @@ pub mod room_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Topic;
-        type Name;
         type Purpose;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Topic = Unset;
-        type Name = Unset;
         type Purpose = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
         type Topic = Set<members::topic>;
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Topic = S::Topic;
-        type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
         type Topic = S::Topic;
-        type Name = S::Name;
         type Purpose = Set<members::purpose>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Topic = S::Topic;
-        type Name = S::Name;
         type Purpose = S::Purpose;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `topic` field
         pub struct topic(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -153,10 +145,7 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -188,18 +177,12 @@ where
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -285,9 +268,9 @@ impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
     S::Topic: room_state::IsSet,
-    S::Name: room_state::IsSet,
     S::Purpose: room_state::IsSet,
     S::CreatedAt: room_state::IsSet,
+    S::Name: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
@@ -437,13 +420,7 @@ impl jacquard_common::IntoStatic for RoomPurpose<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGetRecordOutput<'a> {
@@ -500,9 +477,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("category"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -512,9 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -525,9 +498,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -538,9 +509,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "topic",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("topic"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -550,9 +519,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.room"),
@@ -816,7 +783,7 @@ fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::Lexicon
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomSettings<'a> {
@@ -924,9 +891,7 @@ impl jacquard_common::IntoStatic for RoomSettingsVisibility<'_> {
             RoomSettingsVisibility::Public => RoomSettingsVisibility::Public,
             RoomSettingsVisibility::Unlisted => RoomSettingsVisibility::Unlisted,
             RoomSettingsVisibility::Private => RoomSettingsVisibility::Private,
-            RoomSettingsVisibility::Other(v) => {
-                RoomSettingsVisibility::Other(v.into_static())
-            }
+            RoomSettingsVisibility::Other(v) => RoomSettingsVisibility::Other(v.into_static()),
         }
     }
 }

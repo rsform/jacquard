@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeVerifications<'a> {
@@ -28,7 +22,7 @@ pub struct RevokeVerifications<'a> {
 
 pub mod revoke_verifications_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,18 +82,12 @@ impl<'a> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
 
 impl<'a, S: revoke_verifications_state::State> RevokeVerificationsBuilder<'a, S> {
     /// Set the `revokeReason` field (optional)
-    pub fn revoke_reason(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn revoke_reason(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `revokeReason` field to an Option value (optional)
-    pub fn maybe_revoke_reason(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_revoke_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -155,21 +143,14 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeVerificationsOutput<'a> {
     /// List of verification uris that couldn't be revoked, including failure reasons
     #[serde(borrow)]
-    pub failed_revocations: Vec<
-        crate::tools_ozone::verification::revoke_verifications::RevokeError<'a>,
-    >,
+    pub failed_revocations:
+        Vec<crate::tools_ozone::verification::revoke_verifications::RevokeError<'a>>,
     /// List of verification uris successfully revoked
     #[serde(borrow)]
     pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
@@ -187,9 +168,8 @@ impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RevokeVerificationsResponse;
 }
 
@@ -198,9 +178,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
 pub struct RevokeVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = RevokeVerifications<'de>;
     type Response = RevokeVerificationsResponse;
 }
@@ -208,13 +187,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
 /// Error object for failed revocations
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeError<'a> {
@@ -228,7 +201,7 @@ pub struct RevokeError<'a> {
 
 pub mod revoke_error_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,37 +209,37 @@ pub mod revoke_error_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Error;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Error = S::Error;
+        type Uri = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Uri = S::Uri;
         type Error = Set<members::error>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Error = S::Error;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -339,8 +312,8 @@ where
 impl<'a, S> RevokeErrorBuilder<'a, S>
 where
     S: revoke_error_state::State,
-    S::Uri: revoke_error_state::IsSet,
     S::Error: revoke_error_state::IsSet,
+    S::Uri: revoke_error_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RevokeError<'a> {
@@ -366,14 +339,11 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tools_ozone_verification_revokeVerifications()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.ozone.verification.revokeVerifications",
-        ),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.verification.revokeVerifications"),
         revision: None,
         description: None,
         defs: {

@@ -175,7 +175,8 @@ pub fn generate_variant_tokens(variants: &[UnionVariant]) -> Vec<TokenStream> {
     variants
         .iter()
         .map(|variant| {
-            let variant_ident = syn::Ident::new(&variant.variant_name, proc_macro2::Span::call_site());
+            let variant_ident =
+                syn::Ident::new(&variant.variant_name, proc_macro2::Span::call_site());
             let ref_str_literal = &variant.ref_str;
             let rust_type = &variant.rust_type;
 

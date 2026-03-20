@@ -8,13 +8,7 @@
 /// Setting Like based auto labeling.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
@@ -25,14 +19,12 @@ pub struct Settings<'a> {
     /// The post to remove the label from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub delete: std::option::Option<
-        crate::blue_rito::label::auto::like::settings::PostRef<'a>,
-    >,
+    pub delete: std::option::Option<crate::blue_rito::label::auto::like::settings::PostRef<'a>>,
 }
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,37 +32,37 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Apply;
         type CreatedAt;
+        type Apply;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Apply = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `apply` field to Set
-    pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApply<S> {}
-    impl<S: State> State for SetApply<S> {
-        type Apply = Set<members::apply>;
-        type CreatedAt = S::CreatedAt;
+        type Apply = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Apply = S::Apply;
         type CreatedAt = Set<members::created_at>;
+        type Apply = S::Apply;
+    }
+    ///State transition - sets the `apply` field to Set
+    pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApply<S> {}
+    impl<S: State> State for SetApply<S> {
+        type CreatedAt = S::CreatedAt;
+        type Apply = Set<members::apply>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `apply` field
-        pub struct apply(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `apply` field
+        pub struct apply(());
     }
 }
 
@@ -78,13 +70,9 @@ pub mod settings_state {
 pub struct SettingsBuilder<'a, S: settings_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            crate::blue_rito::label::auto::like::settings::PostRef<'a>,
-        >,
+        ::core::option::Option<crate::blue_rito::label::auto::like::settings::PostRef<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            crate::blue_rito::label::auto::like::settings::PostRef<'a>,
-        >,
+        ::core::option::Option<crate::blue_rito::label::auto::like::settings::PostRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -149,9 +137,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `delete` field (optional)
     pub fn delete(
         mut self,
-        value: impl Into<
-            Option<crate::blue_rito::label::auto::like::settings::PostRef<'a>>,
-        >,
+        value: impl Into<Option<crate::blue_rito::label::auto::like::settings::PostRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -169,8 +155,8 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::Apply: settings_state::IsSet,
     S::CreatedAt: settings_state::IsSet,
+    S::Apply: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
@@ -213,13 +199,7 @@ impl<'a> Settings<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
@@ -276,9 +256,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
 }
 
-fn lexicon_doc_blue_rito_label_auto_like_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blue_rito_label_auto_like_settings()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.rito.label.auto.like.settings"),
@@ -365,61 +344,61 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> ::jacquard_lexicon::lexic
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("postRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("CID of the post"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "CID of the post",
+                                        )),
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("URI of the post"),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
+                                    ::jacquard_lexicon::lexicon::LexString {
+                                        description: Some(::jacquard_common::CowStr::new_static(
+                                            "URI of the post",
+                                        )),
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    },
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
@@ -428,13 +407,7 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> ::jacquard_lexicon::lexic
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostRef<'a> {
@@ -443,12 +416,12 @@ pub struct PostRef<'a> {
     pub cid: jacquard_common::CowStr<'a>,
     /// URI of the post
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::Uri<'a>,
+    pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod post_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -495,7 +468,7 @@ pub struct PostRefBuilder<'a, S: post_ref_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -545,7 +518,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
     ) -> PostRefBuilder<'a, post_ref_state::SetUri<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         PostRefBuilder {

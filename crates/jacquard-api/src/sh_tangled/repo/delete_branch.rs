@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBranch<'a> {
@@ -25,7 +19,7 @@ pub struct DeleteBranch<'a> {
 
 pub mod delete_branch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,9 +169,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteBranchResponse;
 }
 
@@ -186,9 +179,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
 pub struct DeleteBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = DeleteBranch<'de>;
     type Response = DeleteBranchResponse;
 }

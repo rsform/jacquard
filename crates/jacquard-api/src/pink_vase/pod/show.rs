@@ -8,13 +8,7 @@
 /// A podcast show. A single user can have multiple shows.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Show<'a> {
@@ -41,12 +35,12 @@ pub struct Show<'a> {
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod show_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,7 +93,7 @@ pub struct ShowBuilder<'a, S: show_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::string::Language>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -132,10 +126,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
         self
     }
     /// Set the `categories` field to an Option value (optional)
-    pub fn maybe_categories(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_categories(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -181,18 +172,12 @@ where
 
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -253,7 +238,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `websiteUrl` field (optional)
     pub fn website_url(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
@@ -261,7 +246,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `websiteUrl` field to an Option value (optional)
     pub fn maybe_website_url(
         mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
+        value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
@@ -325,13 +310,7 @@ impl<'a> Show<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShowGetRecordOutput<'a> {
@@ -388,9 +367,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "categories",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("categories"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -400,9 +377,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -413,9 +388,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });

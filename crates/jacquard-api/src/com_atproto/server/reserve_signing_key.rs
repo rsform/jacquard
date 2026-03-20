@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKey<'a> {
@@ -33,7 +33,7 @@ pub struct ReserveSigningKey<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKeyOutput<'a> {
@@ -54,9 +54,8 @@ impl jacquard_common::xrpc::XrpcResp for ReserveSigningKeyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ReserveSigningKey<'a> {
     const NSID: &'static str = "com.atproto.server.reserveSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ReserveSigningKeyResponse;
 }
 
@@ -65,9 +64,8 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReserveSigningKey<'a> {
 pub struct ReserveSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReserveSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.reserveSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<'de> = ReserveSigningKey<'de>;
     type Response = ReserveSigningKeyResponse;
 }

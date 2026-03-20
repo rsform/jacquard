@@ -8,13 +8,7 @@
 /// Fertilizer codelist
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cl022<'a> {
@@ -58,7 +52,7 @@ pub struct Cl022<'a> {
 
 pub mod cl022_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -66,37 +60,37 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Description;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Description = S::Description;
+        type Id = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Id = S::Id;
         type Description = Set<members::description>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Description = S::Description;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -132,17 +126,7 @@ impl<'a> Cl022Builder<'a, cl022_state::Empty> {
         Cl022Builder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -159,10 +143,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
         self
     }
     /// Set the `added` field to an Option value (optional)
-    pub fn maybe_added(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_added(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -170,10 +151,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -276,10 +254,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -292,10 +267,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `unit` field (optional)
-    pub fn unit(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn unit(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -328,8 +300,8 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S> Cl022Builder<'a, S>
 where
     S: cl022_state::State,
-    S::Id: cl022_state::IsSet,
     S::Description: cl022_state::IsSet,
+    S::Id: cl022_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cl022<'a> {
@@ -388,13 +360,7 @@ impl<'a> Cl022<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cl022GetRecordOutput<'a> {
@@ -450,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
         if let Some(ref value) = self.denominator {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "denominator",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("denominator"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -461,9 +425,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
         if let Some(ref value) = self.k2o {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "k2o",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("k2o"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -472,9 +434,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
         if let Some(ref value) = self.n {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "n",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("n"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -483,9 +443,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
         if let Some(ref value) = self.p2o5 {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "p2o5",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("p2o5"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -495,9 +453,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
     }
 }
 
-fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_farmapps_temp_agroconnect_cl022()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.farmapps.temp.agroconnect.cl022"),

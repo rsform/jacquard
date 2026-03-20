@@ -8,13 +8,7 @@
 /// A declaration of a measured trees cluster for an organization
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasuredTreesCluster<'a> {
@@ -27,7 +21,7 @@ pub struct MeasuredTreesCluster<'a> {
 
 pub mod measured_trees_cluster_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +29,37 @@ pub mod measured_trees_cluster_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shapefile;
         type CreatedAt;
+        type Shapefile;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shapefile = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `shapefile` field to Set
-    pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapefile<S> {}
-    impl<S: State> State for SetShapefile<S> {
-        type Shapefile = Set<members::shapefile>;
-        type CreatedAt = S::CreatedAt;
+        type Shapefile = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Shapefile = S::Shapefile;
         type CreatedAt = Set<members::created_at>;
+        type Shapefile = S::Shapefile;
+    }
+    ///State transition - sets the `shapefile` field to Set
+    pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShapefile<S> {}
+    impl<S: State> State for SetShapefile<S> {
+        type CreatedAt = S::CreatedAt;
+        type Shapefile = Set<members::shapefile>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shapefile` field
-        pub struct shapefile(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `shapefile` field
+        pub struct shapefile(());
     }
 }
 
@@ -81,10 +75,7 @@ pub struct MeasuredTreesClusterBuilder<'a, S: measured_trees_cluster_state::Stat
 
 impl<'a> MeasuredTreesCluster<'a> {
     /// Create a new builder for this type
-    pub fn new() -> MeasuredTreesClusterBuilder<
-        'a,
-        measured_trees_cluster_state::Empty,
-    > {
+    pub fn new() -> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::Empty> {
         MeasuredTreesClusterBuilder::new()
     }
 }
@@ -141,8 +132,8 @@ where
 impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
 where
     S: measured_trees_cluster_state::State,
-    S::Shapefile: measured_trees_cluster_state::IsSet,
     S::CreatedAt: measured_trees_cluster_state::IsSet,
+    S::Shapefile: measured_trees_cluster_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MeasuredTreesCluster<'a> {
@@ -183,13 +174,7 @@ impl<'a> MeasuredTreesCluster<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasuredTreesClusterGetRecordOutput<'a> {
@@ -246,9 +231,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasuredTreesCluster<'a> 
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(

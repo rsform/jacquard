@@ -148,19 +148,20 @@
 //! ## Client options
 //!
 //! - Stateless XRPC: any `HttpClient` (e.g., `reqwest::Client`) implements `XrpcExt`,
-//!   which provides `xrpc(base: Url) -> XrpcCall` for per-request calls with
+//!   which provides `xrpc(base: Uri<String>) -> XrpcCall` for per-request calls with
 //!   optional `CallOptions` (auth, proxy, labelers, headers). Useful when you
 //!   want to pass auth on each call or build advanced flows.
 //!  ```no_run
 //!   #  use jacquard::xrpc::XrpcExt;
 //!   #  use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
 //!   #  use jacquard::types::ident::AtIdentifier;
+//!   #  use jacquard::deps::fluent_uri::Uri;
 //!   #  use miette::IntoDiagnostic;
 //!   #
 //!   #[tokio::main]
 //!   async fn main() -> miette::Result<()> {
 //!       let http = reqwest::Client::new();
-//!       let base = url::Url::parse("https://public.api.bsky.app").into_diagnostic()?;
+//!       let base = Uri::parse("https://public.api.bsky.app").into_diagnostic()?.to_owned();
 //!       let resp = http
 //!           .xrpc(base)
 //!           .send(
@@ -189,12 +190,13 @@
 //! # use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
 //! # use jacquard::types::ident::AtIdentifier;
 //! # use jacquard::CowStr;
+//! # use jacquard::deps::fluent_uri::Uri;
 //! # use miette::IntoDiagnostic;
 //! #
 //! #[tokio::main]
 //! async fn main() -> miette::Result<()> {
 //!     let http = reqwest::Client::new();
-//!     let base = url::Url::parse("https://public.api.bsky.app").into_diagnostic()?;
+//!     let base = Uri::parse("https://public.api.bsky.app").into_diagnostic()?.to_owned();
 //!     let resp = http
 //!         .xrpc(base)
 //!         .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))

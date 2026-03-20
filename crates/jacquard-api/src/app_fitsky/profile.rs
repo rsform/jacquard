@@ -8,13 +8,7 @@
 /// A FitSky-specific user profile with custom banner and bio
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -48,7 +42,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,10 +191,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `unitSystem` field (optional)
-    pub fn unit_system(
-        mut self,
-        value: impl Into<Option<ProfileUnitSystem<'a>>>,
-    ) -> Self {
+    pub fn unit_system(mut self, value: impl Into<Option<ProfileUnitSystem<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -368,13 +359,7 @@ impl jacquard_common::IntoStatic for ProfileUnitSystem<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -431,9 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bio",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bio"),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -447,22 +430,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "bio",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
+                    return Err(
+                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("bio"),
+                            max: 256usize,
+                            actual: count,
+                        },
+                    );
                 }
             }
         }
         if let Some(ref value) = self.height_cm {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height_cm",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height_cm"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -472,9 +453,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "unit_system",
-                    ),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("unit_system"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });

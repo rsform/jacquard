@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tape<'a> {
@@ -49,7 +43,7 @@ pub struct Tape<'a> {
 
 pub mod tape_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,49 +51,49 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type Slug;
+        type Code;
         type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type Slug = Unset;
+        type Code = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type Slug = S::Slug;
-        type When = S::When;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Code = S::Code;
         type Slug = Set<members::slug>;
+        type Code = S::Code;
+        type When = S::When;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Slug = S::Slug;
+        type Code = Set<members::code>;
         type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Code = S::Code;
         type Slug = S::Slug;
+        type Code = S::Code;
         type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
     }
@@ -141,10 +135,7 @@ impl<'a> TapeBuilder<'a, tape_state::Empty> {
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `acUrl` field (optional)
-    pub fn ac_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn ac_url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -176,10 +167,7 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -238,10 +226,7 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_video(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -268,10 +253,7 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `zipUrl` field (optional)
-    pub fn zip_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn zip_url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -285,8 +267,8 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::Code: tape_state::IsSet,
     S::Slug: tape_state::IsSet,
+    S::Code: tape_state::IsSet,
     S::When: tape_state::IsSet,
 {
     /// Build the final struct
@@ -340,13 +322,7 @@ impl<'a> Tape<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TapeGetRecordOutput<'a> {
@@ -403,9 +379,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
     }
 }
 
-fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.tape"),

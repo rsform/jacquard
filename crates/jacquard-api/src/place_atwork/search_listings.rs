@@ -8,13 +8,7 @@
 /// A job listing record with metadata for strong references
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingRecord<'a> {
@@ -32,7 +26,7 @@ pub struct ListingRecord<'a> {
 
 pub mod listing_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,10 +145,7 @@ impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
         self
     }
     /// Set the `value` field to an Option value (optional)
-    pub fn maybe_value(
-        mut self,
-        value: Option<crate::place_atwork::listing::Listing<'a>>,
-    ) -> Self {
+    pub fn maybe_value(mut self, value: Option<crate::place_atwork::listing::Listing<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -192,9 +183,7 @@ where
     }
 }
 
-fn lexicon_doc_place_atwork_searchListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_atwork_searchListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.searchListings"),
@@ -348,13 +337,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
 }
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchListings<'a> {
@@ -364,7 +347,7 @@ pub struct SearchListings<'a> {
 
 pub mod search_listings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -453,13 +436,7 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchListingsOutput<'a> {
@@ -477,7 +454,7 @@ pub struct SearchListingsOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

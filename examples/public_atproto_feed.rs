@@ -1,5 +1,6 @@
 use jacquard::api::app_bsky::feed::get_feed::GetFeed;
 use jacquard::api::app_bsky::feed::post::Post;
+use jacquard::deps::fluent_uri::Uri;
 use jacquard::types::string::AtUri;
 use jacquard::types::value::from_data;
 use jacquard::xrpc::XrpcExt;
@@ -9,7 +10,9 @@ use miette::IntoDiagnostic;
 async fn main() -> miette::Result<()> {
     // Stateless XRPC - no auth required for public feeds
     let http = reqwest::Client::new();
-    let base = url::Url::parse("https://public.api.bsky.app").into_diagnostic()?;
+    let base = Uri::parse("https://public.api.bsky.app")
+        .into_diagnostic()?
+        .to_owned();
 
     // Feed of posts about the AT Protocol
     let feed_uri =

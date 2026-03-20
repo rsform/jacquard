@@ -8,13 +8,7 @@
 /// Record granting moderation permissions to a user for this streamer's content.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Permission<'a> {
@@ -33,7 +27,7 @@ pub struct Permission<'a> {
 
 pub mod permission_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,50 +36,50 @@ pub mod permission_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Moderator;
-        type Permissions;
         type CreatedAt;
+        type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Moderator = Unset;
-        type Permissions = Unset;
         type CreatedAt = Unset;
+        type Permissions = Unset;
     }
     ///State transition - sets the `moderator` field to Set
     pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModerator<S> {}
     impl<S: State> State for SetModerator<S> {
         type Moderator = Set<members::moderator>;
+        type CreatedAt = S::CreatedAt;
         type Permissions = S::Permissions;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Moderator = S::Moderator;
-        type Permissions = Set<members::permissions>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Moderator = S::Moderator;
-        type Permissions = S::Permissions;
         type CreatedAt = Set<members::created_at>;
+        type Permissions = S::Permissions;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Moderator = S::Moderator;
+        type CreatedAt = S::CreatedAt;
+        type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `moderator` field
         pub struct moderator(());
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
     }
 }
 
@@ -199,8 +193,8 @@ impl<'a, S> PermissionBuilder<'a, S>
 where
     S: permission_state::State,
     S::Moderator: permission_state::IsSet,
-    S::Permissions: permission_state::IsSet,
     S::CreatedAt: permission_state::IsSet,
+    S::Permissions: permission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Permission<'a> {
@@ -245,13 +239,7 @@ impl<'a> Permission<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PermissionGetRecordOutput<'a> {
@@ -308,9 +296,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_moderation_permission()
+-> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.moderation.permission"),

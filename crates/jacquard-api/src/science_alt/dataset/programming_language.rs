@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Javascript;
 impl std::fmt::Display for Javascript {
@@ -125,7 +125,7 @@ impl jacquard_common::IntoStatic for ProgrammingLanguage<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Python;
 impl std::fmt::Display for Python {
@@ -143,7 +143,7 @@ impl std::fmt::Display for Python {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Rust;
 impl std::fmt::Display for Rust {
@@ -161,7 +161,7 @@ impl std::fmt::Display for Rust {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 pub struct Typescript;
 impl std::fmt::Display for Typescript {

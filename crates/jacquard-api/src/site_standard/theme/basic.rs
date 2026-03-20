@@ -7,13 +7,7 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Basic<'a> {
@@ -29,7 +23,7 @@ pub struct Basic<'a> {
 
 pub mod basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,67 +31,67 @@ pub mod basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Background;
-        type Foreground;
-        type AccentForeground;
         type Accent;
+        type Foreground;
+        type Background;
+        type AccentForeground;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Background = Unset;
-        type Foreground = Unset;
-        type AccentForeground = Unset;
         type Accent = Unset;
-    }
-    ///State transition - sets the `background` field to Set
-    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBackground<S> {}
-    impl<S: State> State for SetBackground<S> {
-        type Background = Set<members::background>;
-        type Foreground = S::Foreground;
-        type AccentForeground = S::AccentForeground;
-        type Accent = S::Accent;
-    }
-    ///State transition - sets the `foreground` field to Set
-    pub struct SetForeground<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForeground<S> {}
-    impl<S: State> State for SetForeground<S> {
-        type Background = S::Background;
-        type Foreground = Set<members::foreground>;
-        type AccentForeground = S::AccentForeground;
-        type Accent = S::Accent;
-    }
-    ///State transition - sets the `accent_foreground` field to Set
-    pub struct SetAccentForeground<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccentForeground<S> {}
-    impl<S: State> State for SetAccentForeground<S> {
-        type Background = S::Background;
-        type Foreground = S::Foreground;
-        type AccentForeground = Set<members::accent_foreground>;
-        type Accent = S::Accent;
+        type Foreground = Unset;
+        type Background = Unset;
+        type AccentForeground = Unset;
     }
     ///State transition - sets the `accent` field to Set
     pub struct SetAccent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccent<S> {}
     impl<S: State> State for SetAccent<S> {
-        type Background = S::Background;
-        type Foreground = S::Foreground;
-        type AccentForeground = S::AccentForeground;
         type Accent = Set<members::accent>;
+        type Foreground = S::Foreground;
+        type Background = S::Background;
+        type AccentForeground = S::AccentForeground;
+    }
+    ///State transition - sets the `foreground` field to Set
+    pub struct SetForeground<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForeground<S> {}
+    impl<S: State> State for SetForeground<S> {
+        type Accent = S::Accent;
+        type Foreground = Set<members::foreground>;
+        type Background = S::Background;
+        type AccentForeground = S::AccentForeground;
+    }
+    ///State transition - sets the `background` field to Set
+    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBackground<S> {}
+    impl<S: State> State for SetBackground<S> {
+        type Accent = S::Accent;
+        type Foreground = S::Foreground;
+        type Background = Set<members::background>;
+        type AccentForeground = S::AccentForeground;
+    }
+    ///State transition - sets the `accent_foreground` field to Set
+    pub struct SetAccentForeground<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccentForeground<S> {}
+    impl<S: State> State for SetAccentForeground<S> {
+        type Accent = S::Accent;
+        type Foreground = S::Foreground;
+        type Background = S::Background;
+        type AccentForeground = Set<members::accent_foreground>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `background` field
-        pub struct background(());
-        ///Marker type for the `foreground` field
-        pub struct foreground(());
-        ///Marker type for the `accent_foreground` field
-        pub struct accent_foreground(());
         ///Marker type for the `accent` field
         pub struct accent(());
+        ///Marker type for the `foreground` field
+        pub struct foreground(());
+        ///Marker type for the `background` field
+        pub struct background(());
+        ///Marker type for the `accent_foreground` field
+        pub struct accent_foreground(());
     }
 }
 
@@ -210,10 +204,10 @@ where
 impl<'a, S> BasicBuilder<'a, S>
 where
     S: basic_state::State,
-    S::Background: basic_state::IsSet,
-    S::Foreground: basic_state::IsSet,
-    S::AccentForeground: basic_state::IsSet,
     S::Accent: basic_state::IsSet,
+    S::Foreground: basic_state::IsSet,
+    S::Background: basic_state::IsSet,
+    S::AccentForeground: basic_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Basic<'a> {
@@ -243,9 +237,7 @@ where
     }
 }
 
-fn lexicon_doc_site_standard_theme_basic() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_site_standard_theme_basic() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("site.standard.theme.basic"),
@@ -255,71 +247,79 @@ fn lexicon_doc_site_standard_theme_basic() -> ::jacquard_lexicon::lexicon::Lexic
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(
+                    ::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("background"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("foreground"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("accent"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accentForeground")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accentForeground",
                             ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "background",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "foreground",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("site.standard.theme.color#rgb")
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map
+                        ]),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("accent"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![::jacquard_common::CowStr::new_static(
+                                            "site.standard.theme.color#rgb",
+                                        )],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "accentForeground",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![::jacquard_common::CowStr::new_static(
+                                            "site.standard.theme.color#rgb",
+                                        )],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "background",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![::jacquard_common::CowStr::new_static(
+                                            "site.standard.theme.color#rgb",
+                                        )],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "foreground",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![::jacquard_common::CowStr::new_static(
+                                            "site.standard.theme.color#rgb",
+                                        )],
+                                        closed: None,
+                                    },
+                                ),
+                            );
+                            map
+                        },
                     },
-                }),
+                ),
             );
             map
         },
