@@ -135,8 +135,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 
 - ["the most straightforward interface to atproto I've encountered so far."](https://bsky.app/profile/offline.mountainherder.xyz/post/3m3xwewzs3k2v) - @offline.mountainherder.xyz
 - "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)
-- ["This is what your library allowed me to do in an hour!!! Thank you!!!"](https://bsky.app/profile/desertthunder.dev/post/3mhhbcula6224)
- - @desertthunder.dev
+- ["This is what your library allowed me to do in an hour!!! Thank you!!!"](https://bsky.app/profile/desertthunder.dev/post/3mhhbcula6224) - @desertthunder.dev
 
 
 ## Development

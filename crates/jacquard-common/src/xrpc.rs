@@ -13,6 +13,9 @@
 #[cfg(feature = "streaming")]
 pub mod streaming;
 
+/// Hand-written XRPC types for com.atproto endpoints (bootstrap types).
+pub mod atproto;
+
 use alloc::borrow::ToOwned;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
